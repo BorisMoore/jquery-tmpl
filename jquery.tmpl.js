@@ -17,7 +17,13 @@
 		
 		// This will allow us to do: .append( "template", dataObject )
 		domManip: function( args ) {
-			if ( args.length === 2 && typeof args[1] !== "string" ) {
+			// This appears to be a bug in the appendTo, etc. implementation
+			// it should be doing .call() instead of .apply(). See #6227
+			if ( args.length > 1 && args[0].nodeType ) {
+				arguments[0] = [ jQuery.makeArray(args) ];
+			}
+
+			if ( args.length === 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
 				arguments[0] = [ jQuery.render( args[0], args[1] ) ];
 			}
 			
@@ -47,11 +53,11 @@
 
 			if ( jQuery.isArray( data ) ) {
 				return jQuery.map( data, function( data, i ) {
-					return jQuery.makeArray( fn( jQuery, data, i ) );
+					return fn( jQuery, data, i );
 				});
 
 			} else {
-				return jQuery.makeArray( fn( jQuery, data, 0 ) );
+				return fn( jQuery, data, 0 );
 			}
 		},
 		
@@ -65,6 +71,7 @@
 		 */
 
 		// Some easy-to-use pre-built functions
+		// You can extend it with your own methods here (like $id, for example)
 		tmplFn: {
 			html: function() {
 				jQuery._.push.apply( jQuery._, arguments );
@@ -77,13 +84,8 @@
 		},
 
 		// A store for the templating string being built
+		// NOTE: How will this work if we're doing a template in a template?
 		_: null,
-
-		/*
-		 * For example, someone could do:
-		 *   jQuery.templates.foo = jQuery.tmpl("some long templating string");
-		 *   $("#test").append("foo", data);
-		 */
 		
 		tmpl: function tmpl(str, data, i) {
 			// Generate a reusable function that will serve as a template
@@ -103,42 +105,10 @@
 					.split("<%").join("');")
 					.split("%>").join("_.push('")
 
-				+ "');}}return $.buildFragment([_.join('')]).fragment.cloneNode(true).childNodes;");
+				+ "');}}return $(_.join('')).get();");
 
 			// Provide some basic currying to the user
 			return data ? fn( jQuery, data, i ) : fn;
-		},
-
-		// Copied from jQuery core - this should be exposed by jQuery itself
-		buildFragment: function( args, nodes, scripts ) {
-			var fragment, cacheable, cacheresults,
-				doc = (nodes && nodes[0] ? nodes[0].ownerDocument || nodes[0] : document);
-
-			// Only cache "small" (1/2 KB) strings that are associated with the main document
-			// Cloning options loses the selected state, so don't cache them
-			// IE 6 doesn't like it when you put <object> or <embed> elements in a fragment
-			// Also, WebKit does not clone 'checked' attributes on cloneNode, so don't cache
-			if ( args.length === 1 && typeof args[0] === "string" && args[0].length < 512 && doc === document ) {
-	
-				cacheable = true;
-				cacheresults = jQuery.fragments[ args[0] ];
-				if ( cacheresults ) {
-					if ( cacheresults !== 1 ) {
-						fragment = cacheresults;
-					}
-				}
-			}
-
-			if ( !fragment ) {
-				fragment = doc.createDocumentFragment();
-				jQuery.clean( args, doc, fragment, scripts );
-			}
-
-			if ( cacheable ) {
-				jQuery.fragments[ args[0] ] = cacheresults ? fragment : 1;
-			}
-
-			return { fragment: fragment, cacheable: cacheable };
 		}
 	});
 })(jQuery);
