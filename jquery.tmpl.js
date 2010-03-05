@@ -64,10 +64,10 @@
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
 			var fn = new Function("jQuery","obj",
-				"var p=[],print=function(){p.push.apply(p,arguments);};" +
+				"var p=[],$=jQuery,print=function(){p.push.apply(p,arguments);};" +
 
 				// Introduce the data as local variables using with(){}
-				"with(jQuery){with(obj){p.push('" +
+				"with(obj){p.push('" +
 
 				// Convert the template into pure JavaScript
 				str.replace(/[\r\t\n]/g, " ")
@@ -78,7 +78,7 @@
 					.split("<%").join("');")
 					.split("%>").join("p.push('")
 
-				+ "');}}return p.join('');");
+				+ "');}return p.join('');");
 
 			// Provide some basic currying to the user
 			return data ? fn( jQuery, data ) : fn;
