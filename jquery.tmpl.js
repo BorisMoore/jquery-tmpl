@@ -53,7 +53,28 @@
 		
 		// You can stick pre-built template functions here
 		templates: {},
-		
+
+		/*
+		 * For example, someone could do:
+		 *   jQuery.templates.foo = jQuery.tmpl("some long templating string");
+		 *   $("#test").append("foo", data);
+		 */
+
+		// Some easy-to-use pre-built functions
+		tmplFn: {
+			html: function() {
+				jQuery._.push.apply( jQuery._, arguments );
+			},
+			text: function() {
+				jQuery._.push.apply( jQuery._, jQuery.map(arguments, function(str) {
+					return document.createTextNode(str).nodeValue;
+				}) );
+			}
+		},
+
+		// A store for the templating string being built
+		_: null,
+
 		/*
 		 * For example, someone could do:
 		 *   jQuery.templates.foo = jQuery.tmpl("some long templating string");
@@ -64,10 +85,10 @@
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
 			var fn = new Function("jQuery","obj",
-				"var p=[],$=jQuery,print=function(){p.push.apply(p,arguments);};" +
+				"var $=jQuery,_=$._=[];" +
 
 				// Introduce the data as local variables using with(){}
-				"with(obj){p.push('" +
+				"with($.tmplFn){with(obj){_.push('" +
 
 				// Convert the template into pure JavaScript
 				str.replace(/[\r\t\n]/g, " ")
@@ -76,9 +97,9 @@
 					.split("\t").join("'")
 					.replace(/<%=(.+?)%>/g, "',$1,'")
 					.split("<%").join("');")
-					.split("%>").join("p.push('")
+					.split("%>").join("_.push('")
 
-				+ "');}return p.join('');");
+				+ "');}}return _.join('');");
 
 			// Provide some basic currying to the user
 			return data ? fn( jQuery, data ) : fn;

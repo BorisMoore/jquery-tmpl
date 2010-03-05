@@ -15,12 +15,15 @@ jQuery(function(){
 	
 	var tmpl = '<li><a href="<%= url %>"><%= name %></a> (<%= cities.join(", ") %>)</li>';
 
-
 	$("#sometmpl")
         	.render( dataObject ) // Returns a LI with all the data filled in
         	.appendTo("ul");
 	
 	$("#sometmpl")
+        	.render( arrayOfDataObjects ) // Returns two LIs with data filled in
+        	.appendTo("ul");
+
+	$("#sometmpl2")
         	.render( arrayOfDataObjects ) // Returns two LIs with data filled in
         	.appendTo("ul");
 	
@@ -33,6 +36,13 @@ jQuery(function(){
 <script id="sometmpl" type="text/html">
         <li><a href="<%= url %>"><%= name %></a>
                 (<%= cities.join(", ") %>)</li>
+</script>
+
+<script id="sometmpl2" type="text/html">
+	<li><a href="<%= url %>"><%= name %></a> Cities:
+	<% for ( var i = 0; i < cities.length; i++ ) {
+		text( cities[i] );
+	} %></li>
 </script>
 
 <ul></ul>
