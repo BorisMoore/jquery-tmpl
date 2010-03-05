@@ -10,14 +10,8 @@
 	
 	jQuery.fn.extend({
 		render: function( data ) {
-			if ( !jQuery.isArray(data) ) {
-				data = [ data ];
-			}
-			
 			return this.map(function(i, tmpl){
-				return jQuery.map( data, function( data ){
-					return jQuery.render( tmpl, data );
-				});
+				return jQuery.render( tmpl, data );
 			});
 		},
 		
@@ -44,11 +38,21 @@
 				var node = tmpl, elemData = jQuery.data( node );
 				fn = elemData.tmpl || jQuery.tmpl( node.innerHTML );
 			}
+
+			fn = fn || jQuery.tmpl( tmpl );
 			
 			// We assume that if the template string is being passed directly
 			// in the user doesn't want it cached. They can stick it in
 			// jQuery.templates to cache it.
-			return (fn || jQuery.tmpl( tmpl ))( jQuery, data );
+
+			if ( jQuery.isArray( data ) ) {
+				return jQuery.map( data, function( data, i ) {
+					return jQuery.makeArray( fn( jQuery, data, i ) );
+				});
+
+			} else {
+				return jQuery.makeArray( fn( jQuery, data, 0 ) );
+			}
 		},
 		
 		// You can stick pre-built template functions here
@@ -81,14 +85,14 @@
 		 *   $("#test").append("foo", data);
 		 */
 		
-		tmpl: function tmpl(str, data) {
+		tmpl: function tmpl(str, data, i) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
-			var fn = new Function("jQuery","obj",
-				"var $=jQuery,_=$._=[];" +
+			var fn = new Function("jQuery","$data","$i",
+				"var $=jQuery,_=$._=[];_.data=$data;_.index=$i;" +
 
 				// Introduce the data as local variables using with(){}
-				"with($.tmplFn){with(obj){_.push('" +
+				"with($.tmplFn){with($data){_.push('" +
 
 				// Convert the template into pure JavaScript
 				str.replace(/[\r\t\n]/g, " ")
@@ -99,10 +103,42 @@
 					.split("<%").join("');")
 					.split("%>").join("_.push('")
 
-				+ "');}}return _.join('');");
+				+ "');}}return $.buildFragment([_.join('')]).fragment.cloneNode(true).childNodes;");
 
 			// Provide some basic currying to the user
-			return data ? fn( jQuery, data ) : fn;
+			return data ? fn( jQuery, data, i ) : fn;
+		},
+
+		// Copied from jQuery core - this should be exposed by jQuery itself
+		buildFragment: function( args, nodes, scripts ) {
+			var fragment, cacheable, cacheresults,
+				doc = (nodes && nodes[0] ? nodes[0].ownerDocument || nodes[0] : document);
+
+			// Only cache "small" (1/2 KB) strings that are associated with the main document
+			// Cloning options loses the selected state, so don't cache them
+			// IE 6 doesn't like it when you put <object> or <embed> elements in a fragment
+			// Also, WebKit does not clone 'checked' attributes on cloneNode, so don't cache
+			if ( args.length === 1 && typeof args[0] === "string" && args[0].length < 512 && doc === document ) {
+	
+				cacheable = true;
+				cacheresults = jQuery.fragments[ args[0] ];
+				if ( cacheresults ) {
+					if ( cacheresults !== 1 ) {
+						fragment = cacheresults;
+					}
+				}
+			}
+
+			if ( !fragment ) {
+				fragment = doc.createDocumentFragment();
+				jQuery.clean( args, doc, fragment, scripts );
+			}
+
+			if ( cacheable ) {
+				jQuery.fragments[ args[0] ] = cacheresults ? fragment : 1;
+			}
+
+			return { fragment: fragment, cacheable: cacheable };
 		}
 	});
 })(jQuery);
