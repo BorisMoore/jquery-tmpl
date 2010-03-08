@@ -13,8 +13,7 @@ jQuery(function(){
 	
 	var arrayOfDataObjects = [ dataObject, dataObject, dataObject ];
 	
-	var tmpl = '<li>{%= $i %}) <a href="{%= url %}">{%= name %}</a> ({%= cities.join(", ") %})</li>';
-
+	var tmpl = '<li>{%= $i %}) <a href="{%= url %}">{%= name %}</a> {%= $context.options.cities ? ("("+cities.join(", ")+")") : "" %}</li>';
 	$("#sometmpl")
         	.render( dataObject ) // Returns a LI with all the data filled in
         	.appendTo("ul");
@@ -26,12 +25,16 @@ jQuery(function(){
 	$("#sometmpl2")
         	.render( arrayOfDataObjects ) // Returns multiple LIs with data filled in
         	.appendTo("ul");
+
+	$("#sometmpl3")
+        	.render( arrayOfDataObjects, { cities: false } ) // Uses parameters and $context
+        	.appendTo("ul");
 	
 	// Appends one LI, filled with data, into the UL
 	$("ul").append( tmpl, dataObject );
 
 	// Appends multiple LI, filled with data, into the UL
-	$("ul").append( tmpl, arrayOfDataObjects );
+	$("ul").append( tmpl, arrayOfDataObjects, { cities: false } );
 });
 </script>
 
@@ -45,6 +48,16 @@ jQuery(function(){
 	{% for ( var i = 0; i < cities.length; i++ ) {
 		text( cities[i] );
 	} %}</li>
+</script>
+
+<script id="sometmpl3" type="text/html">
+	<li>{%= $i %} of {%= $context.data.length-1 %}) <a href="{%= url %}">{%= name %}</a> 
+	{% if ($context.options.cities) { %}
+	Cities:
+	{%  for ( var i = 0; i < cities.length; i++ ) {
+		    text( cities[i] );
+	    }
+	   } %}</li>
 </script>
 
 <ul></ul>

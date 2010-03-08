@@ -9,9 +9,9 @@
 	var oldManip = jQuery.fn.domManip;
 	
 	jQuery.fn.extend({
-		render: function( data ) {
+		render: function( data, options ) {
 			return this.map(function(i, tmpl){
-				return jQuery.render( tmpl, data );
+				return jQuery.render( tmpl, data, options );
 			});
 		},
 		
@@ -23,8 +23,8 @@
 				arguments[0] = [ jQuery.makeArray(args) ];
 			}
 
-			if ( args.length === 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
-				arguments[0] = [ jQuery.render( args[0], args[1] ) ];
+			if ( args.length >= 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
+				arguments[0] = [ jQuery.render( args[0], args[1], args[2] ) ];
 			}
 			
 			return oldManip.apply( this, arguments );
@@ -32,7 +32,7 @@
 	});
 	
 	jQuery.extend({
-		render: function( tmpl, data ) {
+		render: function( tmpl, data, options ) {
 			var fn;
 			
 			// Use a pre-defined template, if available
@@ -51,13 +51,22 @@
 			// in the user doesn't want it cached. They can stick it in
 			// jQuery.templates to cache it.
 
+			var context = {
+                data: data,
+                index: 0,
+                dataItem: data,
+                options: options || {}
+			};
+
 			if ( jQuery.isArray( data ) ) {
 				return jQuery.map( data, function( data, i ) {
-					return fn( jQuery, data, i );
+                    context.index = i;
+                    context.dataItem = data;
+					return fn( jQuery, context );
 				});
 
 			} else {
-				return fn( jQuery, data, 0 );
+				return fn( jQuery, context );
 			}
 		},
 		
@@ -74,6 +83,7 @@
 		// You can extend it with your own methods here (like $id, for example)
 		tmplFn: {
 			html: function() {
+                // access to context: jQuery._.context === $context
 				jQuery._.push.apply( jQuery._, arguments );
 			},
 			text: function() {
@@ -87,12 +97,12 @@
 		// NOTE: How will this work if we're doing a template in a template?
 		_: null,
 		
-		tmpl: function tmpl(str, data, i) {
+		tmpl: function tmpl(str, data, i, options) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
-			
-			var fn = new Function("jQuery","$data","$i",
-				"var $=jQuery,_=$._=[];_.data=$data;_.index=$i;" +
+
+			var fn = new Function("jQuery","$context",
+				"var $=jQuery,$data=$context.dataItem,$i=$context.index,_=$._=[];_.context=$context;" +
 
 				// Introduce the data as local variables using with(){}
 				"with($.tmplFn){with($data){_.push('" +
@@ -118,7 +128,16 @@
 				+ "');}}return $(_.join('')).get();");
 
 			// Provide some basic currying to the user
-			return data ? fn( jQuery, data, i ) : fn;
+			// TODO: When currying, the fact that only the dataItem and index are passed
+			// in means we cannot know the value of 'data' although we know 'dataItem' and 'index'
+			// Ok? Or, if this api took the array and index, we could know all 3 values.
+			// e.g. instead of this:
+			//  tmpl(tmpl, foo[i], i)
+			// this:
+			//  tmpl(tmpl, foo, i)
+			// If you intend data to be as is,
+			//  tmpl(tmpl, foo) or tmpl(tmpl, foo, null, options)
+			return data ? fn( jQuery, { data: null, dataItem: data, index: i, options: options } ) : fn;
 		}
 	});
 })(jQuery);
