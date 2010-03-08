@@ -90,6 +90,7 @@
 		tmpl: function tmpl(str, data, i) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
+			
 			var fn = new Function("jQuery","$data","$i",
 				"var $=jQuery,_=$._=[];_.data=$data;_.index=$i;" +
 
@@ -98,12 +99,21 @@
 
 				// Convert the template into pure JavaScript
 				str.replace(/[\r\t\n]/g, " ")
-					.replace(/'(?=[^%]*%>)/g,"\t")
+                    // protect single quotes that are within expressions
+                    // BUG: Fails to protect the first quote in: <%= foo + '%' %>
+                    // No regex solution I can think of -- may require manual parsing
+                    // using indexOf, etc (which may be just as fast?)
+					.replace(/'(?=[^%]*%})/g,"\t")
+					// escape other single quotes
 					.split("'").join("\\'")
+					// put back protected quotes
 					.split("\t").join("'")
-					.replace(/<%=(.+?)%>/g, "',$1,'")
-					.split("<%").join("');")
-					.split("%>").join("_.push('")
+					// convert inline expressions into inline parameters
+					.replace(/{%=(.+?)%}/g, "',($1),'")
+					// convert start of code blocks into end of push()
+					.split("{%").join("');")
+					// and end of code blocks into start of push()
+					.split("%}").join("_.push('")
 
 				+ "');}}return $(_.join('')).get();");
 
