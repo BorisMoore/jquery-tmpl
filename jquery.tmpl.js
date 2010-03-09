@@ -6,8 +6,8 @@
  */
 (function(jQuery){
 	// Override the DOM manipulation function
-	var oldManip = jQuery.fn.domManip;
-	
+	var oldManip = jQuery.fn.domManip,
+		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/;
 	jQuery.fn.extend({
 		render: function( data, options ) {
 			return this.map(function(i, tmpl){
@@ -33,40 +33,64 @@
 	
 	jQuery.extend({
 		render: function( tmpl, data, options ) {
-			var fn;
+			var fn, node;
 			
-			// Use a pre-defined template, if available
-			if ( jQuery.templates[ tmpl ] ) {
+			if ( typeof tmpl === "string" ) {
+				// Use a pre-defined template, if available
 				fn = jQuery.templates[ tmpl ];
-				
-			// We're pulling from a script node
+				if ( !fn && !htmlExpr.test( tmpl ) ) {
+					// it is a selector
+					node = jQuery( tmpl ).get( 0 );
+				}
+			} else if ( tmpl instanceof jQuery ) {
+				node = tmpl.get( 0 );
 			} else if ( tmpl.nodeType ) {
-				var node = tmpl, elemData = jQuery.data( node );
-				fn = elemData.tmpl || jQuery.tmpl( node.innerHTML );
+				node = tmpl;
 			}
-
-			fn = fn || jQuery.tmpl( tmpl );
+			
+			if ( !fn && node ) {
+				var elemData = jQuery.data( node );
+				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node.innerHTML ));
+			}
 			
 			// We assume that if the template string is being passed directly
 			// in the user doesn't want it cached. They can stick it in
 			// jQuery.templates to cache it.
 
-			var context = {
-                data: data,
-                index: 0,
-                dataItem: data,
-                options: options || {}
-			};
+			fn = fn || jQuery.tmpl( tmpl );
+
+			var rendering,
+				rendered,
+				context = {
+					data: data,
+					index: 0,
+					dataItem: data,
+					options: options || {}
+				};
+			if ( options ) {
+				rendering = options.rendering;
+				rendered = options.rendered;
+			}
+
+			function renderItem() {
+				var dom = null;
+				if ( !rendering || rendering( context ) !== false) {
+					var dom = fn( jQuery, context );
+					if ( rendered ) 
+						rendered( context, dom );
+				}
+				return dom;
+			}
 
 			if ( jQuery.isArray( data ) ) {
 				return jQuery.map( data, function( data, i ) {
-                    context.index = i;
-                    context.dataItem = data;
-					return fn( jQuery, context );
+					context.index = i;
+					context.dataItem = data;
+					return renderItem( );
 				});
 
 			} else {
-				return fn( jQuery, context );
+				return renderItem( );
 			}
 		},
 		
@@ -83,7 +107,10 @@
 		// You can extend it with your own methods here (like $id, for example)
 		tmplFn: {
 			html: function() {
-                // access to context: jQuery._.context === $context
+				// access to context: jQuery._.context === $context (data, dataItem, index, options)
+				// TODO: jQuery._.context seems backwards.
+				// Perhaps jQuery.tmplContext would make more sense
+				// (e.g. jQuery.tmplContext.html.push("foo"))
 				jQuery._.push.apply( jQuery._, arguments );
 			},
 			text: function() {
@@ -95,6 +122,11 @@
 
 		// A store for the templating string being built
 		// NOTE: How will this work if we're doing a template in a template?
+		// NOTE: Not actually a problem when using rendered() callback to create
+		//       a nested template since outer template is complete by then.
+		//       Only a problem if code within a template renders one, but that
+		//       is hard to imagine since that code wouldn't have anywhere to 
+		//       append the resulting nodes.
 		_: null,
 		
 		tmpl: function tmpl(str, data, i, options) {
@@ -109,10 +141,10 @@
 
 				// Convert the template into pure JavaScript
 				str.replace(/[\r\t\n]/g, " ")
-                    // protect single quotes that are within expressions
-                    // BUG: Fails to protect the first quote in: <%= foo + '%' %>
-                    // No regex solution I can think of -- may require manual parsing
-                    // using indexOf, etc (which may be just as fast?)
+					// protect single quotes that are within expressions
+					// BUG: Fails to protect the first quote in: <%= foo + '%' %>
+					// No regex solution I can think of -- may require manual parsing
+					// using indexOf, etc (which may be just as fast?)
 					.replace(/'(?=[^%]*%})/g,"\t")
 					// escape other single quotes
 					.split("'").join("\\'")

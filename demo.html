@@ -10,6 +10,13 @@ jQuery(function(){
                 	"San Francisco, CA"
         	]
 	};
+	var products = [
+        { name: "Widget 1", price: 12.99, special: false },
+        { name: "Deleted Widget", price: 12.99, special: false, deleted: true },
+        { name: "Widget 2", price: 9.99,  special: true, actualPrice: 5.99 },
+        { name: "Widget 3", price: 35.59, special: true, actualPrice: 19.95 },
+        { name: "Widget 4", price: 12.99, special: false }
+	];
 	
 	var arrayOfDataObjects = [ dataObject, dataObject, dataObject ];
 	
@@ -35,6 +42,43 @@ jQuery(function(){
 
 	// Appends multiple LI, filled with data, into the UL
 	$("ul").append( tmpl, arrayOfDataObjects, { cities: false } );
+	
+	// Demonstrate using rendered and rendering callbacks
+	function rendering( context ) {
+        // called before each item renders
+        var item = context.dataItem;
+
+        // return false to cancel rendering of this item altogether
+        if (item.deleted) return false;
+        
+        // setup additional information to be used more clearly within the template
+        // (avoids complex expressions)
+        item.tax = Math.floor( item.price * 8.75 ) / 100;
+	}
+	function rendered( context, dom ) {
+        // called after each item renders but before added to the dom
+        var dataItem = context.dataItem;
+        if ( dataItem.special ) 
+            jQuery(dom).click(function() {
+                alert( dataItem.name + " actually costs: $" + dataItem.actualPrice );
+            });
+	}
+	$("#producttemp")
+        	.render( products, {
+                rendering: rendering,
+                rendered: rendered } ) // Callbacks
+        	.appendTo("ul");
+        	
+    // demonstrate using nested templates
+	$("#sometmpl4")
+        	.render( arrayOfDataObjects, {
+                rendered: function( context, dom ) {
+                    jQuery(dom).find(".cities")
+                        .append( "#citytemplate", context.dataItem.cities );
+                }
+        	}) 
+        	.appendTo("ul");
+    	
 });
 </script>
 
@@ -58,6 +102,27 @@ jQuery(function(){
 		    text( cities[i] );
 	    }
 	   } %}</li>
+</script>
+
+<script id="sometmpl4" type="text/html">
+	<li>{%= $i %}) <a href="{%= url %}">{%= name %}</a> Cities:
+	<ul class='cities'></ul>
+	</li>
+</script>
+
+<script id="citytemplate" type="text/html">
+    <li>{%= $context.dataItem %}</li>
+</script>
+
+
+<script id="producttemp" type="text/html">
+    <li>
+        {%= name %}
+        Price: ${%= price %} (tax: ${%= tax %})
+        {% if ( special ) { %}
+        <em>Actual price is too low for us to show! Click here to see it.</em>
+        {% } %}
+    </li>
 </script>
 
 <ul></ul>
