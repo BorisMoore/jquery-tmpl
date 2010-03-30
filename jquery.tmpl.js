@@ -70,17 +70,30 @@
 		 *   $("#test").append("foo", data);
 		 */
 
-		// Some easy-to-use pre-built functions
-		// You can extend it with your own methods here (like $id, for example)
-		tmplFn: {
-			html: function() {
-				jQuery._.push.apply( jQuery._, arguments );
+		tmplcmd: {
+			each: {
+				_default: [ null, "$i" ],
+				prefix: "jQuery.each($1,function($2){",
+				suffix: "});"
 			},
-			text: function() {
-				jQuery._.push.apply( jQuery._, jQuery.map(arguments, function(str) {
-					return document.createTextNode(str).nodeValue;
-				}) );
+			if: {
+				prefix: "if(($1)!=null){",
+				suffix: "}"
+			},
+			else: {
+				prefix: "}else{"
+			},
+			html: {
+				prefix: "_.push($1);"
+			},
+			"=": {
+				_default: [ "this" ],
+				prefix: "_.push($.encode($1));"
 			}
+		},
+
+		encode: function( text ) {
+			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
 		},
 
 		// A store for the templating string being built
@@ -94,18 +107,26 @@
 				"var $=jQuery,_=$._=[];_.data=$data;_.index=$i;" +
 
 				// Introduce the data as local variables using with(){}
-				"with($.tmplFn){with($data){_.push('" +
+				"with($data){_.push('" +
 
 				// Convert the template into pure JavaScript
-				str.replace(/[\r\t\n]/g, " ")
-					.replace(/'(?=[^%]*%>)/g,"\t")
-					.split("'").join("\\'")
-					.split("\t").join("'")
-					.replace(/<%=(.+?)%>/g, "',$1,'")
-					.split("<%").join("');")
-					.split("%>").join("_.push('")
+				str
+					.replace(/[\r\t\n]/g, " ")
+					.replace(/\${([^}]*)}/g, "{{= $1}}")
+					.replace(/{{(\/?)(\w+|.)(?:\((.*?)\))?(?: (.*?))?}}/g, function(all, slash, type, fnargs, args) {
+						var tmpl = jQuery.tmplcmd[ type ];
 
-				+ "');}}return $(_.join('')).get();");
+						if ( !tmpl ) {
+							throw "Template not found: " + type;
+						}
+
+						var def = tmpl._default;
+
+						return "');" + tmpl[slash ? "suffix" : "prefix"]
+							.split("$1").join(args || def[0])
+							.split("$2").join(fnargs || def[1]) + "_.push('";
+					})
+				+ "');}return $(_.join('')).get();");
 
 			// Provide some basic currying to the user
 			return data ? fn( jQuery, data, i ) : fn;
