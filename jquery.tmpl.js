@@ -96,15 +96,11 @@
 			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
 		},
 
-		// A store for the templating string being built
-		// NOTE: How will this work if we're doing a template in a template?
-		_: null,
-		
-		tmpl: function tmpl(str, data, i) {
+		tmpl: function(str, data, i) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
 			var fn = new Function("jQuery","$data","$i",
-				"var $=jQuery,_=$._=[];_.data=$data;_.index=$i;" +
+				"var $=jQuery,_=[];_.data=$data;_.index=$i;" +
 
 				// Introduce the data as local variables using with(){}
 				"with($data){_.push('" +
