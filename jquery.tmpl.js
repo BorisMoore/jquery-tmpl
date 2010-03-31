@@ -84,7 +84,7 @@
 				prefix: "}else{"
 			},
 			html: {
-				prefix: "_.push($1);"
+				prefix: "_.push(typeof $1==='function'?$1.call(this):$1);"
 			},
 			"=": {
 				_default: [ "this" ],
