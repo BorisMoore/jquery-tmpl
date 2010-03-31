@@ -3,8 +3,15 @@
 <script>
 jQuery(function(){
 	var dataObject = {
-        	name: "John Resig",
+        	name: function() {
+			return this.firstName + " " + this.lastName;
+		},
+        	firstName: "John",
+		lastName: "Resig",
         	url: "http://ejohn.org/",
+		cityJoin: function() {
+			return this.cities.join(", ");
+		},
         	cities: [
                 	"Boston, MA",
                 	"San Francisco, CA"
@@ -13,7 +20,7 @@ jQuery(function(){
 	
 	var arrayOfDataObjects = [ dataObject, dataObject, dataObject ];
 	
-	var tmpl = '<li>${$i}) <a href="${url}">${name}</a> (${cities.join(", ")})</li>';
+	var tmpl = '<li>${$i}) <a href="${url}">${name}</a> (${cityJoin})</li>';
 
 	$("#sometmpl")
         	.render( dataObject ) // Returns a LI with all the data filled in
@@ -36,7 +43,7 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl" type="text/html">
-	<li>${$i}) <a href="${url}">${name}</a> (${cities.join(", ")})</li>
+	<li>${$i}) <a href="${url}">${name}</a> (${cityJoin})</li>
 </script>
 
 <script id="sometmpl2" type="text/html">
