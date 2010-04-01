@@ -77,7 +77,7 @@
 				suffix: "}});"
 			},
 			if: {
-				prefix: "if(($1)!=null){",
+				prefix: "if($1){",
 				suffix: "}"
 			},
 			else: {
