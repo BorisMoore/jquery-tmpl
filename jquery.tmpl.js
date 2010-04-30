@@ -6,7 +6,8 @@
  */
 (function(jQuery){
 	// Override the DOM manipulation function
-	var oldManip = jQuery.fn.domManip;
+	var oldManip = jQuery.fn.domManip,
+		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/;
 	
 	jQuery.fn.extend({
 		render: function( data, options ) {
@@ -33,35 +34,44 @@
 	
 	jQuery.extend({
 		render: function( tmpl, data, options ) {
-			var fn;
+			var fn, node;
 			
-			// Use a pre-defined template, if available
-			if ( jQuery.templates[ tmpl ] ) {
+			if ( typeof tmpl === "string" ) {
+				// Use a pre-defined template, if available
 				fn = jQuery.templates[ tmpl ];
-				
-			// We're pulling from a script node
+				if ( !fn && !htmlExpr.test( tmpl ) ) {
+					// it is a selector
+					node = jQuery( tmpl ).get( 0 );
+				}
+				else {
+					fn = jQuery.tmpl( tmpl );
+				}
+			} else if ( tmpl instanceof jQuery ) {
+				node = tmpl.get( 0 );
 			} else if ( tmpl.nodeType ) {
-				var node = tmpl, elemData = jQuery.data( node );
-				fn = elemData.tmpl || jQuery.tmpl( node.innerHTML );
+				node = tmpl;
 			}
-
-			fn = fn || jQuery.tmpl( tmpl );
+			
+			if ( !fn && node ) {
+				var elemData = jQuery.data( node );
+				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node.innerHTML ));
+			}
 			
 			// We assume that if the template string is being passed directly
 			// in the user doesn't want it cached. They can stick it in
 			// jQuery.templates to cache it.
 			
 			var context = {
-                data: data,
-                index: 0,
-                dataItem: data,
-                options: options || {}
+				data: data,
+				index: 0,
+				dataItem: data,
+				options: options || {}
 			};
 
 			if ( jQuery.isArray( data ) ) {
 				return jQuery.map( data, function( data, i ) {
-                    context.index = i;
-                    context.dataItem = data;
+					context.index = i;
+					context.dataItem = data;
 					return fn.call( data, jQuery, context );
 				});
 
@@ -135,15 +145,15 @@
 				+ "');};return $(_.join('')).get();");
 				
 			// Provide some basic currying to the user
-            // TODO: When currying, the fact that only the dataItem and index are passed
-            // in means we cannot know the value of 'data' although we know 'dataItem' and 'index'
-            // If this api took the array and index, we could know all 3 values.
-            // e.g. instead of this:
-            //  tmpl(tmpl, foo[i], i) // foo[i] passed in is the dataItem
-            // this:
-            //  tmpl(tmpl, foo, i) // foo[i] used internally to get dataItem
-            // If you intend data to be as is,
-            //  tmpl(tmpl, foo) or tmpl(tmpl, foo, null, options)			
+			// TODO: When currying, the fact that only the dataItem and index are passed
+			// in means we cannot know the value of 'data' although we know 'dataItem' and 'index'
+			// If this api took the array and index, we could know all 3 values.
+			// e.g. instead of this:
+			//  tmpl(tmpl, foo[i], i) // foo[i] passed in is the dataItem
+			// this:
+			//  tmpl(tmpl, foo, i) // foo[i] used internally to get dataItem
+			// If you intend data to be as is,
+			//  tmpl(tmpl, foo) or tmpl(tmpl, foo, null, options)			
 			return data ? fn.call( this, jQuery, { data: null, dataItem: data, index: i, options: options } ) : fn;
 		}
 	});
