@@ -9,9 +9,9 @@
 	var oldManip = jQuery.fn.domManip;
 	
 	jQuery.fn.extend({
-		render: function( data ) {
+		render: function( data, options ) {
 			return this.map(function(i, tmpl){
-				return jQuery.render( tmpl, data );
+				return jQuery.render( tmpl, data, options );
 			});
 		},
 		
@@ -23,8 +23,8 @@
 				arguments[0] = [ jQuery.makeArray(args) ];
 			}
 
-			if ( args.length === 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
-				arguments[0] = [ jQuery.render( args[0], args[1] ) ];
+			if ( args.length >= 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
+				arguments[0] = [ jQuery.render( args[0], args[1], args[2] ) ];
 			}
 			
 			return oldManip.apply( this, arguments );
@@ -32,7 +32,7 @@
 	});
 	
 	jQuery.extend({
-		render: function( tmpl, data ) {
+		render: function( tmpl, data, options ) {
 			var fn;
 			
 			// Use a pre-defined template, if available
@@ -50,14 +50,23 @@
 			// We assume that if the template string is being passed directly
 			// in the user doesn't want it cached. They can stick it in
 			// jQuery.templates to cache it.
+			
+			var context = {
+                data: data,
+                index: 0,
+                dataItem: data,
+                options: options || {}
+			};
 
 			if ( jQuery.isArray( data ) ) {
 				return jQuery.map( data, function( data, i ) {
-					return fn.call( data, jQuery, data, i );
+                    context.index = i;
+                    context.dataItem = data;
+					return fn.call( data, jQuery, context );
 				});
 
 			} else {
-				return fn.call( data, jQuery, data, 0 );
+				return fn.call( data, jQuery, context );
 			}
 		},
 		
@@ -84,11 +93,11 @@
 				prefix: "}else{"
 			},
 			"html": {
-				prefix: "_.push(typeof $1==='function'?$1.call(this):$1);"
+				prefix: "_.push(typeof ($1)==='function'?($1).call(this):$1);"
 			},
 			"=": {
 				_default: [ "this" ],
-				prefix: "_.push($.encode(typeof $1==='function'?$1.call(this):$1));"
+				prefix: "_.push($.encode(typeof ($1)==='function'?($1).call(this):$1));"
 			}
 		},
 
@@ -96,11 +105,12 @@
 			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
 		},
 
-		tmpl: function(str, data, i) {
+		tmpl: function(str, data, i, options) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
-			var fn = new Function("jQuery","$data","$i",
-				"var $=jQuery,_=[];_.data=$data;_.index=$i;" +
+			
+			var fn = new Function("jQuery","$context",
+				"var $=jQuery,$data=$context.dataItem,$i=$context.index,_=[];_.data=$data;_.index=$i;" +
 
 				// Introduce the data as local variables using with(){}
 				"with($data){_.push('" +
@@ -119,13 +129,22 @@
 						var def = tmpl._default;
 
 						return "');" + tmpl[slash ? "suffix" : "prefix"]
-							.split("$1").join(args || def[0])
-							.split("$2").join(fnargs || def[1]) + "_.push('";
+							.split("$1").join(args || (def ? def[0] : ""))
+							.split("$2").join(fnargs || (def ? def[1] : "")) + "_.push('";
 					})
-				+ "');}return $(_.join('')).get();");
-
+				+ "');};return $(_.join('')).get();");
+				
 			// Provide some basic currying to the user
-			return data ? fn.call( this, jQuery, data, i ) : fn;
+            // TODO: When currying, the fact that only the dataItem and index are passed
+            // in means we cannot know the value of 'data' although we know 'dataItem' and 'index'
+            // If this api took the array and index, we could know all 3 values.
+            // e.g. instead of this:
+            //  tmpl(tmpl, foo[i], i) // foo[i] passed in is the dataItem
+            // this:
+            //  tmpl(tmpl, foo, i) // foo[i] used internally to get dataItem
+            // If you intend data to be as is,
+            //  tmpl(tmpl, foo) or tmpl(tmpl, foo, null, options)			
+			return data ? fn.call( this, jQuery, { data: null, dataItem: data, index: i, options: options } ) : fn;
 		}
 	});
 })(jQuery);
