@@ -1,20 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+    <title></title>
+</head>
+<body>
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="jquery.tmpl.js"></script>
 <script>
 jQuery(function(){
 	var dataObject = {
         	name: function() {
-			return this.firstName + " " + this.lastName;
-		},
-        	firstName: "John",
-		lastName: "Resig",
-        	url: "http://ejohn.org/",
-		cityJoin: function() {
-			return this.cities.join(", ");
-		},
+    			return this.firstName + " " + this.lastName;
+    		},
+            firstName: "John",
+    		lastName: "Resig",
+            url: "http://ejohn.org/",
+    		cityJoin: function() {
+    			return this.cities.join(", ");
+    		},
         	cities: [
-                	"Boston, MA",
-                	"San Francisco, CA"
+            	"Boston, MA",
+            	"San Francisco, CA"
         	]
 	};
 	
@@ -55,15 +61,20 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl2" type="text/html">
-	<li>${$i}) <a href="${url}">${name}</a> Cities: {{each(i,city) cities}}${city}{{/each}}</li>
+	<li>${$i}) <a href="${url}">${name}</a> Cities: {{each(i,city) cities}}${city} {{/each}}</li>
 </script>
 
 <script id="sometmpl3" type="text/html">
-	<li>${$i} of ${$context.data.length-1}) <a href="${url}">${name}</a>
+	<li>${$i+1} of ${$context.data.length}) <a href="${url}">${name}</a>
 	{{if $context.options.cities}}
-	Cities: {{each(i,city) cities}}${city}{{/each}}
-	{{/if}}
+	Cities: {{each(i,city) cities}}${city} {{/each}}
+	{{else}}
+	No Cities
+    {{/if}}
 	</li>
 </script>
 
 <ul></ul>
+
+</body>
+</html>

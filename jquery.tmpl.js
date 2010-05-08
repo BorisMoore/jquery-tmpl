@@ -54,7 +54,7 @@
 			
 			if ( !fn && node ) {
 				var elemData = jQuery.data( node );
-				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node.innerHTML ));
+				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node ));
 			}
 			
 			// We assume that if the template string is being passed directly
@@ -113,18 +113,19 @@
 			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
 		},
 
-		tmpl: function(str, data, i, options) {
+		tmpl: function( markup ) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
-			
-			var fn = new Function("jQuery","$context",
+			if (markup.nodeType) markup = markup.innerHTML; 
+
+			return new Function("jQuery","$context",
 				"var $=jQuery,$data=$context.dataItem,$i=$context.index,_=[];_.data=$data;_.index=$i;" +
 
 				// Introduce the data as local variables using with(){}
 				"with($data){_.push('" +
 
 				// Convert the template into pure JavaScript
-				str
+				markup
 					.replace(/[\r\t\n]/g, " ")
 					.replace(/\${([^}]*)}/g, "{{= $1}}")
 					.replace(/{{(\/?)(\w+|.)(?:\((.*?)\))?(?: (.*?))?}}/g, function(all, slash, type, fnargs, args) {
@@ -141,18 +142,6 @@
 							.split("$2").join(fnargs || (def ? def[1] : "")) + "_.push('";
 					})
 				+ "');};return _;");
-				
-			// Provide some basic currying to the user
-			// TODO: When currying, the fact that only the dataItem and index are passed
-			// in means we cannot know the value of 'data' although we know 'dataItem' and 'index'
-			// If this api took the array and index, we could know all 3 values.
-			// e.g. instead of this:
-			//  tmpl(tmpl, foo[i], i) // foo[i] passed in is the dataItem
-			// this:
-			//  tmpl(tmpl, foo, i) // foo[i] used internally to get dataItem
-			// If you intend data to be as is,
-			//  tmpl(tmpl, foo) or tmpl(tmpl, foo, null, options)			
-			return data ? fn.call( this, jQuery, { data: null, dataItem: data, index: i, options: options } ) : fn;
 		}
 	});
 })(jQuery);
