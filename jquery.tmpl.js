@@ -66,19 +66,17 @@
 				index: 0,
 				dataItem: data,
 				options: options || {}
-			};
-
-			if ( jQuery.isArray( data ) ) {
-				return jQuery.map( data, function( data, i ) {
+			}; 
+            return jQuery((
+                jQuery.isArray( data ) ? 
+                jQuery.map( data, function( data, i ) {
 					context.index = i;
 					context.dataItem = data;
 					return fn.call( data, jQuery, context );
-				});
-
-			} else {
-				return fn.call( data, jQuery, context );
-			}
-		},
+				}) : 
+                fn.call( data, jQuery, context )
+            ).join("")).get();
+        },
 		
 		// You can stick pre-built template functions here
 		templates: {},
@@ -142,7 +140,7 @@
 							.split("$1").join(args || (def ? def[0] : ""))
 							.split("$2").join(fnargs || (def ? def[1] : "")) + "_.push('";
 					})
-				+ "');};return $(_.join('')).get();");
+				+ "');};return _;");
 				
 			// Provide some basic currying to the user
 			// TODO: When currying, the fact that only the dataItem and index are passed
