@@ -42,8 +42,7 @@
 				if ( !fn && !htmlExpr.test( tmpl ) ) {
 					// it is a selector
 					node = jQuery( tmpl ).get( 0 );
-				}
-				else {
+				} else {
 					fn = jQuery.tmpl( tmpl );
 				}
 			} else if ( tmpl instanceof jQuery ) {
@@ -55,11 +54,10 @@
 			if ( !fn && node ) {
 				var elemData = jQuery.data( node );
 				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node ));
+    			// Cache, if tmpl is a node. We assume that if the template string is 
+                // being passed directly in, the user doesn't want it cached. They can
+    			// stick it in jQuery.templates to cache it.
 			}
-			
-			// We assume that if the template string is being passed directly
-			// in the user doesn't want it cached. They can stick it in
-			// jQuery.templates to cache it.
 			
 			var context = {
 				data: data,
@@ -89,7 +87,6 @@
 
 		tmplcmd: {
 			"each": {
-				_default: [ null, "$i" ],
 				prefix: "jQuery.each($1,function($2){with(this){",
 				suffix: "}});"
 			},
@@ -119,10 +116,10 @@
 			if (markup.nodeType) markup = markup.innerHTML; 
 
 			return new Function("jQuery","$context",
-				"var $=jQuery,$data=$context.dataItem,$i=$context.index,_=[];_.data=$data;_.index=$i;" +
+				"var $=jQuery,$options=$context.options,$i=$context.index,_=[];" +
 
 				// Introduce the data as local variables using with(){}
-				"with($data){_.push('" +
+				"with(this){_.push('" +
 
 				// Convert the template into pure JavaScript
 				markup
@@ -135,11 +132,11 @@
 							throw "Template not found: " + type;
 						}
 
-						var def = tmpl._default;
+						var def = tmpl._default || [];
 
 						return "');" + tmpl[slash ? "suffix" : "prefix"]
-							.split("$1").join(args || (def ? def[0] : ""))
-							.split("$2").join(fnargs || (def ? def[1] : "")) + "_.push('";
+							.split("$1").join(args || def[0])
+							.split("$2").join(fnargs || def[1]) + "_.push('";
 					})
 				+ "');};return _;");
 		}
