@@ -54,9 +54,9 @@
 			if ( !fn && node ) {
 				var elemData = jQuery.data( node );
 				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node ));
-    			// Cache, if tmpl is a node. We assume that if the template string is 
-                // being passed directly in, the user doesn't want it cached. They can
-    			// stick it in jQuery.templates to cache it.
+				// Cache, if tmpl is a node. We assume that if the template string is 
+				// being passed directly in, the user doesn't want it cached. They can
+				// stick it in jQuery.templates to cache it.
 			}
 			
 			var context = {
@@ -65,16 +65,16 @@
 				dataItem: data,
 				options: options || {}
 			}; 
-            return jQuery((
-                jQuery.isArray( data ) ? 
-                jQuery.map( data, function( data, i ) {
+			return jQuery((
+				jQuery.isArray( data ) ? 
+				jQuery.map( data, function( data, i ) {
 					context.index = i;
 					context.dataItem = data;
 					return fn.call( data, jQuery, context );
 				}) : 
-                fn.call( data, jQuery, context )
-            ).join("")).get();
-        },
+				fn.call( data, jQuery, context )
+			).join("")).get();
+		},
 		
 		// You can stick pre-built template functions here
 		templates: {},
@@ -87,8 +87,8 @@
 
 		tmplcmd: {
 			"each": {
-				prefix: "jQuery.each($1,function($2){with(this){",
-				suffix: "}});"
+				prefix: "if(typeof($1)!==undef){jQuery.each($1,function($2){with(this){",
+				suffix: "}});}"
 			},
 			"if": {
 				prefix: "if($1){",
@@ -98,11 +98,11 @@
 				prefix: "}else{"
 			},
 			"html": {
-				prefix: "_.push(typeof ($1)==='function'?($1).call(this):$1);"
+				prefix: "if(typeof($1)!==undef){_.push(typeof($1)==='function'?($1).call(this):$1);}"
 			},
 			"=": {
 				_default: [ "this" ],
-				prefix: "_.push($.encode(typeof ($1)==='function'?($1).call(this):$1));"
+				prefix: "if(typeof($1)!==undef){_.push($.encode(typeof($1)==='function'?($1).call(this):$1));}"
 			}
 		},
 
@@ -116,13 +116,14 @@
 			if (markup.nodeType) markup = markup.innerHTML; 
 
 			return new Function("jQuery","$context",
-				"var $=jQuery,$options=$context.options,$i=$context.index,_=[];" +
+				"var undef='undefined',jQuery,$options=$context.options,$i=$context.index,_=[];" +
 
 				// Introduce the data as local variables using with(){}
 				"with(this){_.push('" +
 
 				// Convert the template into pure JavaScript
 				markup
+					.replace(/([\\'])/g, "\\$1")
 					.replace(/[\r\t\n]/g, " ")
 					.replace(/\${([^}]*)}/g, "{{= $1}}")
 					.replace(/{{(\/?)(\w+|.)(?:\((.*?)\))?(?: (.*?))?}}/g, function(all, slash, type, fnargs, args) {
