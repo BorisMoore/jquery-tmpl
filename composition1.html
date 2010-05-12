@@ -1,0 +1,73 @@
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="jquery.tmpl.js"></script>
+<script>
+$(function(){
+	var people = [
+		{
+			firstName: "John",
+			lastName: "Resig",
+			url: "http://ejohn.org/",
+			cities: [
+				{ name: "Boston", state: "MA" },
+				{ name: "San Francisco", state: "CA" }
+			],
+			name: getName
+		},
+		{
+			firstName: "Dave",
+			lastName: "Reed",
+			url: "http://dave.org/",
+			name: getName
+		},
+		{
+			firstName: "Boris",
+			lastName: "Moore",
+			url: "http://boris.org/",
+			cities: [
+				{ name: "Redmond", state: "WA" },
+				{ name: "Seattle", state: "WA" },
+				{ name: "New York", state: "NY" }
+			],
+			name: getName
+		}
+	];
+	
+	function getName( context ) {
+		return context.options.invert ? "<b>" + this.lastName + "</b>, " + this.firstName : this.firstName + " " + this.lastName;
+	}
+	
+	$.templates.valueLi = $.tmpl( "#valueLi" );
+	$.templates.cityLi = $.tmpl( "#cityLi" );
+
+	$("ul").append( "#composite", people, {
+		name: { label: "Name: ", invert: true },
+		first: { label: "First Name: " },
+		cities: { heading: "Favorite Cities" }
+	});
+});
+</script>
+
+<script id="composite" type="text/html">
+	<li>====================</li>
+	{{render(name, $options.name) $.templates.valueLi}}
+	{{render(firstName, $options.first) $.templates.valueLi}}
+	{{if cities}}
+		{{render(cities, $options.cities) $.templates.cityLi}}
+	{{/if}}
+	{{if $i===$context.parent.data.length-1}}
+		<li>====================</li>
+	{{/if}}
+</script>
+	
+<script id="valueLi" type="text/html">
+	<li>${$options.label}${this}</li>
+</script>
+
+<script id="cityLi" type="text/html">
+	{{if $options.heading && $i===0}}
+		<li><i>-------${$options.heading}</i>-------</li>
+	{{/if}}    
+	<li>City ${$i+1} - ${name}, ${state}</li>
+</script>
+
+<ul></ul>

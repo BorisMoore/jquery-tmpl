@@ -1,27 +1,21 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-    <title></title>
-</head>
-<body>
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="jquery.tmpl.js"></script>
 <script>
 jQuery(function(){
 	var dataObject = {
-        	name: function() {
-    			return this.firstName + " " + this.lastName;
-    		},
-            firstName: "John",
-    		lastName: "Resig",
-            url: "http://ejohn.org/",
-    		cityJoin: function() {
-    			return this.cities.join(", ");
-    		},
-        	cities: [
-            	"Boston, MA",
-            	"San Francisco, CA"
-        	]
+		name: function() {
+			return this.firstName + " " + this.lastName;
+		},
+		firstName: "John",
+		lastName: "Resig",
+		url: "http://ejohn.org/",
+		cityJoin: function() {
+			return this.cities.join(", ");
+		},
+		cities: [
+			"Boston, MA",
+			"San Francisco, CA"
+		]
 	};
 	
 	var arrayOfDataObjects = [ dataObject, dataObject, dataObject ];
@@ -29,24 +23,24 @@ jQuery(function(){
 	var tmpl = '<li>${$i}) <a href="${url}">${name}</a> ({{if $context.options.cities}}${cityJoin}{{/if}})</li>';
 	
 	$("#sometmpl")
-        	.render( dataObject ) // Returns a LI with all the data filled in
-        	.appendTo("ul");
+		.render( dataObject ) // Returns a LI with all the data filled in
+		.appendTo("ul");
 
 	$("#sometmpl")
-        	.render( arrayOfDataObjects ) // Returns multiple LIs with data filled in
-        	.appendTo("ul");
+		.render( arrayOfDataObjects ) // Returns multiple LIs with data filled in
+		.appendTo("ul");
 
 	$("#sometmpl2")
-        	.render( arrayOfDataObjects ) // Returns multiple LIs with data filled in
-        	.appendTo("ul");
-	
+		.render( arrayOfDataObjects ) // Returns multiple LIs with data filled in
+		.appendTo("ul");
+
 	// Render the same template with different options
 	$("#sometmpl3")
-        	.render( arrayOfDataObjects, { cities: false } )
-        	.appendTo("ul");
+		.render( arrayOfDataObjects, { cities: false } )
+		.appendTo("ul");
 	$("#sometmpl3")
-        	.render( arrayOfDataObjects, { cities: true } ) 
-        	.appendTo("ul");
+		.render( arrayOfDataObjects, { cities: true } ) 
+		.appendTo("ul");
 	
 	// Appends one LI, filled with data, into the UL
 	$("ul").append( tmpl, dataObject );
@@ -65,16 +59,13 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl3" type="text/html">
-	<li>${$i+1} of ${$context.data.length}) <a href="${url}">${name}</a>
+	<li>${$i+1} of ${$context.parent.data.length}) <a href="${url}">${name}</a>
 	{{if $context.options.cities}}
-	Cities: {{each(i,city) cities}}${city} {{/each}}
+		Cities: {{each(i,city) cities}}${city} {{/each}}
 	{{else}}
-	No Cities
-    {{/if}}
+		No Cities
+	{{/if}}
 	</li>
 </script>
 
 <ul></ul>
-
-</body>
-</html>

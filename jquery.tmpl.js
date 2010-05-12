@@ -10,9 +10,9 @@
 		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/;
 	
 	jQuery.fn.extend({
-		render: function( data, options ) {
+		render: function( data, options, context ) {
 			return this.map(function(i, tmpl){
-				return jQuery.render( tmpl, data, options );
+				return jQuery( jQuery.evalTmpl( tmpl, context, data, options ).join("") ).get();
 			});
 		},
 		
@@ -25,7 +25,7 @@
 			}
 
 			if ( args.length >= 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
-				arguments[0] = [ jQuery.render( args[0], args[1], args[2] ) ];
+				arguments[0] = [ jQuery( jQuery.evalTmpl( args[0], args[3], args[1], args[2] ).join("")).get() ];
 			}
 			
 			return oldManip.apply( this, arguments );
@@ -33,49 +33,53 @@
 	});
 	
 	jQuery.extend({
-		render: function( tmpl, data, options ) {
+		evalTmpl: function( tmpl, context, data, options, index ) {
 			var fn, node;
 			
 			if ( typeof tmpl === "string" ) {
 				// Use a pre-defined template, if available
 				fn = jQuery.templates[ tmpl ];
-				if ( !fn && !htmlExpr.test( tmpl ) ) {
-					// it is a selector
-					node = jQuery( tmpl ).get( 0 );
-				} else {
+				if ( !fn ) {
 					fn = jQuery.tmpl( tmpl );
 				}
 			} else if ( tmpl instanceof jQuery ) {
 				node = tmpl.get( 0 );
 			} else if ( tmpl.nodeType ) {
 				node = tmpl;
+			} else if ( typeof tmpl === "function" ) {
+				fn = tmpl;
 			}
-			
-			if ( !fn && node ) {
+			if ( node ) {
 				var elemData = jQuery.data( node );
 				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node ));
 				// Cache, if tmpl is a node. We assume that if the template string is 
 				// being passed directly in, the user doesn't want it cached. They can
 				// stick it in jQuery.templates to cache it.
 			}
-			
-			var context = {
-				data: data,
-				index: 0,
-				dataItem: data,
-				options: options || {}
-			}; 
-			return jQuery((
-				jQuery.isArray( data ) ? 
+			if (!fn) {
+				return [];
+			}
+			context = ctx( data, context, options, index );
+			if ( typeof data === "function" ) {
+				data = data.call(context.parent.data, context);
+			}
+			return (jQuery.isArray( data ) ? 
 				jQuery.map( data, function( data, i ) {
-					context.index = i;
-					context.dataItem = data;
-					return fn.call( data, jQuery, context );
+					return fn.call( data, jQuery, ctx( data, context, options, i ) );
 				}) : 
-				fn.call( data, jQuery, context )
-			).join("")).get();
+				fn.call( data, jQuery, context ) 
+			);
+
+			function ctx( data, context, options, index ) {
+				return { 
+					options: options || (context ? context.options : {}),
+					data: data || (context ? context.data : null),
+					parent: context,
+					index: index || 0
+				};
+			}
 		},
-		
+				
 		// You can stick pre-built template functions here
 		templates: {},
 
@@ -86,12 +90,15 @@
 		 */
 
 		tmplcmd: {
+			"render": {
+				prefix: "if(typeof($1)!==undef){_=_.concat($.evalTmpl($1,$context,$2));}"
+			},
 			"each": {
 				prefix: "if(typeof($1)!==undef){jQuery.each($1,function($2){with(this){",
 				suffix: "}});}"
 			},
 			"if": {
-				prefix: "if($1){",
+				prefix: "if((typeof($1)!==undef) && ($1)){",
 				suffix: "}"
 			},
 			"else": {
@@ -113,10 +120,14 @@
 		tmpl: function( markup ) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
+			if ( !htmlExpr.test(markup) ) {
+				// it is a selector
+				markup = jQuery( markup )[0];
+			}
 			if (markup.nodeType) markup = markup.innerHTML; 
 
 			return new Function("jQuery","$context",
-				"var undef='undefined',jQuery,$options=$context.options,$i=$context.index,_=[];" +
+				"var undef='undefined',$=jQuery,$options=$context.options,$i=$context.index,_=[];" +
 
 				// Introduce the data as local variables using with(){}
 				"with(this){_.push('" +
