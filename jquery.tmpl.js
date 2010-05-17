@@ -92,7 +92,7 @@
 
 		tmplcmd: {
 			"render": {
-				prefix: "if(typeof($1)!=='undefined'){_=_.concat($.evalTmpl($context,$1,$2));}"
+				prefix: "if(typeof($1)!=='undefined'){_=_.concat($.evalTmpl($context,$1,$3));}"
 			},
 			"each": {
 				prefix: "if(typeof($1)!=='undefined'){jQuery.each((typeof($1)==='function'?($1).call(this,$context,$2):($1)),function($index){with(this){",
@@ -140,15 +140,16 @@
 					.replace(/([\\'])/g, "\\$1")
 					.replace(/[\r\t\n]/g, " ")
 					.replace(/\${(?:\(([^\}]*)?\)\s+)?([^}]*)}/g, "{{=($1) $2}}")
-					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?}}/g, function(all, slash, type, fnargs, arg) {
+					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(?:\((.*?)\))?}}/g, function(all, slash, type, fnargs, target, args) {
 						var cmd = jQuery.tmplcmd[ type ], ret = ["');"], def = cmd._default || [];
 						if ( !cmd ) {
 							throw "Template command not found: " + type;
 						}
 						cmd = cmd[slash ? "suffix" : "prefix"];
 						ret.push(cmd
-							.split("$1").join( unescape(arg)||def[0]||null )
-							.split("$2").join( unescape(fnargs)||def[1]||null ) + "_.push('");
+							.split("$1").join( unescape(target)||def[0]||null )
+							.split("$2").join( unescape(args)||def[1]||null )
+							.split("$3").join( unescape(fnargs)||def[2]||null ) + "_.push('");
 						return ret.join("");
 					})
 				+ "');}return _;");

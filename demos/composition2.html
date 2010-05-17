@@ -76,8 +76,8 @@ function alternate( context, depth ) {
 
 <script id="cityTr" type="text/html">
 	<tr class="citySeparator"><td colspan="2"></td></tr>
-	<tr class="{{=(1) alternate}}"><td colspan="2"><b><i>City ${$i+1}:</i></b></td></tr>
-	<tr class="{{=(1) alternate}}"><td><b>${name}</b></td><td>${state}</td></tr>
+	<tr class="{{= alternate(1)}}"><td colspan="2"><b><i>City ${$i+1}:</i></b></td></tr>
+	<tr class="{{= alternate(1)}}"><td><b>${name}</b></td><td>${state}</td></tr>
 </script>
 
 <table class="peopleTable"><tbody>

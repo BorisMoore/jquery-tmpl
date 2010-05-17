@@ -76,11 +76,11 @@ var startIndex = 1, endIndex = 3;
 </script>
 
 <script id="peopleTr" type="text/html">
-	<tr class="${alternate}"><td colspan="2"><a href="${url}">${(true) getName}</a></td></tr>
+	<tr class="${alternate}"><td colspan="2"><a href="${url}">${getName(true)}</a></td></tr>
 	<tr class="personSeparator"><td colspan="2"></td></tr>
-	{{if(startIndex, endIndex) getCityCount}}
+	{{if getCityCount(startIndex, endIndex)}}
 		<tr class="${alternate}"><td colspan="2"><i>Favorite Cities</i></td></tr>
-		{{each(startIndex, endIndex) getCities}}
+		{{each getCities(startIndex, endIndex)}}
 			<tr class="citySeparator"><td colspan="2"></td></tr>
 			<tr class="${alternate}"><td><b>${name}</b></td><td>${state}</td></tr>
 			<tr class="${alternate}"><td colspan="2"><i>${weather}...</i></td></tr>
