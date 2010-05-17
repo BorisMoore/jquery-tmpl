@@ -1,5 +1,5 @@
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="jquery.tmpl.js"></script>
+<script src="../jquery.tmpl.js"></script>
 <script>
 jQuery(function(){
 	var dataObject = {
@@ -9,8 +9,8 @@ jQuery(function(){
 		firstName: "John",
 		lastName: "Resig",
 		url: "http://ejohn.org/",
-		cityJoin: function() {
-			return this.cities.join(", ");
+		cityJoin: function(context, separator) {
+			return this.cities.join(separator || ", ");
 		},
 		cities: [
 			"Boston, MA",
@@ -48,20 +48,21 @@ jQuery(function(){
 	// Appends multiple LIs for each item. Use options referenced in tmpl string
 	$("ul").append( tmpl, arrayOfDataObjects, { cities: true } );
 });
+var Z="ABC"	;
 </script>
 
 <script id="sometmpl" type="text/html">
-	<li>${$i}) <a href="${url}">${name}</a> (${cityJoin})</li>
+	<li>${$i}) <a href="${url}">${name}</a> (${(" (param with escaped \\, \' and \"!)... ") cityJoin})</li>
 </script>
 
 <script id="sometmpl2" type="text/html">
-	<li>${$i}) <a href="${url}">${name}</a> Cities: {{each(i,city) cities}}${city} {{/each}}</li>
+	<li>${$i}) <a href="${url}">${name}</a> Cities: {{each cities}} ${this} {{/each}}</li>
 </script>
 
 <script id="sometmpl3" type="text/html">
-	<li>${$i+1} of ${$context.parent.data.length}) <a href="${url}">${name}</a>
+	<li>${$i+1} of ${$context.dataArray.length}) <a href="${url}">${name}</a>
 	{{if $context.options.cities}}
-		Cities: {{each(i,city) cities}}${city} {{/each}}
+		Cities: {{each cities}} ${this} {{/each}}
 	{{else}}
 		No Cities
 	{{/if}}

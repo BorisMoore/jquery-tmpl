@@ -1,0 +1,82 @@
+<style type="text/css">
+    *[data-tmpl], .html-template {   
+    	display:none;    
+    }
+    .peopleTable td { border:2px solid #555; text-align:center; }   
+    .person{ background-color:#AFA; }   
+    .personAlt{ background-color:#9ED; }   
+    .personSeparator { background-color:#C77; height:6px;}   
+    .citySeparator { background-color:#CCC; height:4px;}   
+    .peopleTable { border-collapse:collapse; border:2px solid #555; }   
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="../jquery.tmpl.js"></script>
+<script src="../nje.tmplPlus.js"></script>
+<script>
+$(function(){
+	var people = [
+		{
+			firstName: "John",
+			lastName: "Resig",
+			url: "http://ejohn.org/",
+			cities: [
+				{ name: "Boston", state: "MA" },
+				{ name: "San Francisco", state: "CA" }
+			],
+			name: getName
+		},
+		{
+			firstName: "Dave",
+			lastName: "Reed",
+			url: "http://dave.org/",
+			cities: [
+				{ name: "Seattle", state: "WA" },
+				{ name: "Los Angeles", state: "CA" },
+				{ name: "New York", state: "NY" }
+			],
+			name: getName
+		},
+		{
+			firstName: "Boris",
+			lastName: "Moore",
+			url: "http://boris.org/",
+			cities: [
+				{ name: "Redmond", state: "WA" }
+			],
+			name: getName
+		}
+	];
+	
+	function getName( context ) {
+		return this.firstName + " " + this.lastName;
+	}
+
+	$(".peopleTable")
+		.append("#peopleTr", people );
+
+});
+
+function alternate( context, depth ) {
+	while (context && depth) {
+		context = context.parent;
+		depth--;
+	}
+	return (context.index % 2) ? "personAlt" : "person";
+}
+</script>
+
+<script id="peopleTr" type="text/html">
+	<tr class="${alternate}"><td colspan="2"><a href="${url}">${name}</a></td></tr>
+	{{each cities}}
+		<tr class="citySeparator"><td colspan="2"></td></tr>
+		<tr class="${alternate}"><td colspan="2"><b><i>City ${$index+1}:</i></b></td></tr>
+		<tr class="${alternate}"><td><b>${name}</b></td><td>${state}</td></tr>
+	{{/each}}
+	<tr class="personSeparator"><td colspan="2"></td></tr>
+</script>
+
+<table class="peopleTable"><tbody>
+	<tr class="personSeparator"><td colspan="2"></td></tr>
+</tbody></table>
+

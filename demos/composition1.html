@@ -1,5 +1,5 @@
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="jquery.tmpl.js"></script>
+<script src="../jquery.tmpl.js"></script>
 <script>
 $(function(){
 	var people = [
@@ -54,7 +54,7 @@ $(function(){
 	{{if cities}}
 		{{render(cities, $options.cities) $.templates.cityLi}}
 	{{/if}}
-	{{if $i===$context.parent.data.length-1}}
+	{{if $i===$context.dataArray.length-1}}
 		<li>====================</li>
 	{{/if}}
 </script>

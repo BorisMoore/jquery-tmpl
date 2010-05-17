@@ -1,16 +1,17 @@
-    <style type="text/css">
-        *[data-tmpl], .html-template {   
-        	display:none;    
-        }
-        .peopleTable td { border:2px solid #555; text-align:center; }   
-        .person{ background-color:#AFA; }   
-        .personAlt{ background-color:#9ED; }   
-        .personSeparator { background-color:#C77; height:6px;}   
-        .peopleTable { border-collapse:collapse; border:2px solid #555; }   
-    </style>
+<style type="text/css">
+    *[data-tmpl], .html-template {   
+    	display:none;    
+    }
+    .peopleTable td { border:2px solid #555; text-align:center; }   
+    .person{ background-color:#AFA; }   
+    .personAlt{ background-color:#9ED; }   
+    .personSeparator { background-color:#C77; height:6px;}   
+    .citySeparator { background-color:#CCC; height:4px;}   
+    .peopleTable { border-collapse:collapse; border:2px solid #555; }   
+</style>
 
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="jquery.tmpl.js"></script>
+<script src="../jquery.tmpl.js"></script>
 <script>
 $(function(){
 	var people = [
@@ -56,20 +57,27 @@ $(function(){
 		.append("#peopleTr", people );
 
 });
+         
+function alternate( context, depth ) {
+	while (context && depth) {
+		context = context.parent;
+		depth--;
+	}
+	return (context.index % 2) ? "personAlt" : "person";
+}
+
 </script>
 
 <script id="peopleTr" type="text/html">
-	<tr class="person"><td colspan="2"><a href="${url}">${name}</a></td></tr>
-	{{if cities}}
-		{{render(cities) $.templates.cityTr}}
-	{{/if}}
+	<tr class="${alternate}"><td colspan="2"><a href="${url}">${name}</a></td></tr>
+	{{render(cities) $.templates.cityTr}}
 	<tr class="personSeparator"><td colspan="2"></td></tr>
 </script>
 
 <script id="cityTr" type="text/html">
 	<tr class="citySeparator"><td colspan="2"></td></tr>
-	<tr class="person"><td colspan="2"><b><i>City ${$context.index+1}:</i></b></td></tr>
-	<tr class="person"><td><b>${name}</b></td><td>${state}</td></tr>
+	<tr class="{{=(1) alternate}}"><td colspan="2"><b><i>City ${$i+1}:</i></b></td></tr>
+	<tr class="{{=(1) alternate}}"><td><b>${name}</b></td><td>${state}</td></tr>
 </script>
 
 <table class="peopleTable"><tbody>

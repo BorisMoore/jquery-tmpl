@@ -12,7 +12,7 @@
 	jQuery.fn.extend({
 		render: function( data, options, context ) {
 			return this.map(function(i, tmpl){
-				return jQuery( jQuery.evalTmpl( tmpl, context, data, options ).join("") ).get();
+				return jQuery( jQuery.evalTmpl( context, tmpl, data, options ).join("") ).get();
 			});
 		},
 		
@@ -25,7 +25,7 @@
 			}
 
 			if ( args.length >= 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
-				arguments[0] = [ jQuery( jQuery.evalTmpl( args[0], args[3], args[1], args[2] ).join("")).get() ];
+				arguments[0] = [ jQuery( jQuery.evalTmpl( args[3], args[0], args[1], args[2] ).join("")).get() ];
 			}
 			
 			return oldManip.apply( this, arguments );
@@ -33,9 +33,19 @@
 	});
 	
 	jQuery.extend({
-		evalTmpl: function( tmpl, context, data, options, index ) {
+		evalTmpl: function( context, tmpl, data, options, index ) {
+			function ctx( data, parentCtx, i, dataArray ) { 
+				return { 
+					options: options || (context ? context.options : {}),
+					data: data,
+					parent: parentCtx || null,
+					index: i || 0,
+					dataArray: dataArray || null
+				};
+			}
 			var fn, node;
-			
+			data = data || (context ? context.data : null);
+					
 			if ( typeof tmpl === "string" ) {
 				// Use a pre-defined template, if available
 				fn = jQuery.templates[ tmpl ];
@@ -57,32 +67,23 @@
 				// stick it in jQuery.templates to cache it.
 			}
 			if (!fn) {
-				return [];
+				return []; //Could throw...
 			}
-			context = ctx( data, context, options, index );
+			context = context || {};
+			context.options = options || context.options || {};
 			if ( typeof data === "function" ) {
-				data = data.call(context.parent.data, context);
+				data = data.call(context.data || {}, context);  
 			}
 			return (jQuery.isArray( data ) ? 
-				jQuery.map( data, function( data, i ) {
-					return fn.call( data, jQuery, ctx( data, context, options, i ) );
+				jQuery.map( data, function( dataItem, i ) {
+					return fn.call( dataItem, jQuery, ctx( dataItem, context, i, data ) );
 				}) : 
-				fn.call( data, jQuery, context ) 
+				fn.call( data, jQuery, ctx( data, context ) ) 
 			);
-
-			function ctx( data, context, options, index ) {
-				return { 
-					options: options || (context ? context.options : {}),
-					data: data || (context ? context.data : null),
-					parent: context,
-					index: index || 0
-				};
-			}
 		},
-				
+
 		// You can stick pre-built template functions here
 		templates: {},
-
 		/*
 		 * For example, someone could do:
 		 *   jQuery.templates.foo = jQuery.tmpl("some long templating string");
@@ -91,33 +92,36 @@
 
 		tmplcmd: {
 			"render": {
-				prefix: "if(typeof($1)!==undef){_=_.concat($.evalTmpl($1,$context,$2));}"
+				prefix: "if(typeof($1)!=='undefined'){_=_.concat($.evalTmpl($context,$1,$2));}"
 			},
 			"each": {
-				prefix: "if(typeof($1)!==undef){jQuery.each($1,function($2){with(this){",
+				prefix: "if(typeof($1)!=='undefined'){jQuery.each((typeof($1)==='function'?($1).call(this,$context,$2):($1)),function($index){with(this){",
 				suffix: "}});}"
 			},
 			"if": {
-				prefix: "if((typeof($1)!==undef) && ($1)){",
+				prefix: "if((typeof($1)!=='undefined') && (typeof($1)==='function'?($1).call(this,$context,$2):($1))){",
 				suffix: "}"
 			},
 			"else": {
 				prefix: "}else{"
 			},
 			"html": {
-				prefix: "if(typeof($1)!==undef){_.push(typeof($1)==='function'?($1).call(this):$1);}"
+				prefix: "if(typeof($1)!=='undefined'){_.push(typeof($1)==='function'?($1).call(this,$context,$2):($1));}"
 			},
 			"=": {
 				_default: [ "this" ],
-				prefix: "if(typeof($1)!==undef){_.push($.encode(typeof($1)==='function'?($1).call(this):$1));}"
+				prefix: "if(typeof($1)!=='undefined'){_.push($.encode(typeof($1)==='function'?($1).call(this,$context,$2):($1)));}"
 			}
 		},
-
+		
 		encode: function( text ) {
 			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
-		},
 
+		},
 		tmpl: function( markup ) {
+			function unescape(args) {
+				return args ? args.replace(/\\'/g, "'").replace(/\\\\/g, "\\") : null;
+			}
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
 			if ( !htmlExpr.test(markup) ) {
@@ -125,9 +129,8 @@
 				markup = jQuery( markup )[0];
 			}
 			if (markup.nodeType) markup = markup.innerHTML; 
-
 			return new Function("jQuery","$context",
-				"var undef='undefined',$=jQuery,$options=$context.options,$i=$context.index,_=[];" +
+				"var $=jQuery,$options=$context.options,$i=$context.index,_=[];" +
 
 				// Introduce the data as local variables using with(){}
 				"with(this){_.push('" +
@@ -136,21 +139,19 @@
 				markup
 					.replace(/([\\'])/g, "\\$1")
 					.replace(/[\r\t\n]/g, " ")
-					.replace(/\${([^}]*)}/g, "{{= $1}}")
-					.replace(/{{(\/?)(\w+|.)(?:\((.*?)\))?(?: (.*?))?}}/g, function(all, slash, type, fnargs, args) {
-						var tmpl = jQuery.tmplcmd[ type ];
-
-						if ( !tmpl ) {
-							throw "Template not found: " + type;
+					.replace(/\${(?:\(([^\}]*)?\)\s+)?([^}]*)}/g, "{{=($1) $2}}")
+					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?}}/g, function(all, slash, type, fnargs, arg) {
+						var cmd = jQuery.tmplcmd[ type ], ret = ["');"], def = cmd._default || [];
+						if ( !cmd ) {
+							throw "Template command not found: " + type;
 						}
-
-						var def = tmpl._default || [];
-
-						return "');" + tmpl[slash ? "suffix" : "prefix"]
-							.split("$1").join(args || def[0])
-							.split("$2").join(fnargs || def[1]) + "_.push('";
+						cmd = cmd[slash ? "suffix" : "prefix"];
+						ret.push(cmd
+							.split("$1").join( unescape(arg)||def[0]||null )
+							.split("$2").join( unescape(fnargs)||def[1]||null ) + "_.push('");
+						return ret.join("");
 					})
-				+ "');};return _;");
+				+ "');}return _;");
 		}
 	});
 })(jQuery);
