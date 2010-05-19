@@ -53,7 +53,7 @@ $(function(){
 	}
 
 	$(".peopleTable")
-		.append("#peopleTr", people );
+		.append("#tmplPeople", people );
 
 });
 
@@ -66,12 +66,12 @@ function alternate( context, depth ) {
 }
 </script>
 
-<script id="peopleTr" type="text/html">
-	<tr class="${alternate}"><td colspan="2"><a href="${url}">${name}</a></td></tr>
+<script id="tmplPeople" type="text/html">
+	<tr class="${alternate()}"><td colspan="2"><a href="${url}">${name()}</a></td></tr>
 	{{each cities}}
 		<tr class="citySeparator"><td colspan="2"></td></tr>
-		<tr class="${alternate}"><td colspan="2"><b><i>City ${$index+1}:</i></b></td></tr>
-		<tr class="${alternate}"><td><b>${name}</b></td><td>${state}</td></tr>
+		<tr class="${alternate()}"><td colspan="2"><b><i>City ${$index+1}:</i></b></td></tr>
+		<tr class="${alternate()}"><td><b>${name}</b></td><td>${state}</td></tr>
 	{{/each}}
 	<tr class="personSeparator"><td colspan="2"></td></tr>
 </script>

@@ -92,25 +92,26 @@
 
 		tmplcmd: {
 			"render": {
-				prefix: "if(typeof($1)!=='undefined'){_=_.concat($.evalTmpl($context,$1,$3));}"
+				prefix: "if($defined_1){_=_.concat($.evalTmpl($context,$1,$2));}"
 			},
 			"each": {
-				prefix: "if(typeof($1)!=='undefined'){jQuery.each((typeof($1)==='function'?($1).call(this,$context,$2):($1)),function($index){with(this){",
+				_default: { $2: "$index, $value" },
+				prefix: "if($defined_1){jQuery.each($1,function($2){with(this){",
 				suffix: "}});}"
 			},
 			"if": {
-				prefix: "if((typeof($1)!=='undefined') && (typeof($1)==='function'?($1).call(this,$context,$2):($1))){",
+				prefix: "if(($defined_1) && $1){",
 				suffix: "}"
 			},
 			"else": {
 				prefix: "}else{"
 			},
 			"html": {
-				prefix: "if(typeof($1)!=='undefined'){_.push(typeof($1)==='function'?($1).call(this,$context,$2):($1));}"
+				prefix: "if($defined_1){_.push($1);}"
 			},
 			"=": {
-				_default: [ "this" ],
-				prefix: "if(typeof($1)!=='undefined'){_.push($.encode(typeof($1)==='function'?($1).call(this,$context,$2):($1)));}"
+				_default: { $1: "this" },
+				prefix: "if($defined_1){_.push($.encode($1));}"
 			}
 		},
 		
@@ -119,9 +120,6 @@
 
 		},
 		tmpl: function( markup ) {
-			function unescape(args) {
-				return args ? args.replace(/\\'/g, "'").replace(/\\\\/g, "\\") : null;
-			}
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
 			if ( !htmlExpr.test(markup) ) {
@@ -139,20 +137,40 @@
 				markup
 					.replace(/([\\'])/g, "\\$1")
 					.replace(/[\r\t\n]/g, " ")
-					.replace(/\${(?:\(([^\}]*)?\)\s+)?([^}]*)}/g, "{{=($1) $2}}")
-					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(?:\((.*?)\))?}}/g, function(all, slash, type, fnargs, target, args) {
-						var cmd = jQuery.tmplcmd[ type ], ret = ["');"], def = cmd._default || [];
+					.replace(/\${([^}]*)}/g, "{{= $1}}")
+					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?}}/g, function(all, slash, type, fnargs, target, parens, args) {
+						function unescape( args ) {
+							return args ? args.replace(/\\'/g, "'").replace(/\\\\/g, "\\") : null;
+						}
+						var cmd = jQuery.tmplcmd[ type ], def, expr;
 						if ( !cmd ) {
 							throw "Template command not found: " + type;
 						}
-						cmd = cmd[slash ? "suffix" : "prefix"];
-						ret.push(cmd
-							.split("$1").join( unescape(target)||def[0]||null )
-							.split("$2").join( unescape(args)||def[1]||null )
-							.split("$3").join( unescape(fnargs)||def[2]||null ) + "_.push('");
-						return ret.join("");
-					})
-				+ "');}return _;");
+						def = cmd._default || [];
+						if (target) {
+							target = unescape(target); 
+							args = args ? ("$context," + unescape(args) + ")") : (parens ? "$context)" : "");
+							expr = args ? ("(" + target + ").call(this," + args) : target;
+						}
+						else {
+							expr = def["$1"] || "null";
+						}
+						fnargs = unescape( fnargs );
+						return "');" + 
+							cmd[ slash ? "suffix" : "prefix" ]
+								.split("$defined_1").join( "typeof("+ target  +")!=='undefined'" )
+								.split("$1").join( expr )
+								.split("$2").join( fnargs ? 
+									fnargs.replace(/\s*([^\(]+)\s*(\((.*?)\))?/g, function(all, name, parens, params) {
+										params = params ? ("$context," + params + ")") : (parens ? "$context)" : "");
+										return params ? ("(" + name + ").call(this," + params) : all;
+									})	 
+									: (def["$2"]||"") 
+								) +
+							"_.push('";
+					}) + 
+				"');}return _;"
+			);
 		}
 	});
 })(jQuery);

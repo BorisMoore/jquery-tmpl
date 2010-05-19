@@ -9,7 +9,7 @@ jQuery(function(){
 		firstName: "John",
 		lastName: "Resig",
 		url: "http://ejohn.org/",
-		cityJoin: function(context, separator) {
+		cityJoin: function(context, separator ) {
 			return this.cities.join(separator || ", ");
 		},
 		cities: [
@@ -20,8 +20,8 @@ jQuery(function(){
 	
 	var arrayOfDataObjects = [ dataObject, dataObject, dataObject ];
 	
-	var tmpl = '<li>${$i}) <a href="${url}">${name}</a> ({{if $context.options.cities}}${cityJoin}{{/if}})</li>';
-	
+	var tmpl = '<li>${$i}) <a href="${url}">${name()}</a> ({{if $context.options.cities}}${cityJoin()}{{/if}})</li>';
+		
 	$("#sometmpl")
 		.render( dataObject ) // Returns a LI with all the data filled in
 		.appendTo("ul");
@@ -46,27 +46,30 @@ jQuery(function(){
 	$("ul").append( tmpl, dataObject );
 
 	// Appends multiple LIs for each item. Use options referenced in tmpl string
-	$("ul").append( tmpl, arrayOfDataObjects, { cities: true } );
+	$("ul").append( "#sometmpl4", arrayOfDataObjects, { cities: true } );
 });
-var Z="ABC"	;
 </script>
 
 <script id="sometmpl" type="text/html">
-	<li>${$i}) <a href="${url}">${name}</a> (${cityJoin(" (param with escaped \\, \' and \"!)... ")})</li>
+	<li>${$i}) <a href="${url}">${name()}</a> (${cityJoin(" (param with escaped \\, \' and \"!)... ")})</li>
 </script>
 
 <script id="sometmpl2" type="text/html">
-	<li>${$i}) <a href="${url}">${name}</a> Cities: {{each cities}} ${this} {{/each}}</li>
+	<li>${$i}) <a href="${url}">${name()}</a> Cities: {{each cities}} ${this} {{/each}}</li>
 </script>
 
 <script id="sometmpl3" type="text/html">
-	<li>${$i+1} of ${$context.dataArray.length}) <a href="${url}">${name}</a>
+	<li>${$i+1} of ${$context.dataArray.length}) <a href="${url}">${name()}</a>
 	{{if $context.options.cities}}
 		Cities: {{each cities}} ${this} {{/each}}
 	{{else}}
 		No Cities
 	{{/if}}
 	</li>
+</script>
+
+<script id="sometmpl4" type="text/html">
+	<li>${$i}) <a href="${url}">${name()}</a> ({{if $context.options.cities}}${cityJoin()}{{/if}})</li>
 </script>
 
 <ul></ul>

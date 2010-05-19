@@ -51,10 +51,8 @@ $(function(){
 		return this.firstName + " " + this.lastName;
 	}
 	
-	$.templates.cityTr = $.tmpl( "#cityTr" );
-
 	$(".peopleTable")
-		.append("#peopleTr", people );
+		.append("#tmplPeople", people );
 
 });
          
@@ -66,18 +64,22 @@ function alternate( context, depth ) {
 	return (context.index % 2) ? "personAlt" : "person";
 }
 
+function getTemplate( context, key ) {
+	return $.tmpl("#tmpl" + key);
+}
+
 </script>
 
-<script id="peopleTr" type="text/html">
-	<tr class="${alternate}"><td colspan="2"><a href="${url}">${name}</a></td></tr>
-	{{render(cities) $.templates.cityTr}}
+<script id="tmplPeople" type="text/html">
+	<tr class="${alternate()}"><td colspan="2"><a href="${url}">${name()}</a></td></tr>
+	{{render(cities) getTemplate("City")}}
 	<tr class="personSeparator"><td colspan="2"></td></tr>
 </script>
 
-<script id="cityTr" type="text/html">
+<script id="tmplCity" type="text/html">
 	<tr class="citySeparator"><td colspan="2"></td></tr>
-	<tr class="{{= alternate(1)}}"><td colspan="2"><b><i>City ${$i+1}:</i></b></td></tr>
-	<tr class="{{= alternate(1)}}"><td><b>${name}</b></td><td>${state}</td></tr>
+	<tr class="${alternate(1)}"><td colspan="2"><b><i>City ${$i+1}:</i></b></td></tr>
+	<tr class="${alternate(1)}"><td><b>${name}</b></td><td>${state}</td></tr>
 </script>
 
 <table class="peopleTable"><tbody>

@@ -33,11 +33,10 @@ $(function(){
 	];
 	
 	function getName( context ) {
-		return context.options.invert ? "<b>" + this.lastName + "</b>, " + this.firstName : this.firstName + " " + this.lastName;
+		return this.firstName + " " + this.lastName;
 	}
 	
-	$.templates.valueLi = $.tmpl( "#valueLi" );
-	$.templates.cityLi = $.tmpl( "#cityLi" );
+	$.templates.value = $.tmpl( "#tmplValue" );
 
 	$("ul").append( "#composite", people, {
 		name: { label: "Name: ", invert: true },
@@ -49,21 +48,21 @@ $(function(){
 
 <script id="composite" type="text/html">
 	<li>====================</li>
-	{{render(name, $options.name) $.templates.valueLi}}
-	{{render(firstName, $options.first) $.templates.valueLi}}
+	{{render(name(), $options.name) $.templates.value}}
+	{{render(firstName, $options.first) "value"}}
 	{{if cities}}
-		{{render(cities, $options.cities) $.templates.cityLi}}
+		{{render(cities, $options.cities) "#tmplCity"}}
 	{{/if}}
 	{{if $i===$context.dataArray.length-1}}
 		<li>====================</li>
 	{{/if}}
 </script>
 	
-<script id="valueLi" type="text/html">
+<script id="tmplValue" type="text/html">
 	<li>${$options.label}${this}</li>
 </script>
 
-<script id="cityLi" type="text/html">
+<script id="tmplCity" type="text/html">
 	{{if $options.heading && $i===0}}
 		<li><i>-------${$options.heading}</i>-------</li>
 	{{/if}}    

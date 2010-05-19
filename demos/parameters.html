@@ -20,19 +20,24 @@ $(function(){
 			firstName: "John",
 			lastName: "Resig",
 			url: "http://ejohn.org/",
-			cities: [ "BSTN", "NY", "SF" ]
+			cities: [ "BSTN", "NY", "SF" ],
+			favoriteCity: 1
 		},
 		{
 			firstName: "Dave",
 			lastName: "Reed",
 			url: "http://dave.org/",
-			cities: [ "RDMD", "STL", "SF", "LA" ]
+			cities: [ "RDMD", "STL", "SF", "LA" ],
+			favoriteCity: 2,
+			invertName: true
 		},
 		{
 			firstName: "Boris",
 			lastName: "Moore",
 			url: "http://boris.org/",
-			cities: [ "RDMD" ]
+			cities: [ "RDMD" ],
+			favoriteCity: 0,
+			invertName: true
 		}
 	];
 	
@@ -47,45 +52,35 @@ $(function(){
 
 	$(".peopleTable")
 		.append("#tmplPeople", people, {cities: cities} );
-
 });
 
-function getName( context ) {
-	return this.firstName + " " + this.lastName;
+function getName( context, person ) {
+	return person.invertName ? "<b>" + person.lastName + "</b>, " + person.firstName : person.firstName + " " + person.lastName;
 }
 
-function getCities( context, begin, end ) {
-	return $.map(this.cities.slice(begin, end), function(city) {
-		return context.options.cities[city];
-	});
+function getCity( context, index ) {
+	return context.options.cities[this.cities[index]];
 }
 
-function getCityCount( context, begin, end ) {
-	return this.cities.slice(begin, end).length;
+function getTemplate( context, key) {
+	return $.tmpl("#tmpl" + key);
 }
-
-function alternate( context ) {
-	return (context.index % 2) ? "personAlt" : "person";
-}
-
-var startIndex = 1, endIndex = 3;
 </script>
 
 <script id="tmplPeople" type="text/html">
-	<tr class="${alternate()}"><td colspan="2"><a href="${url}">${getName()}</a></td></tr>
-	<tr class="personSeparator"><td colspan="2"></td></tr>
-	{{if getCityCount(startIndex, endIndex)}}
-		<tr class="${alternate()}"><td colspan="2"><i>Favorite Cities</i></td></tr>
-		{{each getCities(startIndex, endIndex)}}
-			<tr class="citySeparator"><td colspan="2"></td></tr>
-			<tr class="${alternate()}"><td><b>${name}</b></td><td>${state}</td></tr>
-			<tr class="${alternate()}"><td colspan="2"><i>${weather}...</i></td></tr>
-		{{/each}}
-		<tr class="personSeparator"><td colspan="2"></td></tr>
-	{{/if}}
+	{{render(
+		getCity(favoriteCity), 
+		{ owner: this, title: "Favorite city for" }
+	) 
+	getTemplate("City")}}
+</script>
+
+<script id="tmplCity" type="text/html">
+	<tr class="person${$context.parent.index%2?'Alt':''}">
+		<td>${$options.title} ${getName($options.owner)} </td>
+		<td><b>${name}</b></td><td>${state}</td><td>Weather: <i>${weather}</i></td>
+	</tr>
 </script>
 
 <table class="peopleTable"><tbody>
-	<tr class="personSeparator"><td colspan="2"></td></tr>
 </tbody></table>
-
