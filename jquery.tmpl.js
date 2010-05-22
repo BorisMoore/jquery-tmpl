@@ -12,37 +12,43 @@
 	jQuery.fn.extend({
 		render: function( data, options, context ) {
 			return this.map(function(i, tmpl){
-				return jQuery( jQuery.evalTmpl( context, tmpl, data, options ).join("") ).get();
+				return jQuery.evalTmpl( context, tmpl, data, options, 0, true );
 			});
 		},
-		
+
 		// This will allow us to do: .append( "template", dataObject )
-		domManip: function( args ) {
+		domManip: function( args, table, callback ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
-			if ( args.length > 1 && args[0].nodeType ) {
-				arguments[0] = [ jQuery.makeArray(args) ];
+			var options = args[2], 
+				dmArgs = jQuery.makeArray(arguments);
+			if (args.length > 1 && args[0].nodeType) {
+				dmArgs[0] = [jQuery.makeArray(args)];
 			}
+			else if (args.length >= 2 && typeof args[0] === "string" && typeof args[1] !== "string") {
+				// Fragment to clone and insert.
+				dmArgs[0] = [ jQuery.evalTmpl( args[3], args[0], args[1], args[2], 0, true ) ]; 
+			}
+			dmArgs[2] = function (fragClone) { 	
+				// Called before inserting cloned fragment into DOM 
+				var content = jQuery.makeArray(fragClone.childNodes);
 
-			if ( args.length >= 2 && typeof args[0] === "string" && typeof args[1] !== "string" ) {
-				arguments[0] = [ jQuery( jQuery.evalTmpl( args[3], args[0], args[1], args[2] ).join("")).get() ];
+				// Return fragment to caller (e.g. append) for DOM insertion
+				callback.call(this, fragClone); 
+
+				var ctxs = jQuery.templateContexts;
+				for ( var i = 0, l=ctxs.length; i<l; i++ ) {
+					if (ctxs[i].options.rendered) {
+						ctxs[i].options.rendered(jQuery( content ).filter( "[_tmplctx=" + i + "]:not([_tmplctx=" + i + "] *)" ).get(), ctxs[i]);
+					}
+				}
 			}
-			
-			return oldManip.apply( this, arguments );
+			return oldManip.apply(this, dmArgs);
 		}
 	});
 	
 	jQuery.extend({
-		evalTmpl: function( context, tmpl, data, options, index ) {
-			function ctx( data, parentCtx, i, dataArray ) { 
-				return { 
-					options: options || (context ? context.options : {}),
-					data: data,
-					parent: parentCtx || null,
-					index: i || 0,
-					dataArray: dataArray || null
-				};
-			}
+		evalTmpl: function( context, tmpl, data, options, index, domFrag ) {
 			var fn, node;
 			data = data || (context ? context.data : null);
 					
@@ -70,16 +76,39 @@
 				return []; //Could throw...
 			}
 			context = context || {};
-			context.options = options || context.options || {};
+			options = options || {};
+			options.context = context;
 			if ( typeof data === "function" ) {
 				data = data.call(context.data || {}, context);  
 			}
-			return (jQuery.isArray( data ) ? 
+			var ret = context.content = jQuery.isArray( data ) ? 
 				jQuery.map( data, function( dataItem, i ) {
-					return fn.call( dataItem, jQuery, ctx( dataItem, context, i, data ) );
+					return ctx( fn, dataItem, context, i, data )
 				}) : 
-				fn.call( data, jQuery, ctx( data, context ) ) 
-			);
+				[ ctx( fn, data, context ) ];
+			
+			return domFrag ? jQuery( build(ret, context.key).join("") ).get() : ret;
+			
+			function ctx( fn, data, parentCtx, i, dataArray, content ) { 
+				var newCtx = { 
+					options: options || (parentCtx ? parentCtx.options : {}),
+					data: data,
+					parent: parentCtx || null,
+					index: i || 0,
+					dataArray: dataArray || null,
+					content: content || null
+				};
+				newCtx.content = fn.call( data, jQuery, newCtx);
+				newCtx.key = jQuery.templateContexts.push(newCtx) - 1;
+				return newCtx;
+			}
+			function build( content, ctxKey ) {
+				return jQuery.map( content, function( item ) {
+					return (typeof item === "string") ? 
+						// Insert context info, which will be used in rendered event or in user code.
+						item.replace(/(<\w+)([^>]*)/g, "$1 _tmplctx=\"" + ctxKey + "\" $2") : build( item.content, item.key );
+				});
+			}
 		},
 
 		// You can stick pre-built template functions here
@@ -89,6 +118,7 @@
 		 *   jQuery.templates.foo = jQuery.tmpl("some long templating string");
 		 *   $("#test").append("foo", data);
 		 */
+		templateContexts: [],
 
 		tmplcmd: {
 			"render": {
@@ -114,7 +144,6 @@
 				prefix: "if($defined_1){_.push($.encode($1));}"
 			}
 		},
-		
 		encode: function( text ) {
 			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
 
@@ -127,9 +156,10 @@
 				markup = jQuery( markup )[0];
 			}
 			if (markup.nodeType) markup = markup.innerHTML; 
-			return new Function("jQuery","$context",
-				"var $=jQuery,$options=$context.options,$i=$context.index,_=[];" +
-
+			return new Function("jQuery","$context", 
+				"var $=jQuery,_=[]," +
+				"$options=$context.options,$i=$context.index;" +
+				
 				// Introduce the data as local variables using with(){}
 				"with(this){_.push('" +
 
@@ -138,7 +168,8 @@
 					.replace(/([\\'])/g, "\\$1")
 					.replace(/[\r\t\n]/g, " ")
 					.replace(/\${([^}]*)}/g, "{{= $1}}")
-					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?}}/g, function(all, slash, type, fnargs, target, parens, args) {
+					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?}}/g, 
+					function(all, slash, type, fnargs, target, parens, args) {
 						function unescape( args ) {
 							return args ? args.replace(/\\'/g, "'").replace(/\\\\/g, "\\") : null;
 						}

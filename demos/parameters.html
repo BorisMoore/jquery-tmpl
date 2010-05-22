@@ -12,7 +12,6 @@
 
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../jquery.tmpl.js"></script>
-<script src="../nje.tmplPlus.js"></script>
 <script>
 $(function(){
 	var people = [
@@ -21,14 +20,14 @@ $(function(){
 			lastName: "Resig",
 			url: "http://ejohn.org/",
 			cities: [ "BSTN", "NY", "SF" ],
-			favoriteCity: 1
+			favoriteCity: 0
 		},
 		{
 			firstName: "Dave",
 			lastName: "Reed",
 			url: "http://dave.org/",
 			cities: [ "RDMD", "STL", "SF", "LA" ],
-			favoriteCity: 2,
+			favoriteCity: 3,
 			invertName: true
 		},
 		{
@@ -42,12 +41,12 @@ $(function(){
 	];
 	
 	var cities = {
-		BSTN: { name: "Boston", state: "MA", weather: "Cold" },
-		SF: { name: "San Francisco", state: "CA", weather: "Warm" },
-		STL: { name: "Seattle", state: "WA", weather: "Wet" },
-		RDMD: { name: "Redmond", state: "WA", weather: "Wet" },
-		LA: { name: "Los Angeles", state: "CA", weather: "Hot" },
-		NY: { name: "New York", state: "NY", weather: "Variable" }
+		BSTN: { name: "Boston", state: "MA", weather: "Cold", averageTemp: 30 },
+		SF: { name: "San Francisco", state: "CA", weather: "Hot", averageTemp: 70 },
+		STL: { name: "Seattle", state: "WA", weather: "Wet", averageTemp: 60 },
+		RDMD: { name: "Redmond", state: "WA", weather: "Wet", averageTemp: 60 },
+		LA: { name: "Los Angeles", state: "CA", weather: "Hot", averageTemp: 90 },
+		NY: { name: "New York", state: "NY", weather: "Variable", averageTemp: 50 }
 	};
 
 	$(".peopleTable")
@@ -62,15 +61,27 @@ function getCity( context, index ) {
 	return context.options.cities[this.cities[index]];
 }
 
-function getTemplate( context, key) {
+function getTemplate( context, key ) {
 	return $.tmpl("#tmpl" + key);
 }
+
+function cityRendered( nodes, context ) {
+	$("input", nodes)
+		.animate({"width":"+=" + (context.data.averageTemp - 50)}, 2000)
+		.click(function(){ 
+			alert(context.data.weather) 
+		});
+}
+
 </script>
 
 <script id="tmplPeople" type="text/html">
 	{{render(
 		getCity(favoriteCity), 
-		{ owner: this, title: "Favorite city for" }
+		{ 
+			owner: this, 
+			title: "Favorite city for",
+			rendered: cityRendered }
 	) 
 	getTemplate("City")}}
 </script>
@@ -78,7 +89,8 @@ function getTemplate( context, key) {
 <script id="tmplCity" type="text/html">
 	<tr class="person${$context.parent.index%2?'Alt':''}">
 		<td>${$options.title} ${getName($options.owner)} </td>
-		<td><b>${name}</b></td><td>${state}</td><td>Weather: <i>${weather}</i></td>
+		<td><b>${name}</b></td><td>${state}</td>
+		<td><input type="button" value="Local Weather?"/></td>
 	</tr>
 </script>
 

@@ -1,0 +1,138 @@
+﻿body
+{
+	background-color: #b9090b;
+	font-family: Verdana;
+	font-size: 12px;
+}
+
+#pageBody
+{
+	position: relative;
+	margin: auto;
+	width: 90%;
+	background-color: White;
+	padding: 15px;
+	height: 650px;
+}
+
+#movieContainer
+{
+	width: 700px;
+	clear:both;
+}
+
+#movieContainer > div
+{
+	border: 1px solid #00509f;
+	margin-bottom: 10px;
+	padding: 8px;
+}
+
+#movieContainer div div
+{
+	margin-right: 8px;
+	float: left;
+	width: 120px;
+	height: 150px;
+}
+
+#movieContainer div img
+{
+	width: 120px;
+	height: 150px;
+}
+
+#movieContainer div br
+{
+	clear:both;
+}
+
+#genres
+{
+	display: block;
+	padding: 0;
+}
+
+#genres li
+{
+	list-style: none;
+	float: left;
+	border: 1px solid #ccc;
+	text-decoration: none;
+	margin: 0 5px 0 0;
+	padding: 5px;
+	cursor: pointer;
+}
+
+#genres li:hover
+{
+	border: 1px solid #003f7e;
+}
+
+#genres li.selected
+{
+	border: 1px solid #003f7e;
+	color: #000;
+	font-weight: 700;
+	background-color: #eee;
+}
+
+#pager
+{
+	float: left;
+	clear:both;
+	margin: 0 0 10px;
+}
+
+#pager ul.pages
+{
+	display: block;
+	border: none;
+	text-transform: uppercase;
+	font-size: 10px;
+	padding: 0;
+}
+
+#pager ul.pages li
+{
+	list-style: none;
+	float: left;
+	border: 1px solid #888;
+	text-decoration: none;
+	margin: 0 5px 0 0;
+	padding: 5px;
+}
+
+#pager ul.pages li:hover
+{
+	border: 1px solid #00376f;
+}
+
+#pager ul.pages li.pgEmpty
+{
+	border: 1px solid #ccc;
+	color: #aaa;
+	cursor: default;
+}
+
+#pager ul.pages li.pgCurrent
+{
+	border: 1px solid #003f7e;
+	color: #000;
+	font-weight: 700;
+	background-color: #eee;
+}
+
+#booking
+{
+	background-color: #eee;
+	font: 14px Arial;
+	float: right;
+	width: 500px;
+	padding: 8px;
+	border: solid 2px black;
+}
+
+.buyButton {
+/* 	background: url(buyButton.png) no-repeat 0px -20px) */
+}
