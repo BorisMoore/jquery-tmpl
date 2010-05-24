@@ -47,6 +47,9 @@ jQuery(function(){
 
 	// Appends multiple LIs for each item. Use options referenced in tmpl string
 	$("ul").append( "#sometmpl4", arrayOfDataObjects, { cities: true } );
+
+	// Example of template that has leading or trailing text
+	$("div").append( "#leadingOrTrailingText", arrayOfDataObjects );
 });
 </script>
 
@@ -72,4 +75,10 @@ jQuery(function(){
 	<li>${$i}) <a href="${url}">${name()}</a> ({{if $context.options.cities}}${cityJoin()}{{/if}})</li>
 </script>
 
+<script id="leadingOrTrailingText" type="text/html">
+	${firstName} <strong>${lastName}</strong> <br/>
+</script>
+
 <ul></ul>
+
+<div></div>

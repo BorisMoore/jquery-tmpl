@@ -91,7 +91,7 @@
 				}) : 
 				[ ctx( fn, data, context ) ];
 			
-			return domFrag ? jQuery( build(ret, context.key).join("") ).get() : ret;
+			return domFrag ? build( ret, context.key ) : ret;
 			
 			function ctx( fn, data, parentCtx, i, dataArray, content ) { 
 				var newCtx = { 
@@ -102,16 +102,26 @@
 					dataArray: dataArray || null,
 					content: content || null
 				};
-				newCtx.content = fn.call( data, jQuery, newCtx);
-				newCtx.key = jQuery.templateContexts.push(newCtx) - 1;
+				newCtx.content = fn.call( data, jQuery, newCtx );
+				newCtx.key = jQuery.templateContexts.push( newCtx ) - 1;
 				return newCtx;
 			}
-			function build( content, ctxKey ) {
-				return jQuery.map( content, function( item ) {
+			function build( content, ctxKey, compose ) {
+				var ret = jQuery.map( content, function( item ) {
 					return (typeof item === "string") ? 
 						// Insert context info, which will be used in rendered event or in user code.
-						item.replace(/(<\w+)([^>]*)/g, "$1 _tmplctx=\"" + ctxKey + "\" $2") : build( item.content, item.key );
+						item.replace( /(<\w+)([^>]*)/g, "$1 _tmplctx=\"" + ctxKey + "\" $2" ) : build( item.content, item.key, true );
 				});
+				if (compose) return ret;
+				// Support templates which have initial or final text nodes
+				ret = ret.join("");
+				var frag;
+				ret.replace( /^\s*([^<\s][^<]*)?(<[\w\W]+>)([^>]*[^>\s])?\s*$/, function( all, initial, middle, final ) {
+					frag = jQuery( middle ).get();
+					if ( !!initial ) frag.unshift( document.createTextNode( initial ));
+					if ( !!final ) frag.push( document.createTextNode( final ));
+				});
+				return frag ? frag : document.createTextNode( ret ); 
 			}
 		},
 
