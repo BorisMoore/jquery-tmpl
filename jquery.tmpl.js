@@ -20,7 +20,7 @@
 		domManip: function( args, table, callback ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
-			var options = args[2], 
+			var options = args[2], ctxs = jQuery.templateContexts, ctxsLength = ctxs.length,				
 				dmArgs = jQuery.makeArray(arguments);
 			if (args.length > 1 && args[0].nodeType) {
 				dmArgs[0] = [jQuery.makeArray(args)];
@@ -30,20 +30,24 @@
 				dmArgs[0] = [ jQuery.evalTmpl( args[3], args[0], args[1], args[2], 0, true ) ]; 
 			}
 			dmArgs[2] = function (fragClone) { 	
-				// Called before inserting cloned fragment into DOM 
+				// Called by oldManip, with cloned fragment ready for insertion into DOM 
 				var content = jQuery.makeArray(fragClone.childNodes);
 
-				// Return fragment to caller (e.g. append) for DOM insertion
+				// Return fragment to original caller (e.g. append) for DOM insertion
 				callback.call(this, fragClone); 
 
-				var ctxs = jQuery.templateContexts;
-				for ( var i = 0, l=ctxs.length; i<l; i++ ) {
+				// Fragment has been inserted. Call onRendered for each inserted template instance. 
+				for ( var i = ctxsLength, l=ctxs.length; i<l; i++ ) {
 					if (ctxs[i].options.rendered) {
 						ctxs[i].options.rendered(jQuery( content ).filter( "[_tmplctx=" + i + "]:not([_tmplctx=" + i + "] *)" ).get(), ctxs[i]);
 					}
 				}
 			}
 			return oldManip.apply(this, dmArgs);
+		},
+
+		templateContext: function() {
+			return jQuery.templateContexts[this.closest("[_tmplctx]").attr("_tmplctx")];
 		}
 	});
 	

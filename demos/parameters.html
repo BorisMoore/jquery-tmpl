@@ -2,12 +2,12 @@
     *[data-tmpl], .html-template {   
     	display:none;    
     }
-    .peopleTable td { border:2px solid #555; text-align:center; }   
-    .person{ background-color:#AFA; }   
-    .personAlt{ background-color:#9ED; }   
-    .personSeparator { background-color:#C77; height:6px;}   
-    .citySeparator { background-color:#CCC; height:4px;}   
-    .peopleTable { border-collapse:collapse; border:2px solid #555; }   
+    .citiesTable td { border:2px solid #555; text-align:left; padding:3px; }   
+    .row{ background-color:#AFA; }   
+    .rowAlt{ background-color:#9ED; }   
+    .citiesTable { border-collapse:collapse; border:2px solid #555; margin:10px }   
+    #allCitiesBtn { margin:10px }
+    .center td { text-align:center; }   
 </style>
 
 <script src="http://code.jquery.com/jquery.js"></script>
@@ -45,12 +45,21 @@ $(function(){
 		SF: { name: "San Francisco", state: "CA", weather: "Hot", averageTemp: 70 },
 		STL: { name: "Seattle", state: "WA", weather: "Wet", averageTemp: 60 },
 		RDMD: { name: "Redmond", state: "WA", weather: "Wet", averageTemp: 60 },
-		LA: { name: "Los Angeles", state: "CA", weather: "Hot", averageTemp: 90 },
+		LA: { name: "Los Angeles", state: "CA", weather: "Hot", averageTemp: 95 },
 		NY: { name: "New York", state: "NY", weather: "Variable", averageTemp: 50 }
 	};
 
-	$(".peopleTable")
-		.append("#tmplPeople", people, {cities: cities} );
+	$("#favoriteCities")
+		.append("#tmplFavorites", people, {cities: cities} );
+
+	$("#allCitiesBtn").click(function() {  
+		$("#allCities")
+			.empty()
+			.append("#tmplAll", people, {
+				cities: cities, 
+				rendered: cityRendered 
+			});
+	});
 });
 
 function getName( context, person ) {
@@ -61,38 +70,68 @@ function getCity( context, index ) {
 	return context.options.cities[this.cities[index]];
 }
 
+function getCities( context, cities ) {
+	return $.map(cities, function(index) { 
+		return context.options.cities[index]; 
+	});
+}
+
 function getTemplate( context, key ) {
 	return $.tmpl("#tmpl" + key);
 }
 
 function cityRendered( nodes, context ) {
-	$("input", nodes)
-		.animate({"width":"+=" + (context.data.averageTemp - 50)}, 2000)
+	$(".temperature", nodes)
+		.animate({"width":"+=" + (context.data.averageTemp*2 - 50)}, 2000)
 		.click(function(){ 
-			alert(context.data.weather) 
+			alert(context.data.averageTemp); 
 		});
 }
 
+$( ".weather" ).live("click", function( elem ) {
+	var context = $(this).templateContext();
+	alert(context.data.weather); 
+});
+
 </script>
 
-<script id="tmplPeople" type="text/html">
+<script id="tmplFavorites" type="text/html">
 	{{render(
 		getCity(favoriteCity), 
 		{ 
 			owner: this, 
 			title: "Favorite city for",
-			rendered: cityRendered }
+			rendered: cityRendered 
+		}
+	) 
+	getTemplate("City")}}
+</script>
+
+<script id="tmplAll" type="text/html">
+	<tr class="row${$i%2?'Alt':''} center"><td colspan="4">Cities for ${getName(this)}</td></tr>
+	{{render(
+		getCities(cities), 
+		{ 
+			rendered: cityRendered 
+		}
 	) 
 	getTemplate("City")}}
 </script>
 
 <script id="tmplCity" type="text/html">
-	<tr class="person${$context.parent.index%2?'Alt':''}">
-		<td>${$options.title} ${getName($options.owner)} </td>
-		<td><b>${name}</b></td><td>${state}</td>
-		<td><input type="button" value="Local Weather?"/></td>
+	<tr class="row${$context.parent.index%2?'Alt':''}">
+		{{if $options.owner}}
+			<td>${$options.title} ${getName($options.owner)} </td>
+		{{/if}}
+		<td><b>${name}</b>
+		</td><td>${state}</td>
+		<td><input type="button" value="Local Weather" class="weather"/></td>
+		<td width="320px"><input type="button" value="Local Temperature" class="temperature"/></td>
 	</tr>
 </script>
 
-<table class="peopleTable"><tbody>
-</tbody></table>
+<table id="favoriteCities" class="citiesTable"></table>
+
+<input id="allCitiesBtn" type="button" value="All cities" /> 
+<table id="allCities" class="citiesTable"></table>
+
