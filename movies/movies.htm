@@ -3,9 +3,6 @@
 <head>
 	<title>jQuery + OData + Netflix Catalog API</title>
 	<link href="movies.css" rel="stylesheet" type="text/css" />
-	<style type="text/css">
-	  	div.test { margin: 0px; width: 100px; height: 80px; background: green; border: 1px solid black; position: relative; }
-	</style>
 </head>
 <body>
 
@@ -22,12 +19,13 @@
 		<li>Sci-Fi Cult Classics</li>
 	</ul>
 	
-	<div id="pager"></div>
+	<div id="pager"><ul class="pages"><li class="pgEmpty">first</li><li class="pgEmpty">prev</li></ul></div>
 	
-	<div id="movieContainer"></div>
-	
-</div>
+	<div id="movieList"></div>
 
+	<table id="bookingsList"></table>
+	<br/>
+</div>
 <script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../jquery.tmpl.js" type="text/javascript"></script>
 <script src="jquery.pager.js" type="text/javascript"></script>
@@ -42,17 +40,46 @@
 	</div>
 </script>
 
-<script type="text/javascript">
+<script id="bookingsListTemplate" type="text/html">
+	{{each movies}}
+		<tr>
+			{{if selected === movie.Id}}
+				{{render(this, { rendered: onBookingEditRendered }) "#bookingEditTemplate"}}
+			{{else}}
+				{{render(this, { rendered: onBookingRendered }) "#bookingTemplate"}}
+			{{/if}}
+		</tr>
+	{{/each}}
+</script>
 
-	var genre="Cartoons", pageIndex=1, pageSize=3;
+<script id="bookingEditTemplate" type="text/html">
+	<td class="editBooking" colspan="4">
+		<div class="fields">
+			<strong>${movie.Name}</strong><br/>
+			<div>
+				<span>Movie Theater: </span><input type="text" value="${movieTheatre}" /><br/>
+				<span>Date: </span><input type="text" value="${formatDate(date)}" /><br/>
+				<span>Quantity: </span><input type="text" value="${quantity}" />
+			</div>
+		</div>
+		<div><img src="${movie.BoxArt.LargeUrl}" /></div>
+	</td>
+</script>
+
+<script id="bookingTemplate" type="text/html">
+	<td>${movie.Name}</td>
+	<td>${movieTheatre}</td>
+	<td>${formatDate(date)}</td>
+	<td>${quantity}</td>
+</script>
+
+<script type="text/javascript">
+	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
+		bookings = { selected: 0, movies: {} };
 
 	getMovies(pageIndex);
 
 	$( "#genres li" ).click( selectGenre );
-
-	function buyTickets(data) {
-		alert(data.Name);
-	}
 
 	function selectGenre() {
 		$( "#genres li" ).removeClass( "selected" );
@@ -72,7 +99,7 @@
 
 		pageIndex = index;
 
-		$( "#movieContainer" )
+		$( "#movieList" )
 			.fadeOut( "medium", function () {
 				$.ajax({
 					dataType: "jsonp",
@@ -84,16 +111,36 @@
 	}
 	
 	function showMovies( data ) {
-		var pageCount = Math.ceil( data.d.__count/pageSize ),
+		pageCount = Math.ceil( data.d.__count/pageSize ),
 			movies = data.d.results;
 		
 		$( "#pager" ).pager({ pagenumber: pageIndex, pagecount: pageCount, buttonClickCallback: getMovies });
 		
 		// show movies in template
-		$( "#movieContainer" )
+		$( "#movieList" )
 			.empty()
 			.append( "#movieTemplate", movies, { rendered: onMovieRendered } )
 			.fadeIn( "fast" );
+	}
+
+	function buyTickets(data) {
+		// Add item to bookings list
+		bookings.movies[data.Id] = { movie: data, date: new Date(), quantity: 1, movieTheatre: "" };
+		selectBooking(data.Id);
+	}
+
+	function selectBooking(id) {
+		if (bookings.selected) {
+			$("div", bookings.selectedElem).animate( {height:"-=100"}, 650, function() { book(id); } );
+		}
+		else {
+			book(id);
+		}
+	}
+
+	function book(id) {
+		bookings.selected = id;
+		$("#bookingsList").empty().append("#bookingsListTemplate", bookings);
 	}
 
 	function onMovieRendered( nodes, context ) { 
@@ -101,6 +148,21 @@
 		$( ".buyButton", nodes ).click( function() { 
 			buyTickets(context.data); 
 		});
+	}
+
+	function onBookingRendered( nodes, context ) {
+		$(nodes).click(function(){ 
+			selectBooking(context.data.movie.Id); 
+		});
+	}
+
+	function onBookingEditRendered( nodes, context ) {
+		bookings.selectedElem = nodes[0];
+      	$( "div", nodes ).animate( {height:"+=100"}, 500 );
+	}
+
+	function formatDate(context, date) {
+		return date.toLocaleDateString();
 	}
 </script>
 

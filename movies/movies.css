@@ -7,48 +7,18 @@
 
 #pageBody
 {
+	display: block;
+	clear:both;
 	position: relative;
 	margin: auto;
 	width: 90%;
 	background-color: White;
-	padding: 15px;
-	height: 650px;
-}
-
-#movieContainer
-{
-	width: 700px;
-	clear:both;
-}
-
-#movieContainer > div
-{
-	border: 1px solid #00509f;
-	margin-bottom: 10px;
-	padding: 8px;
-}
-
-#movieContainer div div
-{
-	margin-right: 8px;
-	float: left;
-	width: 120px;
-	height: 150px;
-}
-
-#movieContainer div img
-{
-	width: 120px;
-	height: 150px;
-}
-
-#movieContainer div br
-{
-	clear:both;
+	padding: 10px 15px 0 15px;
 }
 
 #genres
 {
+	clear:both;
 	display: block;
 	padding: 0;
 }
@@ -79,8 +49,9 @@
 
 #pager
 {
+	width: 100%;
 	float: left;
-	clear:both;
+	clear:left;
 	margin: 0 0 10px;
 }
 
@@ -123,16 +94,93 @@
 	background-color: #eee;
 }
 
-#booking
+#movieList
 {
-	background-color: #eee;
-	font: 14px Arial;
-	float: right;
-	width: 500px;
+	display: block;
+	float: left;
+	width: 49.7%;
+	clear:both;
+}
+
+#movieList > div
+{
+	border: 1px solid #00509f;
+	margin-bottom: 10px;
 	padding: 8px;
-	border: solid 2px black;
+}
+
+#movieList div div
+{
+	margin-right: 8px;
+	float: left;
+	width: 120px;
+	height: 150px;
+}
+
+#movieList div img
+{
+	height: 150px;
+}
+
+#movieList div br, #pageBody br 
+{
+	clear:both;
 }
 
 .buyButton {
 /* 	background: url(buyButton.png) no-repeat 0px -20px) */
 }
+
+#bookingsList
+{
+    border-collapse:collapse; 
+	border: 1px solid #00509f;
+	width: 49.7%;
+	float: right;
+}
+
+#bookingsList tr
+{
+	border: 1px solid #00509f;
+}
+
+#bookingsList td
+{
+	padding:8px;
+}
+
+.editBooking > div
+{
+	float: right;
+	height:0px;
+}
+
+.editBooking .fields
+{
+	float: left;
+}
+
+.editBooking .fields span
+{
+	margin: 4px 0;
+	display: inline-block;
+	width: 150px;
+}
+
+.editBooking .fields strong
+{
+	margin-bottom: 6px;
+	display: inline-block;
+}
+
+.editBooking .fields input
+{
+	margin: 3px 0;
+	width: 250px;
+}
+
+.editBooking div img
+{
+	height: 100px;
+}
+

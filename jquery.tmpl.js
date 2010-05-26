@@ -31,7 +31,7 @@
 			}
 			dmArgs[2] = function (fragClone) { 	
 				// Called by oldManip, with cloned fragment ready for insertion into DOM 
-				var content = jQuery.makeArray(fragClone.childNodes);
+				var content = jQuery(fragClone.childNodes);
 
 				// Return fragment to original caller (e.g. append) for DOM insertion
 				callback.call(this, fragClone); 
@@ -39,7 +39,8 @@
 				// Fragment has been inserted. Call onRendered for each inserted template instance. 
 				for ( var i = ctxsLength, l=ctxs.length; i<l; i++ ) {
 					if (ctxs[i].options.rendered) {
-						ctxs[i].options.rendered(jQuery( content ).filter( "[_tmplctx=" + i + "]:not([_tmplctx=" + i + "] *)" ).get(), ctxs[i]);
+						var filter = "[_tmplctx=" + i + "]:not([_tmplctx=" + i + "] *)";
+						ctxs[i].options.rendered(content.find( filter ).add(content.filter( filter )).get(), ctxs[i]);
 					}
 				}
 			}
@@ -136,6 +137,7 @@
 
 		tmplcmd: {
 			"render": {
+				_default: { $2: "null" },
 				prefix: "if($defined_1){_=_.concat($.evalTmpl($context,$1,$2));}"
 			},
 			"each": {
