@@ -38,9 +38,22 @@
 
 				// Fragment has been inserted. Call onRendered for each inserted template instance. 
 				for ( var i = ctxsLength, l=ctxs.length; i<l; i++ ) {
-					if (ctxs[i].options.rendered) {
-						var filter = "[_tmplctx=" + i + "]:not([_tmplctx=" + i + "] *)";
-						ctxs[i].options.rendered(content.find( filter ).add(content.filter( filter )).get(), ctxs[i]);
+					var ctx = ctxs[i], nodes = []; filter = "[_tmplctx=" + i + "]",
+						insertedElems = content.find( filter ).add(content.filter( filter ));
+					
+					insertedElems.each( function() {
+						if ( !jQuery(this.parentNode ).closest( filter ).length ) {
+							nodes.push( this );
+							jQuery.data( this, "tmplCtx", ctx);
+						}
+						if (jQuery.support.deleteExpando) {
+							delete this._tmplctx;
+						} else if (this.removeAttribute) {
+							this.removeAttribute( "_tmplctx" );
+						}
+					});
+					if ( ctx.options.rendered ) {
+						ctx.options.rendered( nodes, ctx );
 					}
 				}
 			}
@@ -48,15 +61,16 @@
 		},
 
 		templateContext: function() {
-			return jQuery.templateContexts[this.closest("[_tmplctx]").attr("_tmplctx")];
+			var node = this.get(0), tmplCtx;
+			while ( !(tmplCtx = jQuery.data( node, "tmplCtx" )) && (node = node.parentNode) ) {}
+			return tmplCtx;
 		}
 	});
 	
 	jQuery.extend({
 		evalTmpl: function( context, tmpl, data, options, index, domFrag ) {
-			var fn, node;
+			var fn;
 			data = data || (context ? context.data : null);
-					
 			if ( typeof tmpl === "string" ) {
 				// Use a pre-defined template, if available
 				fn = jQuery.templates[ tmpl ];
@@ -64,18 +78,11 @@
 					fn = jQuery.tmpl( tmpl );
 				}
 			} else if ( tmpl instanceof jQuery ) {
-				node = tmpl.get( 0 );
+				fn = jQuery.tmpl( tmpl.get( 0 ) );
 			} else if ( tmpl.nodeType ) {
-				node = tmpl;
+				fn = jQuery.tmpl( tmpl );
 			} else if ( typeof tmpl === "function" ) {
 				fn = tmpl;
-			}
-			if ( node ) {
-				var elemData = jQuery.data( node );
-				fn = elemData.tmpl || (elemData.tmpl = jQuery.tmpl( node ));
-				// Cache, if tmpl is a node. We assume that if the template string is 
-				// being passed directly in, the user doesn't want it cached. They can
-				// stick it in jQuery.templates to cache it.
 			}
 			if (!fn) {
 				return []; //Could throw...
@@ -164,60 +171,69 @@
 			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
 
 		},
-		tmpl: function( markup ) {
+		tmpl: function( tmpl ) {
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
-			if ( !htmlExpr.test(markup) ) {
+			if ( (typeof tmpl === "string") && !htmlExpr.test(tmpl) ) {
 				// it is a selector
-				markup = jQuery( markup )[0];
+				tmpl = jQuery( tmpl )[0];
 			}
-			if (markup.nodeType) markup = markup.innerHTML; 
-			return new Function("jQuery","$context", 
-				"var $=jQuery,_=[]," +
-				"$options=$context.options,$i=$context.index;" +
-				
-				// Introduce the data as local variables using with(){}
-				"with(this){_.push('" +
+			if (tmpl.nodeType) {
+				return jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", tmplFn( tmpl.innerHTML ));
+				// Cache, if tmpl is a node. We assume that if the template string is 
+				// being passed directly in, the user doesn't want it cached. They can
+				// stick it in jQuery.templates to cache it.
+			}
+			return tmplFn( tmpl ); 
+			
+			function tmplFn( markup ) {
+				return new Function("jQuery","$context", 
+					"var $=jQuery,_=[]," +
+					"$options=$context.options,$i=$context.index;" +
+					
+					// Introduce the data as local variables using with(){}
+					"with(this){_.push('" +
 
-				// Convert the template into pure JavaScript
-				markup
-					.replace(/([\\'])/g, "\\$1")
-					.replace(/[\r\t\n]/g, " ")
-					.replace(/\${([^}]*)}/g, "{{= $1}}")
-					.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?}}/g, 
-					function(all, slash, type, fnargs, target, parens, args) {
-						function unescape( args ) {
-							return args ? args.replace(/\\'/g, "'").replace(/\\\\/g, "\\") : null;
-						}
-						var cmd = jQuery.tmplcmd[ type ], def, expr;
-						if ( !cmd ) {
-							throw "Template command not found: " + type;
-						}
-						def = cmd._default || [];
-						if (target) {
-							target = unescape(target); 
-							args = args ? ("$context," + unescape(args) + ")") : (parens ? "$context)" : "");
-							expr = args ? ("(" + target + ").call(this," + args) : target;
-						}
-						else {
-							expr = def["$1"] || "null";
-						}
-						fnargs = unescape( fnargs );
-						return "');" + 
-							cmd[ slash ? "suffix" : "prefix" ]
-								.split("$defined_1").join( "typeof("+ target  +")!=='undefined'" )
-								.split("$1").join( expr )
-								.split("$2").join( fnargs ? 
-									fnargs.replace(/\s*([^\(]+)\s*(\((.*?)\))?/g, function(all, name, parens, params) {
-										params = params ? ("$context," + params + ")") : (parens ? "$context)" : "");
-										return params ? ("(" + name + ").call(this," + params) : all;
-									})	 
-									: (def["$2"]||"") 
-								) +
-							"_.push('";
-					}) + 
-				"');}return _;"
-			);
+					// Convert the template into pure JavaScript
+					markup
+						.replace(/([\\'])/g, "\\$1")
+						.replace(/[\r\t\n]/g, " ")
+						.replace(/\${([^}]*)}/g, "{{= $1}}")
+						.replace(/{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?}}/g, 
+						function(all, slash, type, fnargs, target, parens, args) {
+							function unescape( args ) {
+								return args ? args.replace(/\\'/g, "'").replace(/\\\\/g, "\\") : null;
+							}
+							var cmd = jQuery.tmplcmd[ type ], def, expr;
+							if ( !cmd ) {
+								throw "Template command not found: " + type;
+							}
+							def = cmd._default || [];
+							if (target) {
+								target = unescape(target); 
+								args = args ? ("$context," + unescape(args) + ")") : (parens ? "$context)" : "");
+								expr = args ? ("(" + target + ").call(this," + args) : target;
+							}
+							else {
+								expr = def["$1"] || "null";
+							}
+							fnargs = unescape( fnargs );
+							return "');" + 
+								cmd[ slash ? "suffix" : "prefix" ]
+									.split("$defined_1").join( "typeof("+ target  +")!=='undefined'" )
+									.split("$1").join( expr )
+									.split("$2").join( fnargs ? 
+										fnargs.replace(/\s*([^\(]+)\s*(\((.*?)\))?/g, function(all, name, parens, params) {
+											params = params ? ("$context," + params + ")") : (parens ? "$context)" : "");
+											return params ? ("(" + name + ").call(this," + params) : all;
+										})	 
+										: (def["$2"]||"") 
+									) +
+								"_.push('";
+						}) + 
+					"');}return _;"
+				);
+			}
 		}
 	});
 })(jQuery);

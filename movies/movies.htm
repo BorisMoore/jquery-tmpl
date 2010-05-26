@@ -56,11 +56,9 @@
 	<td class="editBooking" colspan="4">
 		<div class="fields">
 			<strong>${movie.Name}</strong><br/>
-			<div>
-				<span>Movie Theater: </span><input type="text" value="${movieTheatre}" /><br/>
-				<span>Date: </span><input type="text" value="${formatDate(date)}" /><br/>
-				<span>Quantity: </span><input type="text" value="${quantity}" />
-			</div>
+			<span>Movie Theater: </span><input type="text" value="${movieTheatre}" /><br/>
+			<span>Date: </span><input type="text" value="${formatDate(date)}" /><br/>
+			<span>Quantity: </span><input type="text" value="${quantity}" />
 		</div>
 		<div><img src="${movie.BoxArt.LargeUrl}" /></div>
 	</td>
@@ -151,7 +149,8 @@
 	}
 
 	function onBookingRendered( nodes, context ) {
-		$(nodes).click(function(){ 
+		$(nodes[0].parentNode).click( function(){ 
+			$(nodes[0]).css({ "font-weight": "bold" });
 			selectBooking(context.data.movie.Id); 
 		});
 	}

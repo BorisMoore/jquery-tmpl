@@ -142,6 +142,7 @@
 #bookingsList tr
 {
 	border: 1px solid #00509f;
+	cursor:pointer;
 }
 
 #bookingsList td
