@@ -3,24 +3,54 @@
 <script>
 jQuery(function(){
 	var dataObject = {
-		name: function() {
-			return this.firstName + " " + this.lastName;
-		},
 		firstName: "John",
 		lastName: "Resig",
 		url: "http://ejohn.org/",
-		cityJoin: function(context, separator ) {
-			return this.cities.join(separator || ", ");
-		},
 		cities: [
 			"Boston, MA",
 			"San Francisco, CA"
-		]
+		],
+		name: getName,
+		cityJoin: cityJoin
 	};
 	
-	var arrayOfDataObjects = [ dataObject, dataObject, dataObject ];
+	var arrayOfDataObjects = [ 
+		dataObject, 
+		{
+			firstName: "Dave",
+			lastName: "Reed",
+			url: "http://dave.org/",
+			cities: [
+				"Seattle, WA",
+				"Los Angeles, CA",
+				"New York, NY"
+			],
+			name: getName,
+			cityJoin: cityJoin
+		},
+		{
+			firstName: "Boris",
+			lastName: "Moore",
+			url: "http://boris.org/",
+			cities: [
+				"Redmond, WA",
+				"Seattle, WA",
+				"New York, NY"
+			],
+			name: getName,
+			cityJoin: cityJoin
+		}
+	];
 	
-	var tmpl = '<li>${$i}) <a href="${url}">${name()}</a> {{if $context.options.cities}}(${cityJoin()}){{/if}}</li>';
+	function cityJoin( context, separator ) {
+		return this.cities.join( separator || ", " );
+	}
+	
+	function getName() {
+		return this.firstName + " " + this.lastName;
+	}
+	
+	var tmpl = '<li>${$i}) <a href="${url}">${name()}</a> {{if $context.showCities}}(${cityJoin()}){{/if}}</li>';
 		
 	$("#sometmpl")
 		.render( dataObject ) // Returns a LI with all the data filled in
@@ -36,17 +66,17 @@ jQuery(function(){
 
 	// Render the same template with different options
 	$("#sometmpl3")
-		.render( arrayOfDataObjects, { cities: false } )
+		.render( arrayOfDataObjects, { showCities: false } )
 		.appendTo("ul");
 	$("#sometmpl3")
-		.render( arrayOfDataObjects, { cities: true } ) 
+		.render( arrayOfDataObjects, { showCities: true } ) 
 		.appendTo("ul");
 	
 	// Appends one LI, filled with data, into the UL
 	$("ul").append( tmpl, dataObject );
 
 	// Appends multiple LIs for each item. Use options referenced in tmpl string
-	$("ul").append( "#sometmpl4", arrayOfDataObjects, { cities: true } );
+	$("ul").append( "#sometmpl4", arrayOfDataObjects, { showCities: true } );
 
 	// Example of template that has leading or trailing text
 	$("div").append( "#leadingOrTrailingText", arrayOfDataObjects );
@@ -62,8 +92,8 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl3" type="text/html">
-	<li>${$i+1} of ${$context.dataArray.length}) <a href="${url}">${name()}</a>
-	{{if $context.options.cities}}
+	<li>${$i+1} of ${$context.array.length}) <a href="${url}">${name()}</a>
+	{{if $context.showCities}}
 		Cities: {{each cities}} ${this} {{/each}}
 	{{else}}
 		No Cities
@@ -72,7 +102,7 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl4" type="text/html">
-	<li>${$i}) <a href="${url}">${name()}</a> ({{if $context.options.cities}}${cityJoin()}{{/if}})</li>
+	<li>${$i}) <a href="${url}">${name()}</a> ({{if $context.showCities}}${cityJoin()}{{/if}})</li>
 </script>
 
 <script id="leadingOrTrailingText" type="text/html">

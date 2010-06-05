@@ -8,17 +8,17 @@
 #pageBody
 {
 	display: block;
-	clear:both;
+	clear: both;
 	position: relative;
 	margin: auto;
 	width: 90%;
-	background-color: White;
-	padding: 10px 15px 0 15px;
+	background-color: #F9F5FA;
+	padding: 10px 15px 5px 15px;
 }
 
 #genres
 {
-	clear:both;
+	clear: both;
 	display: block;
 	padding: 0;
 }
@@ -27,11 +27,12 @@
 {
 	list-style: none;
 	float: left;
-	border: 1px solid #ccc;
+	border: 1px solid #888;
 	text-decoration: none;
 	margin: 0 5px 0 0;
 	padding: 5px;
 	cursor: pointer;
+	background-color: #fff;
 }
 
 #genres li:hover
@@ -42,16 +43,16 @@
 #genres li.selected
 {
 	border: 1px solid #003f7e;
-	color: #000;
+	color: #042CCA;
 	font-weight: 700;
-	background-color: #eee;
+	background: url(images/ui-bg_glass_75_dadada_1x400.png) repeat-x 50% 50%;
 }
 
 #pager
 {
 	width: 100%;
 	float: left;
-	clear:left;
+	clear: left;
 	margin: 0 0 10px;
 }
 
@@ -72,6 +73,7 @@
 	text-decoration: none;
 	margin: 0 5px 0 0;
 	padding: 5px;
+	background-color: #fff;
 }
 
 #pager ul.pages li:hover
@@ -89,9 +91,9 @@
 #pager ul.pages li.pgCurrent
 {
 	border: 1px solid #003f7e;
-	color: #000;
+	color: #042CCA;
 	font-weight: 700;
-	background-color: #eee;
+	background: url(images/ui-bg_glass_75_dadada_1x400.png) #dadada repeat-x 50% 50%;
 }
 
 #movieList
@@ -99,7 +101,7 @@
 	display: block;
 	float: left;
 	width: 49.7%;
-	clear:both;
+	clear: both;
 }
 
 #movieList > div
@@ -107,6 +109,7 @@
 	border: 1px solid #00509f;
 	margin-bottom: 10px;
 	padding: 8px;
+	background-color: #fff;
 }
 
 #movieList div div
@@ -122,66 +125,131 @@
 	height: 150px;
 }
 
-#movieList div br, #pageBody br 
+#movieList div br, #pageBody br
 {
-	clear:both;
+	clear: both;
 }
 
-.buyButton {
-/* 	background: url(buyButton.png) no-repeat 0px -20px) */
+.buyButton
+{
+	/* 	background: url(buyButton.png) no-repeat 0px -20px) */
 }
 
 #bookingsList
 {
-    border-collapse:collapse; 
-	border: 1px solid #00509f;
+	border-collapse: collapse;
+	border: 3px double #00509f;
 	width: 49.7%;
 	float: right;
+	background-color: #fff;
+	margin-bottom: 10px;
 }
 
 #bookingsList tr
 {
 	border: 1px solid #00509f;
-	cursor:pointer;
+	padding: 5px
 }
 
-#bookingsList td
+.bookingsHeader td
 {
-	padding:8px;
+	height: 30px;
+	text-align:center;
+	font-size:  14px;
+	font-style: italic;
+	line-height:30px;	
+	border: 3px double #00509f;
+	background-color: #F9F5FA;
 }
 
-.editBooking > div
+.bookingsHeader .cart-true
+{
+	background-color: #E8DAEB;
+}
+
+.bookingsHeader input
 {
 	float: right;
-	height:0px;
+	height:26px;
+	margin: 2px 15px 2px;
 }
 
-.editBooking .fields
+#cancel 
+{
+	float: left;
+} 
+
+.bookingTitle
+{
+	color: #2F5071;
+	font-weight: bold;
+	background: url(images/ui-bg_highlight-hard_100_eeeeee_1x100.png) #e6e6e6 repeat-x 50% 50%;
+	cursor: pointer;
+}
+
+.bookingTitle:hover, .bookingTitleEdit:hover
+{
+	background: url(images/ui-bg_glass_75_dadada_1x400.png) #dadada repeat-x 50% 50%;
+}
+
+.bookingTitleEdit
+{
+	color: #042CCA;
+	font-weight: bold;
+	background: url(images/ui-bg_highlight-hard_100_eeeeee_1x100.png) #e6e6e6 repeat-x 50% 50%;
+	cursor: pointer;
+}
+
+.bookingTitle td
+{
+	padding: 8px;
+}
+
+.bookingTitleEdit td
+{
+	padding: 7px 8px 7px 8px;
+}
+
+.bookingEdit div
+{
+	float: right;
+	height: 116px;
+}
+
+.bookingEdit .fields
 {
 	float: left;
 }
 
-.editBooking .fields span
+.bookingEdit .fields span
 {
-	margin: 4px 0;
+	margin: 12px 0 0 8px;
 	display: inline-block;
-	width: 150px;
+	width: 100px;
 }
 
-.editBooking .fields strong
+.bookingEdit .fields input
 {
-	margin-bottom: 6px;
-	display: inline-block;
-}
-
-.editBooking .fields input
-{
-	margin: 3px 0;
+	margin: 12px 0 0 8px;
 	width: 250px;
 }
 
-.editBooking div img
+.bookingEdit img
 {
 	height: 100px;
+	margin: 8px;
 }
 
+.close
+{
+	background-position: -96px -128px;
+	float: right;
+	cursor: pointer;
+}
+
+.ui-icon
+{
+	width: 16px;
+	height: 16px;
+	background-image: url(../images/ui-icons_cc0000_256x240.png);
+}

@@ -39,32 +39,32 @@ $(function(){
 	$.templates.value = $.tmpl( "#tmplValue" );
 
 	$("ul").append( "#composite", people, {
-		name: { label: "Name: ", invert: true },
-		first: { label: "First Name: " },
-		cities: { heading: "Favorite Cities" }
+		nameOptions: { label: "Name: ", invert: true },
+		firstOptions: { label: "First Name: " },
+		citiesOptions: { heading: "Favorite Cities" }
 	});
 });
 </script>
 
 <script id="composite" type="text/html">
 	<li>====================</li>
-	{{render(name(), $options.name) $.templates.value}}
-	{{render(firstName, $options.first) "value"}}
+	{{render(name(), $context.nameOptions) $.templates.value}}
+	{{render(firstName, $context.firstOptions) "value"}}
 	{{if cities}}
-		{{render(cities, $options.cities) "#tmplCity"}}
+		{{render(cities, $context.citiesOptions) "#tmplCity"}}
 	{{/if}}
-	{{if $i===$context.dataArray.length-1}}
+	{{if $i===$context.array.length-1}}
 		<li>====================</li>
-	{{/if}}
+	{{/if}}	
 </script>
 	
 <script id="tmplValue" type="text/html">
-	<li>${$options.label}${this}</li>
+	<li>${$context.label}${this}</li>
 </script>
 
 <script id="tmplCity" type="text/html">
-	{{if $options.heading && $i===0}}
-		<li><i>-------${$options.heading}</i>-------</li>
+	{{if $context.heading && $i===0}}
+		<li><i>-------${$context.heading}</i>-------</li>
 	{{/if}}    
 	<li>City ${$i+1} - ${name}, ${state}</li>
 </script>

@@ -35,7 +35,7 @@ $(function(){
 		}
 	];
 	
-	var cities = {
+	var allCities = {
 		BSTN: { name: "Boston", state: "MA", weather: "Cold" },
 		SF: { name: "San Francisco", state: "CA", weather: "Warm" },
 		STL: { name: "Seattle", state: "WA", weather: "Wet" },
@@ -45,7 +45,7 @@ $(function(){
 	};
 
 	$(".peopleTable")
-		.append("#tmplPeople", people, {cities: cities} );
+		.append("#tmplPeople", people, {allCities: allCities} );
 
 });
 
@@ -55,7 +55,7 @@ function getName( context ) {
 
 function getCities( context, begin, end ) {
 	return $.map(this.cities.slice(begin, end), function(city) {
-		return context.options.cities[city];
+		return context.allCities[city];
 	});
 }
 
@@ -64,7 +64,7 @@ function getCityCount( context, begin, end ) {
 }
 
 function alternate( context ) {
-	return (context.index % 2) ? "personAlt" : "person";
+	return (context.dataIndex() % 2) ? "personAlt" : "person";
 }
 
 var startIndex = 1, endIndex = 3;

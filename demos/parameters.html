@@ -40,7 +40,7 @@ $(function(){
 		}
 	];
 	
-	var cities = {
+	var allCities = {
 		BSTN: { name: "Boston", state: "MA", weather: "Cold", averageTemp: 30 },
 		SF: { name: "San Francisco", state: "CA", weather: "Hot", averageTemp: 70 },
 		STL: { name: "Seattle", state: "WA", weather: "Wet", averageTemp: 60 },
@@ -50,14 +50,13 @@ $(function(){
 	};
 
 	$("#favoriteCities")
-		.append("#tmplFavorites", people, {cities: cities} );
+		.append("#tmplFavorites", people, {allCities: allCities} );
 
 	$("#allCitiesBtn").click(function() {  
 		$("#allCities")
 			.empty()
 			.append("#tmplAll", people, {
-				cities: cities, 
-				rendered: cityRendered 
+				allCities: allCities 
 			});
 	});
 });
@@ -67,12 +66,12 @@ function getName( context, person ) {
 }
 
 function getCity( context, index ) {
-	return context.options.cities[this.cities[index]];
+	return context.allCities[this.cities[index]];
 }
 
 function getCities( context, cities ) {
 	return $.map(cities, function(index) { 
-		return context.options.cities[index]; 
+		return context.allCities[index]; 
 	});
 }
 
@@ -80,15 +79,19 @@ function getTemplate( context, key ) {
 	return $.tmpl("#tmpl" + key);
 }
 
-function cityRendered( nodes, context ) {
-	$(".temperature", nodes)
+function cityRendered( context ) {
+	$(".temperature", context.nodes)
 		.animate({"width":"+=" + (context.data.averageTemp*2 - 50)}, 2000)
 		.click(function(){ 
 			alert(context.data.averageTemp); 
 		});
 }
 
-$( ".weather" ).live("click", function( elem ) {
+function alternate( context ) {
+	return (context.dataIndex() % 2) ? "rowAlt" : "row";
+}
+
+$( ".weather" ).live( "click", function() {
 	var context = $(this).templateContext();
 	alert(context.data.weather); 
 });
@@ -108,7 +111,7 @@ $( ".weather" ).live("click", function( elem ) {
 </script>
 
 <script id="tmplAll" type="text/html">
-	<tr class="row${$i%2?'Alt':''} center"><td colspan="4">Cities for ${getName(this)}</td></tr>
+	<tr class="${alternate()} center"><td colspan="4">Cities for ${getName(this)}</td></tr>
 	{{render(
 		getCities(cities), 
 		{ 
@@ -119,9 +122,9 @@ $( ".weather" ).live("click", function( elem ) {
 </script>
 
 <script id="tmplCity" type="text/html">
-	<tr class="row${$context.parent.index%2?'Alt':''}">
-		{{if $options.owner}}
-			<td>${$options.title} ${getName($options.owner)} </td>
+	<tr class="row${alternate()}">
+		{{if $.owner}}
+			<td>${$context.title} ${getName($context.owner)} </td>
 		{{/if}}
 		<td><b>${name}</b>
 		</td><td>${state}</td>

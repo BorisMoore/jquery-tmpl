@@ -61,7 +61,7 @@ function alternate( context, depth ) {
 		context = context.parent;
 		depth--;
 	}
-	return (context.index % 2) ? "personAlt" : "person";
+	return (context.dataIndex() % 2) ? "personAlt" : "person";
 }
 </script>
 
