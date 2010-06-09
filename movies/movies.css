@@ -45,7 +45,7 @@
 	border: 1px solid #003f7e;
 	color: #042CCA;
 	font-weight: 700;
-	background: url(images/ui-bg_glass_75_dadada_1x400.png) repeat-x 50% 50%;
+	background: url(../images/ui-bg_glass_75_dadada_1x400.png) repeat-x 50% 50%;
 }
 
 #pager
@@ -93,7 +93,7 @@
 	border: 1px solid #003f7e;
 	color: #042CCA;
 	font-weight: 700;
-	background: url(images/ui-bg_glass_75_dadada_1x400.png) #dadada repeat-x 50% 50%;
+	background: url(../images/ui-bg_glass_75_dadada_1x400.png) #dadada repeat-x 50% 50%;
 }
 
 #movieList
@@ -151,7 +151,7 @@
 	padding: 5px
 }
 
-.bookingsHeader td
+.cart td
 {
 	height: 30px;
 	text-align:center;
@@ -162,12 +162,12 @@
 	background-color: #F9F5FA;
 }
 
-.bookingsHeader .cart-true
+.cart .cart-true
 {
 	background-color: #E8DAEB;
 }
 
-.bookingsHeader input
+.cart input
 {
 	float: right;
 	height:26px;
@@ -183,20 +183,20 @@
 {
 	color: #2F5071;
 	font-weight: bold;
-	background: url(images/ui-bg_highlight-hard_100_eeeeee_1x100.png) #e6e6e6 repeat-x 50% 50%;
+	background: url(../images/ui-bg_highlight-hard_100_eeeeee_1x100.png) #e6e6e6 repeat-x 50% 50%;
 	cursor: pointer;
 }
 
 .bookingTitle:hover, .bookingTitleEdit:hover
 {
-	background: url(images/ui-bg_glass_75_dadada_1x400.png) #dadada repeat-x 50% 50%;
+	background: url(../images/ui-bg_glass_75_dadada_1x400.png) #dadada repeat-x 50% 50%;
 }
 
 .bookingTitleEdit
 {
 	color: #042CCA;
 	font-weight: bold;
-	background: url(images/ui-bg_highlight-hard_100_eeeeee_1x100.png) #e6e6e6 repeat-x 50% 50%;
+	background: url(../images/ui-bg_highlight-hard_100_eeeeee_1x100.png) #e6e6e6 repeat-x 50% 50%;
 	cursor: pointer;
 }
 

@@ -1,75 +1,74 @@
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../jquery.tmpl.js"></script>
 <script>
-jQuery(function(){
-	var dataObject = {
-		firstName: "John",
-		lastName: "Resig",
-		url: "http://ejohn.org/",
+
+var dataObject = {
+	firstName: "John",
+	lastName: "Resig",
+	url: "http://ejohn.org/",
+	cities: [
+		"Boston, MA",
+		"San Francisco, CA"
+	]
+};
+
+var arrayOfDataObjects = [ 
+	dataObject, 
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/",
 		cities: [
-			"Boston, MA",
-			"San Francisco, CA"
-		],
-		name: getName,
-		cityJoin: cityJoin
-	};
-	
-	var arrayOfDataObjects = [ 
-		dataObject, 
-		{
-			firstName: "Dave",
-			lastName: "Reed",
-			url: "http://dave.org/",
-			cities: [
-				"Seattle, WA",
-				"Los Angeles, CA",
-				"New York, NY"
-			],
-			name: getName,
-			cityJoin: cityJoin
-		},
-		{
-			firstName: "Boris",
-			lastName: "Moore",
-			url: "http://boris.org/",
-			cities: [
-				"Redmond, WA",
-				"Seattle, WA",
-				"New York, NY"
-			],
-			name: getName,
-			cityJoin: cityJoin
-		}
-	];
-	
-	function cityJoin( context, separator ) {
-		return this.cities.join( separator || ", " );
+			"Seattle, WA",
+			"Los Angeles, CA",
+			"New York, NY"
+		]
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [
+			"Redmond, WA",
+			"Seattle, WA",
+			"New York, NY"
+		]
 	}
-	
-	function getName() {
-		return this.firstName + " " + this.lastName;
-	}
-	
-	var tmpl = '<li>${$i}) <a href="${url}">${name()}</a> {{if $context.showCities}}(${cityJoin()}){{/if}}</li>';
+];
+
+function cityJoin( separator ) {
+	return this.data.cities.join( separator || ", " );
+}
+
+function getName() {
+	return this.data.firstName + " " + this.data.lastName;
+}
+
+function index( array ) {
+	return $.inArray( this.data, array ) + 1;
+}
+
+jQuery(function(){
+	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
 		
 	$("#sometmpl")
-		.render( dataObject ) // Returns a LI with all the data filled in
+		.tmpl( dataObject ) // Returns a LI with all the data filled in
 		.appendTo("ul");
 
 	$("#sometmpl")
-		.render( arrayOfDataObjects ) // Returns multiple LIs with data filled in
+		.tmpl( arrayOfDataObjects ) // Returns multiple LIs with data filled in
 		.appendTo("ul");
 
 	$("#sometmpl2")
-		.render( arrayOfDataObjects ) // Returns multiple LIs with data filled in
+		.tmpl( arrayOfDataObjects ) // Returns multiple LIs with data filled in
 		.appendTo("ul");
 
 	// Render the same template with different options
 	$("#sometmpl3")
-		.render( arrayOfDataObjects, { showCities: false } )
+		.tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: false } )
 		.appendTo("ul");
 	$("#sometmpl3")
-		.render( arrayOfDataObjects, { showCities: true } ) 
+		.tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ) 
 		.appendTo("ul");
 	
 	// Appends one LI, filled with data, into the UL
@@ -84,16 +83,16 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl" type="text/html">
-	<li>${$i}) <a href="${url}">${name()}</a> (${cityJoin(" (param with escaped \\, \' and \"!)... ")})</li>
+	<li>${index(arrayOfDataObjects)}) <a href="${url}">${getName()}</a> (${cityJoin(" (param with escaped \\, \' and \"!)... ")})</li>
 </script>
 
 <script id="sometmpl2" type="text/html">
-	<li>${$i}) <a href="${url}">${name()}</a> Cities: {{each cities}} ${this} {{/each}}</li>
+	<li>${index(arrayOfDataObjects)}) <a href="${url}">${getName()}</a> Cities: {{each cities}} ${this} {{/each}}</li>
 </script>
 
 <script id="sometmpl3" type="text/html">
-	<li>${$i+1} of ${$context.array.length}) <a href="${url}">${name()}</a>
-	{{if $context.showCities}}
+	<li>${index($ctx.array)} of ${$ctx.array.length}) <a href="${url}">${getName()}</a>
+	{{if $ctx.showCities}}
 		Cities: {{each cities}} ${this} {{/each}}
 	{{else}}
 		No Cities
@@ -102,7 +101,7 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl4" type="text/html">
-	<li>${$i}) <a href="${url}">${name()}</a> ({{if $context.showCities}}${cityJoin()}{{/if}})</li>
+	<li>${index(arrayOfDataObjects)}) <a href="${url}">${getName()}</a> ({{if $ctx.showCities}}${cityJoin()}{{/if}})</li>
 </script>
 
 <script id="leadingOrTrailingText" type="text/html">

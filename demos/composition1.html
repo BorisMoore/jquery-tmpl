@@ -1,45 +1,47 @@
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../jquery.tmpl.js"></script>
 <script>
-$(function(){
-	var people = [
-		{
-			firstName: "John",
-			lastName: "Resig",
-			url: "http://ejohn.org/",
-			cities: [
-				{ name: "Boston", state: "MA" },
-				{ name: "San Francisco", state: "CA" }
-			],
-			name: getName
-		},
-		{
-			firstName: "Dave",
-			lastName: "Reed",
-			url: "http://dave.org/",
-			name: getName
-		},
-		{
-			firstName: "Boris",
-			lastName: "Moore",
-			url: "http://boris.org/",
-			cities: [
-				{ name: "Redmond", state: "WA" },
-				{ name: "Seattle", state: "WA" },
-				{ name: "New York", state: "NY" }
-			],
-			name: getName
-		}
-	];
-	
-	function getName( context ) {
-		return this.firstName + " " + this.lastName;
+
+var people = [
+	{
+		firstName: "John",
+		lastName: "Resig",
+		url: "http://ejohn.org/",
+		cities: [
+			{ name: "Boston", state: "MA" },
+			{ name: "San Francisco", state: "CA" }
+		]
+	},
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/"
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [
+			{ name: "Redmond", state: "WA" },
+			{ name: "Seattle", state: "WA" },
+			{ name: "New York", state: "NY" }
+		]
 	}
-	
+];
+
+function getName() {
+	return this.data.firstName + " " + this.data.lastName;
+}
+
+function index( array ) {
+	return $.inArray( this.data, array ) + 1;
+}
+
+$(function(){
 	$.templates.value = $.tmpl( "#tmplValue" );
 
 	$("ul").append( "#composite", people, {
-		nameOptions: { label: "Name: ", invert: true },
+		nameOptions: { label: "Name: " },
 		firstOptions: { label: "First Name: " },
 		citiesOptions: { heading: "Favorite Cities" }
 	});
@@ -48,25 +50,25 @@ $(function(){
 
 <script id="composite" type="text/html">
 	<li>====================</li>
-	{{render(name(), $context.nameOptions) $.templates.value}}
-	{{render(firstName, $context.firstOptions) "value"}}
+	{{tmpl(getName(), $ctx.nameOptions) $.templates.value}}
+	{{tmpl(firstName, $ctx.firstOptions) "value"}}
 	{{if cities}}
-		{{render(cities, $context.citiesOptions) "#tmplCity"}}
+		{{tmpl(cities, $ctx.citiesOptions) "#tmplCity"}}
 	{{/if}}
-	{{if $i===$context.array.length-1}}
+	{{if $.inArray($data,people)===people.length-1}}
 		<li>====================</li>
 	{{/if}}	
 </script>
 	
 <script id="tmplValue" type="text/html">
-	<li>${$context.label}${this}</li>
+	<li>${$ctx.label}${$data}</li>
 </script>
 
 <script id="tmplCity" type="text/html">
-	{{if $context.heading && $i===0}}
-		<li><i>-------${$context.heading}</i>-------</li>
+	{{if $ctx.heading && $.inArray(this,people)===0}}
+		<li><i>-------${$ctx.heading}</i>-------</li>
 	{{/if}}    
-	<li>City ${$i+1} - ${name}, ${state}</li>
+	<li>City ${$.inArray($data,$ctx.parent.data.cities)+1} - ${name}, ${state}</li>
 </script>
 
 <ul></ul>

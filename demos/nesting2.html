@@ -14,57 +14,57 @@
 <script src="../jquery.tmpl.js"></script>
 <script>
 $(function(){
-	var people = [
-		{
-			firstName: "John",
-			lastName: "Resig",
-			url: "http://ejohn.org/",
-			cities: [ "BSTN", "NY", "SF" ]
-		},
-		{
-			firstName: "Dave",
-			lastName: "Reed",
-			url: "http://dave.org/",
-			cities: [ "RDMD", "STL", "SF", "LA" ]
-		},
-		{
-			firstName: "Boris",
-			lastName: "Moore",
-			url: "http://boris.org/",
-			cities: [ "RDMD" ]
-		}
-	];
-	
-	var allCities = {
-		BSTN: { name: "Boston", state: "MA", weather: "Cold" },
-		SF: { name: "San Francisco", state: "CA", weather: "Warm" },
-		STL: { name: "Seattle", state: "WA", weather: "Wet" },
-		RDMD: { name: "Redmond", state: "WA", weather: "Wet" },
-		LA: { name: "Los Angeles", state: "CA", weather: "Hot" },
-		NY: { name: "New York", state: "NY", weather: "Variable" }
-	};
-
 	$(".peopleTable")
 		.append("#tmplPeople", people, {allCities: allCities} );
 
 });
 
-function getName( context ) {
-	return this.firstName + " " + this.lastName;
+var people = [
+	{
+		firstName: "John",
+		lastName: "Resig",
+		url: "http://ejohn.org/",
+		cities: [ "BSTN", "NY", "SF" ]
+	},
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/",
+		cities: [ "RDMD", "STL", "SF", "LA" ]
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [ "RDMD" ]
+	}
+];
+
+var allCities = {
+	BSTN: { name: "Boston", state: "MA", weather: "Cold" },
+	SF: { name: "San Francisco", state: "CA", weather: "Warm" },
+	STL: { name: "Seattle", state: "WA", weather: "Wet" },
+	RDMD: { name: "Redmond", state: "WA", weather: "Wet" },
+	LA: { name: "Los Angeles", state: "CA", weather: "Hot" },
+	NY: { name: "New York", state: "NY", weather: "Variable" }
+};
+
+function getName() {
+	return this.data.firstName + " " + this.data.lastName;
 }
 
-function getCities( context, begin, end ) {
-	return $.map(this.cities.slice(begin, end), function(city) {
-		return context.allCities[city];
+function getCities( begin, end ) {
+	return $.map(this.data.cities.slice(begin, end), function(city) {
+		return allCities[city];
 	});
 }
 
-function getCityCount( context, begin, end ) {
-	return this.cities.slice(begin, end).length;
+function getCityCount( begin, end ) {
+	return this.data.cities.slice(begin, end).length;
 }
 
-function alternate( context ) {
-	return (context.dataIndex() % 2) ? "personAlt" : "person";
+function alternate() {
+	return ($.inArray( this.data, people ) % 2) ? "personAlt" : "person";
 }
 
 var startIndex = 1, endIndex = 3;

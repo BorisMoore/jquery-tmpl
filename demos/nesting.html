@@ -14,63 +14,56 @@
 <script src="../jquery.tmpl.js"></script>
 <script>
 $(function(){
-	var people = [
-		{
-			firstName: "John",
-			lastName: "Resig",
-			url: "http://ejohn.org/",
-			cities: [
-				{ name: "Boston", state: "MA" },
-				{ name: "San Francisco", state: "CA" }
-			],
-			name: getName
-		},
-		{
-			firstName: "Dave",
-			lastName: "Reed",
-			url: "http://dave.org/",
-			cities: [
-				{ name: "Seattle", state: "WA" },
-				{ name: "Los Angeles", state: "CA" },
-				{ name: "New York", state: "NY" }
-			],
-			name: getName
-		},
-		{
-			firstName: "Boris",
-			lastName: "Moore",
-			url: "http://boris.org/",
-			cities: [
-				{ name: "Redmond", state: "WA" }
-			],
-			name: getName
-		}
-	];
-	
-	function getName( context ) {
-		return this.firstName + " " + this.lastName;
-	}
-
 	$(".peopleTable")
 		.append("#tmplPeople", people );
 
 });
 
-function alternate( context, depth ) {
-	while (context && depth) {
-		context = context.parent;
-		depth--;
+var people = [
+	{
+		firstName: "John",
+		lastName: "Resig",
+		url: "http://ejohn.org/",
+		cities: [
+			{ name: "Boston", state: "MA" },
+			{ name: "San Francisco", state: "CA" }
+		]
+	},
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/",
+		cities: [
+			{ name: "Seattle", state: "WA" },
+			{ name: "Los Angeles", state: "CA" },
+			{ name: "New York", state: "NY" }
+		]
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [
+			{ name: "Redmond", state: "WA" }
+		]
 	}
-	return (context.dataIndex() % 2) ? "personAlt" : "person";
+];
+
+function getName() {
+	return this.data.firstName + " " + this.data.lastName;
+}
+
+function alternate( item, array ) {
+	return ($.inArray( item, array ) % 2) ? "personAlt" : "person";
 }
 </script>
 
 <script id="tmplPeople" type="text/html">
-	<tr class="${alternate()}"><td colspan="2"><a href="${url}">${name()}</a></td></tr>
+	<tr class="${alternate($data, people)}"><td colspan="2"><a href="${url}">${getName()}</a></td></tr>
 	{{each cities}}
 		<tr class="citySeparator"><td colspan="2"></td></tr>
-		<tr class="${alternate()}"><td colspan="2"><b><i>City ${$index+1}:</i></b></td></tr>
-		<tr class="${alternate()}"><td><b>${name}</b></td><td>${state}</td></tr>
+		<tr class="${alternate($data, people)}"><td colspan="2"><b><i>City ${index()}:</i></b></td></tr>
+		<tr class="${alternate($data, people)}"><td><b>${name}</b></td><td>${state}</td></tr>
 	{{/each}}
 	<tr class="personSeparator"><td colspan="2"></td></tr>
 </script>

@@ -13,73 +13,68 @@
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../jquery.tmpl.js"></script>
 <script>
-$(function(){
-	var people = [
-		{
-			firstName: "John",
-			lastName: "Resig",
-			url: "http://ejohn.org/",
-			cities: [
-				{ name: "Boston", state: "MA" },
-				{ name: "San Francisco", state: "CA" }
-			],
-			name: getName
-		},
-		{
-			firstName: "Dave",
-			lastName: "Reed",
-			url: "http://dave.org/",
-			cities: [
-				{ name: "Seattle", state: "WA" },
-				{ name: "Los Angeles", state: "CA" },
-				{ name: "New York", state: "NY" }
-			],
-			name: getName
-		},
-		{
-			firstName: "Boris",
-			lastName: "Moore",
-			url: "http://boris.org/",
-			cities: [
-				{ name: "Redmond", state: "WA" }
-			],
-			name: getName
-		}
-	];
-	
-	function getName( context ) {
-		return this.firstName + " " + this.lastName;
+var people = [
+	{
+		firstName: "John",
+		lastName: "Resig",
+		url: "http://ejohn.org/",
+		cities: [
+			{ name: "Boston", state: "MA" },
+			{ name: "San Francisco", state: "CA" }
+		]
+	},
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/"
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [
+			{ name: "Redmond", state: "WA" },
+			{ name: "Seattle", state: "WA" },
+			{ name: "New York", state: "NY" }
+		]
 	}
-	
-	$(".peopleTable")
-		.append("#tmplPeople", people );
+];
 
-});
+function getName() {
+	return this.data.firstName + " " + this.data.lastName;
+}
          
-function alternate( context, depth ) {
-	while (context && depth) {
-		context = context.parent;
-		depth--;
-	}
-	return (context.dataIndex() % 2) ? "personAlt" : "person";
+function alternate( item, array ) {
+	return ($.inArray( item, array ) % 2) ? "personAlt" : "person";
 }
 
-function getTemplate( context, key ) {
+function cityNumber() {
+	return $.inArray( this.data, this.parent.data.cities ) + 1;
+}
+
+function getTemplate( key ) {
 	return $.tmpl("#tmpl" + key);
 }
 
+
+$(function(){
+	$(".peopleTable")
+		.append("#tmplPeople", people );
+});
 </script>
 
 <script id="tmplPeople" type="text/html">
-	<tr class="${alternate()}"><td colspan="2"><a href="${url}">${name()}</a></td></tr>
-	{{render(cities) getTemplate("City")}}
+	<tr class="${alternate(this.data, people)}"><td colspan="2"><a href="${url}">${getName()}</a></td></tr>
+	{{if cities}}
+		{{tmpl(cities) getTemplate("City")}}
+	{{/if}}
 	<tr class="personSeparator"><td colspan="2"></td></tr>
 </script>
 
 <script id="tmplCity" type="text/html">
 	<tr class="citySeparator"><td colspan="2"></td></tr>
-	<tr class="${alternate(1)}"><td colspan="2"><b><i>City ${$i+1}:</i></b></td></tr>
-	<tr class="${alternate(1)}"><td><b>${name}</b></td><td>${state}</td></tr>
+	<tr class="${alternate(this.parent.data, people)}"><td colspan="2"><b><i>City ${cityNumber()}:</i></b></td></tr>
+	<tr class="${alternate(this.parent.data, people)}"><td><b>${name}</b></td><td>${state}</td></tr>
 </script>
 
 <table class="peopleTable"><tbody>

@@ -14,41 +14,6 @@
 <script src="../jquery.tmpl.js"></script>
 <script>
 $(function(){
-	var people = [
-		{
-			firstName: "John",
-			lastName: "Resig",
-			url: "http://ejohn.org/",
-			cities: [ "BSTN", "NY", "SF" ],
-			favoriteCity: 0
-		},
-		{
-			firstName: "Dave",
-			lastName: "Reed",
-			url: "http://dave.org/",
-			cities: [ "RDMD", "STL", "SF", "LA" ],
-			favoriteCity: 3,
-			invertName: true
-		},
-		{
-			firstName: "Boris",
-			lastName: "Moore",
-			url: "http://boris.org/",
-			cities: [ "RDMD" ],
-			favoriteCity: 0,
-			invertName: true
-		}
-	];
-	
-	var allCities = {
-		BSTN: { name: "Boston", state: "MA", weather: "Cold", averageTemp: 30 },
-		SF: { name: "San Francisco", state: "CA", weather: "Hot", averageTemp: 70 },
-		STL: { name: "Seattle", state: "WA", weather: "Wet", averageTemp: 60 },
-		RDMD: { name: "Redmond", state: "WA", weather: "Wet", averageTemp: 60 },
-		LA: { name: "Los Angeles", state: "CA", weather: "Hot", averageTemp: 95 },
-		NY: { name: "New York", state: "NY", weather: "Variable", averageTemp: 50 }
-	};
-
 	$("#favoriteCities")
 		.append("#tmplFavorites", people, {allCities: allCities} );
 
@@ -61,45 +26,80 @@ $(function(){
 	});
 });
 
-function getName( context, person ) {
-	return person.invertName ? "<b>" + person.lastName + "</b>, " + person.firstName : person.firstName + " " + person.lastName;
+var people = [
+	{
+		firstName: "John",
+		lastName: "Resig",
+		url: "http://ejohn.org/",
+		cities: [ "BSTN", "NY", "SF" ],
+		favoriteCity: 0
+	},
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/",
+		cities: [ "RDMD", "STL", "SF", "LA" ],
+		favoriteCity: 3,
+		invertName: true
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [ "RDMD" ],
+		favoriteCity: 0,
+		invertName: true
+	}
+];
+
+var allCities = {
+	BSTN: { name: "Boston", state: "MA", weather: "Cold", averageTemp: 30 },
+	SF: { name: "San Francisco", state: "CA", weather: "Hot", averageTemp: 70 },
+	STL: { name: "Seattle", state: "WA", weather: "Wet", averageTemp: 60 },
+	RDMD: { name: "Redmond", state: "WA", weather: "Wet", averageTemp: 60 },
+	LA: { name: "Los Angeles", state: "CA", weather: "Hot", averageTemp: 95 },
+	NY: { name: "New York", state: "NY", weather: "Variable", averageTemp: 50 }
+};
+
+function getName() {
+	return this.data.invertName ? "<b>" + this.data.lastName + "</b>, " + this.data.firstName : this.data.firstName + " " + this.data.lastName;
 }
 
-function getCity( context, index ) {
-	return context.allCities[this.cities[index]];
+function getCity( index ) {
+	return this.allCities[this.data.cities[index]];
 }
 
-function getCities( context, cities ) {
+function getCities( cities ) {
 	return $.map(cities, function(index) { 
-		return context.allCities[index]; 
+		return this.allCities[index]; 
 	});
 }
 
-function getTemplate( context, key ) {
+function getTemplate( key ) {
 	return $.tmpl("#tmpl" + key);
 }
 
-function cityRendered( context ) {
-	$(".temperature", context.nodes)
-		.animate({"width":"+=" + (context.data.averageTemp*2 - 50)}, 2000)
+function cityRendered( ctx ) {
+	$(".temperature", this.nodes)
+		.animate({"width":"+=" + (this.data.averageTemp*2 - 50)}, 2000)
 		.click(function(){ 
-			alert(context.data.averageTemp); 
+			alert(ctx.data.averageTemp); 
 		});
 }
 
-function alternate( context ) {
-	return (context.dataIndex() % 2) ? "rowAlt" : "row";
+function alternate() {
+	return ($.inArray( this.data, people ) % 2) ? "rowAlt" : "row";
 }
 
 $( ".weather" ).live( "click", function() {
-	var context = $(this).templateContext();
-	alert(context.data.weather); 
+	var ctx = $.tmpl(this);
+	alert(ctx.data.weather); 
 });
 
 </script>
 
 <script id="tmplFavorites" type="text/html">
-	{{render(
+	{{tmpl(
 		getCity(favoriteCity), 
 		{ 
 			owner: this, 
@@ -111,8 +111,8 @@ $( ".weather" ).live( "click", function() {
 </script>
 
 <script id="tmplAll" type="text/html">
-	<tr class="${alternate()} center"><td colspan="4">Cities for ${getName(this)}</td></tr>
-	{{render(
+	<tr class="${alternate()} center"><td colspan="4">Cities for ${getName()}</td></tr>
+	{{tmpl(
 		getCities(cities), 
 		{ 
 			rendered: cityRendered 
@@ -123,8 +123,8 @@ $( ".weather" ).live( "click", function() {
 
 <script id="tmplCity" type="text/html">
 	<tr class="row${alternate()}">
-		{{if $.owner}}
-			<td>${$context.title} ${getName($context.owner)} </td>
+		{{if owner}}
+			<td>${this.title} ${getName(this.owner)} </td>
 		{{/if}}
 		<td><b>${name}</b>
 		</td><td>${state}</td>
