@@ -7,7 +7,7 @@
 (function(jQuery){
 	// Override the DOM manipulation function
 	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", filterAll = "[" + tCtxAtt + "]", itm, ob,
-		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs = {}, topCtx = newCtx({ key: 0 }), ctxKey = 0, cachedTmpl;
+		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs = {}, topCtx = newCtx({ key: 0 }), ctxKey = 0;
 		
 	function newCtx( options, parentCtx, fn, data ) { 
 		// Returns a template context for a new instance of a template. 
@@ -50,16 +50,8 @@
 	}
 	
 	jQuery.fn.extend({
-		tmpl: function( data, options, parentCtx ) {
-			// Use wrapped elements as template markup. 
-			// Return wrapped set of fragments obtained by evaluating template against data. 
-			if ( arguments.length ) {
-				cachedTmpl = true;
-				return this.map( function( i, tmpl ){
-					return jQuery.tmpl( tmpl, parentCtx || topCtx, data, options, true );
-				});
-			}	
-			// If no arguments, used to get template context of first wrapped DOM element
+		tmpl: function() {
+			// Used to get template context of first wrapped DOM element
 			return jQuery.tmpl( this[0] );
 		},
 
@@ -67,15 +59,8 @@
 		domManip: function( args, table, callback ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
-			var parentCtx, cloneIndex = -1, dmArgs = jQuery.makeArray( arguments );
-			cachedTmpl = false;
+			var ctxs, parentCtx, cloneIndex = -1, dmArgs = jQuery.makeArray( arguments );
 			if ( args.length > 1 && args[0].nodeType ) {
-				newCtxs = jQuery.data( args[0], "tmplCtxs" );
-				for ( itm in newCtxs ) {
-					parentCtx = newCtxs[itm].parent; // Could test for hasOwnProperty...
-					cachedTmpl = true;
-					break;
-				}
 				dmArgs[0] = [jQuery.makeArray( args )];
 			} 
 			else if ( args.length >= 2 && typeof args[1] === "object" && !args[1].nodeType ) {
@@ -92,7 +77,6 @@
 			} 
 			if ( parentCtx ) {
 				dmArgs[2] = tmplCallback;
-				dmArgs[3] = cachedTmpl;
 			}
 			
 			oldManip.apply( this, dmArgs );
@@ -100,7 +84,7 @@
 			cloneIndex = -1;
 			
 			// Call onRendered for each inserted template instance. 
-			var ctxs = newCtxs;
+			ctxs = newCtxs;
 			newCtxs = {};
 			for ( itm in ctxs ) {
 				ob =  ctxs[itm]; // Could test for hasOwnProperty...
@@ -235,10 +219,6 @@
 				// Support templates which have initial or final text nodes
 				ret.replace( /^\s*([^<\s][^<]*)?(<[\w\W]+>)([^>]*[^>\s])?\s*$/, function( all, before, middle, after) {
 					frag = jQuery( middle ).get();
-					if ( cachedTmpl ) {
-						jQuery.data( frag[0], "tmplCtxs", newCtxs );
-						newCtxs = {};
-					}
 					if ( !!before ) frag.unshift( document.createTextNode( before ));
 					if ( !!after ) frag.push( document.createTextNode( after ));
 				});

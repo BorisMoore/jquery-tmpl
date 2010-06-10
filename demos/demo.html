@@ -51,31 +51,11 @@ function index( array ) {
 jQuery(function(){
 	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
 		
-	$("#sometmpl")
-		.tmpl( dataObject ) // Returns a LI with all the data filled in
-		.appendTo("ul");
-
-	$("#sometmpl")
-		.tmpl( arrayOfDataObjects ) // Returns multiple LIs with data filled in
-		.appendTo("ul");
-
-	$("#sometmpl2")
-		.tmpl( arrayOfDataObjects ) // Returns multiple LIs with data filled in
-		.appendTo("ul");
-
-	// Render the same template with different options
-	$("#sometmpl3")
-		.tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: false } )
-		.appendTo("ul");
-	$("#sometmpl3")
-		.tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ) 
-		.appendTo("ul");
-	
 	// Appends one LI, filled with data, into the UL
 	$("ul").append( tmpl, dataObject );
 
 	// Appends multiple LIs for each item. Use options referenced in tmpl string
-	$("ul").append( "#sometmpl4", arrayOfDataObjects, { showCities: true } );
+	$("ul").append( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } );
 
 	// Example of template that has leading or trailing text
 	$("div").append( "#leadingOrTrailingText", arrayOfDataObjects );
@@ -83,14 +63,6 @@ jQuery(function(){
 </script>
 
 <script id="sometmpl" type="text/html">
-	<li>${index(arrayOfDataObjects)}) <a href="${url}">${getName()}</a> (${cityJoin(" (param with escaped \\, \' and \"!)... ")})</li>
-</script>
-
-<script id="sometmpl2" type="text/html">
-	<li>${index(arrayOfDataObjects)}) <a href="${url}">${getName()}</a> Cities: {{each cities}} ${this} {{/each}}</li>
-</script>
-
-<script id="sometmpl3" type="text/html">
 	<li>${index($ctx.array)} of ${$ctx.array.length}) <a href="${url}">${getName()}</a>
 	{{if $ctx.showCities}}
 		Cities: {{each cities}} ${this} {{/each}}
@@ -98,10 +70,6 @@ jQuery(function(){
 		No Cities
 	{{/if}}
 	</li>
-</script>
-
-<script id="sometmpl4" type="text/html">
-	<li>${index(arrayOfDataObjects)}) <a href="${url}">${getName()}</a> ({{if $ctx.showCities}}${cityJoin()}{{/if}})</li>
 </script>
 
 <script id="leadingOrTrailingText" type="text/html">
