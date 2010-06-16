@@ -50,15 +50,20 @@ function index( array ) {
 
 jQuery(function(){
 	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
+	$.templates.myTmpl = $.tmpl('<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>');
 		
 	// Appends one LI, filled with data, into the UL
 	$("ul").append( tmpl, dataObject );
 
+	var cityCtxs;
 	// Appends multiple LIs for each item. Use options referenced in tmpl string
-	$("ul").append( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } );
+	$("ul").prepend( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true, newCtxs: cityCtxs } );
 
 	// Example of template that has leading or trailing text
-	$("div").append( "#leadingOrTrailingText", arrayOfDataObjects );
+	$("div").before( "#leadingOrTrailingText", arrayOfDataObjects );
+
+	// Use template from $.templates. Target wrapped set has more than one element, so rendered template cloned into to places in DOM
+	$(".multiple").after( "myTmpl", dataObject );
 });
 </script>
 
@@ -76,6 +81,6 @@ jQuery(function(){
 	${firstName} <strong>${lastName}</strong> <br/>
 </script>
 
-<ul></ul>
+<ul><li class="multiple">first</li><li class="multiple">last</li></ul>
 
 <div></div>

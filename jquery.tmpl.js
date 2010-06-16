@@ -7,23 +7,22 @@
 (function(jQuery){
 	// Override the DOM manipulation function
 	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", filterAll = "[" + tCtxAtt + "]", itm, ob,
-		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs = {}, topCtx = newCtx({ key: 0 }), ctxKey = 0;
+		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs, topCtx = { key: 0 }, ctxKey = 0;
 		
 	function newCtx( options, parentCtx, fn, data ) { 
 		// Returns a template context for a new instance of a template. 
 		// The content field is a hierarchical array of strings and nested contexts (to be  
 		// removed and replaced by nodes field of dom elements, once inserted in DOM).
 		var newCtx = { 
-			index: -1,
 			data: data || null,
 			tmpl: null,
 			parent: parentCtx || null,
-			nodes: [],
-			update: update,
-			remove: remove
+			nodes: []
+			// When we have wrapper/container templates - with a concept of where their 'child content' is, we can also support append and prepend
 		};
 		if ( options) {
 			jQuery.extend( newCtx, options, { nodes: [], parent: parentCtx } );
+			fn = fn || (typeof options.tmpl === "function" ? options.tmpl : null);
 		}
 		if ( fn ) {
 			// Build the hierarchical content to be used during insertion into DOM
@@ -35,18 +34,6 @@
 			newCtxs[ctxKey] = newCtx;
 		} 
 		return newCtx;
-		
-		function update( context ) {
-			context  = context ? jQuery.extend( this, context ) : this;
-			var nodes = context.nodes;
-			jQuery( nodes[0] ).before( context );
-			jQuery( nodes ).remove();
-			return this;
-		}
-		function remove() {
-			jQuery( this.nodes ).remove();
-			return this;
-		}
 	}
 	
 	jQuery.fn.extend({
@@ -66,13 +53,15 @@
 			else if ( args.length >= 2 && typeof args[1] === "object" && !args[1].nodeType ) {
 				// args[1] is data, for a template. Eval template to obtain fragment to clone and insert
 				parentCtx = args[3] || topCtx;
+				newCtxs = {};
 				dmArgs[0] = [ jQuery.tmpl( args[0], parentCtx, args[1], args[2], true ) ]; 
 			} 
 			else if ( args.length === 1 && typeof args[0] === "object" && !args[0].nodeType && !(args[0] instanceof jQuery) ) {
 				// args[0] is template context (already inserted in DOM) to be refreshed
+				newCtxs = {};
 				parentCtx = args[0];
 				newCtxs[parentCtx.key] = parentCtx;
-				dmArgs[0] = [ jQuery.tmpl( parentCtx ) ];
+				dmArgs[0] = [ jQuery.tmpl( null, parentCtx ) ];
 				dmArgs[1] = parentCtx.data; 
 			} 
 			if ( parentCtx ) {
@@ -84,12 +73,17 @@
 			cloneIndex = -1;
 			
 			// Call onRendered for each inserted template instance. 
-			ctxs = newCtxs;
-			newCtxs = {};
-			for ( itm in ctxs ) {
-				ob =  ctxs[itm]; // Could test for hasOwnProperty...
-				if ( ob.rendered ) {
-					ob.rendered( ob );
+			if ( newCtxs ) {
+				ctxs = newCtxs;
+				newCtxs = null;
+				for ( itm in ctxs ) {
+					ob =  ctxs[itm]; // Could test for hasOwnProperty...
+					if ( ob.newCtxs && jQuery.inArray( ob, ob.newCtxs ) === -1 ) {
+						ob.newCtxs.push( ob );
+					}
+					if ( ob.rendered ) {
+						ob.rendered( ob );
+					}
 				}
 			}
 			return this; 
@@ -113,13 +107,14 @@
 						parent = ctx = newCtxs[key];
 						if ( cloneIndex ) {
 							key = key + keySuffix;
-							newCtxs[key] = newCtxs[key] || newCtx( ctx, newCtxs[ctx.parent.key + keySuffix] || ctx.parent, true );
+							newCtxs[key] = newCtxs[key] || newCtx( ctx, newCtxs[ctx.parent.key + keySuffix] || ctx.parent, null, true );
 						} 
 						parentNodeCtx = jQuery.attr(this.parentNode, tCtxAtt) || 0;
 						while ( parent && parent.key != parentNodeCtx ) {
 							parent.nodes.push( this );
 							parent = parent.parent;
 						}
+						delete ctx.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
 						jQuery.data( this, "tmplCtx", ctx );
 					}
 				}).removeAttr( tCtxAtt );
@@ -131,43 +126,38 @@
 	
 	jQuery.extend({
 		tmpl: function( tmpl, parentCtx, data, options, domFrag ) {
-			var fn, targetCtx;
-			if ( arguments.length === 1 ) {
-				// Generate a reusable function that will serve as a template
-				// generator (and which will be cached).
-				if ( (typeof tmpl === "string") && !htmlExpr.test( tmpl ) ) {
-					// it is a selector
-					tmpl = jQuery( tmpl )[0];
-				}
-				else if ( tmpl instanceof jQuery ) {
+			var fn, targetCtx, coll;
+			if ( !tmpl && arguments.length === 2) {
+				// Re-evaluate rendered template for the parentCtx
+				targetCtx = parentCtx;
+				tmpl =  parentCtx.tmpl;
+			}				
+			if ( typeof tmpl === "string" ) {
+				if ( htmlExpr.test( tmpl) ) {
 					// This is an HTML string being passed directly in. 
 					// Assume the user doesn't want it cached. 
 					// They can stick it in jQuery.templates to cache it.
-					tmpl = tmpl.get(0);
-				} 
-				if ( tmpl.nodeType ) {
-					// Return template context for an element, unless element is a script block template declaration.
-					if (jQuery.attr( tmpl, "type") !== "text/html" ) {
-						while ( tmpl && !(tmplCtx = jQuery.data( tmpl, "tmplCtx" )) && (tmpl = tmpl.parentNode) ) {}
-						return tmplCtx || topCtx;
-					}
+					tmpl = tmplFn( tmpl )
+				} else if ( fn = jQuery.templates[ tmpl ] ) {
+				 	// Use a pre-defined template, if available
+					tmpl = fn;
 				} else {
-					// Render an updated template context, already associated with DOM.
-					targetCtx = tmpl;
-					tmpl =  tmpl.tmpl;
+					// It's a selector
+					tmpl = jQuery( tmpl )[0];
 				}
-			}
-			if ( !tmpl ) {
-				return topCtx;
-			}
-			// If arguments.length > 1 render template against data, and return fragments ready for DOM insertion.
-			if ( typeof tmpl === "string" ) {
-				// Use a pre-defined template, if available
-				fn = jQuery.templates[ tmpl ];
-				if ( !fn ) {
-					fn = tmplFn( jQuery( tmpl )[0].innerHTML );
-				}
-			} else if ( typeof tmpl === "function" ) {
+			} 
+			// Generate a reusable function that will serve as a template
+			// generator (and which will be cached).
+			if ( tmpl instanceof jQuery ) {
+				tmpl = tmpl.get(0);
+			} 
+			if ( tmpl.nodeType && arguments.length === 1 && jQuery.attr( tmpl, "type") !== "text/html" ) {
+				// Return template context for an element, unless element is a script block template declaration.
+				while ( tmpl && !(tmplCtx = jQuery.data( tmpl, "tmplCtx" )) && (tmpl = tmpl.parentNode) ) {}
+				return tmplCtx || topCtx;
+			} 
+			// If arguments.length > 2, render template against data, and return fragments ready for DOM insertion.
+			if ( typeof tmpl === "function" ) {
 				fn = tmpl;
 			} else if ( tmpl.nodeType ) {
 				// If this is a template block, cache
@@ -188,6 +178,9 @@
 			if ( !data ) {
 				return fn;
 			}
+			if ( !parentCtx ) {
+				return []; //Could throw...
+			}
 			if ( typeof data === "function" ) {
 				data = data.call( parentCtx.data || {}, parentCtx );  
 			}
@@ -198,7 +191,7 @@
 				[ newCtx( options, parentCtx, fn, data ) ];
 			
 			return domFrag ? build( parentCtx ) : parentCtx.content;
-
+			
 			function build( ctx, parent ) {
 				// Convert hierarchical content into flat string array 
 				// and finally return array of fragments ready for DOM insertion
@@ -267,7 +260,7 @@
 										: (def["$2"]||"") 
 									) +
 								"_.push('";
-						}) + 
+						}) +
 					"');}return _;"
 				);
 			}

@@ -6,11 +6,11 @@
 	<link type="text/css" href="../jquery-ui-1.8.1.custom.css" rel="stylesheet" />	
 	<link href="../jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" /></head>
 <body>
+<div id="about">
+	This is a demo of updates to the jQuery templating feature, proposed by Microsoft.<br/>
+	The source can be viewed here: <a href="http://github.com/nje/jquery-tmpl/">NJE Templating Branch on GitHub</a>
+</div>	
 <div id="pageBody">
-<p>
-This is a demo of updates to the jQuery templating feature being proposed by Microsoft. 
-<br/>You can view the source on github, here: <a href="http://github.com/nje/jquery-tmpl/">NJE Templating Branch on GitHub</a>
-</p>	
 <h1>Netflix: Book a Movie...</h1>
 
 	<ul id="genres">
@@ -25,16 +25,16 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 	<div id="pager"><ul class="pages"><li class="pgEmpty">first</li><li class="pgEmpty">prev</li></ul></div>
 	
 	<div id="movieList"></div>
-	
 	<table id="bookingsList">
 		<tbody><tr class="cart"><td class="cart-false" colspan="4">
-			0 bookings in Cart... 
+			<span class="text">0 items in Cart...</span> 
 		</td></tr></tbody>
 	</table>
 	<br/>
 </div>
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../jquery.tmpl.js" type="text/javascript"></script>
+<script src="../jquery.tmplCmd.js" type="text/javascript"></script>
 <script src="jquery.pager.js" type="text/javascript"></script>
 <script src="../jquery-ui-1.8.1.custom.js" type="text/javascript"></script>
 
@@ -43,19 +43,29 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 		<div><img src="${BoxArt.LargeUrl}" /> </div>
 		<strong>${Name}</strong>
 		<p>${Synopsis}</p>
-		<input type="button" title="Buy tickets for '${Name}'" value="Buy tickets..." class="buyButton"/>
+		<input type="button" title="Buy tickets for '${Name}'" value="Add to cart..." class="buyButton"/>
 		<br/>
 	</div>
 </script>
 
 <script id="cartTmpl" type="text/html">
 	<td class="cart-${!!count}" colspan="4">
-		${count} bookings in Cart... 
+		<span class="text">${count} items in Cart...</span> 
 		{{if count}} 
-			<input id="submit" type="button" value="Submit Bookings" /> 
-			<input id="cancel" type="button" value="Cancel" />
+			<span id="submit">Checkout</span> 
+			<span id="cancel">Remove All</span>
+			{{if count>1}} 
+				<span id="sort"><span id="sortBtn">Sort</span>:
+					<select>
+						<option value="0" {{if sortBy==="0"}}selected{{/if}}>Name A-Z</option>
+						<option value="1" {{if sortBy==="1"}}selected{{/if}}>Name Z-A</option>
+						<option value="2" {{if sortBy==="2"}}selected{{/if}}>Date</option>
+					</select>
+				</span>
+			{{/if}}
+			</select>
 		{{/if}}
-	</td>	   
+	</td>   
 </script>
 
 <script id="bookingTitleTmpl" type="text/html">
@@ -85,26 +95,27 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		bookings = { selected: null, movies: {}, count: 0 },
-		createdCtxs = [];
+		cart = { bookings: {}, array: [], count: 0, sortBy:0 }, bookingCtxs = [], selectedBooking;
 		
 	getMovies( pageIndex );
 
 	$( "#genres li" ).click( selectGenre );
 
-	$( ".cart" ).empty().append( "#cartTmpl", bookings );
+	$( ".cart" )
+		.delegate( "select", "change", sort )
+		.delegate( "#sortBtn", "click", sort )
+		.delegate( "#submit", "click", function() {
+			alert( cart.count + " bookings submitted for payment...");
+			removeBookings(); 
+		})
+		.delegate( "#cancel", "click", function() {
+			removeBookings(); 
+		})
+		.empty()
+		.append( "#cartTmpl", cart );
 	
-	var cartCtx = $.tmpl(".cart td");
+	var cartCtx = $.tmpl( ".cart td" );
 	
-	$( "#submit" ).live( "click", function() {
-		alert( bookings.count + " bookings submitted...");
-		removeBookings.apply( this ); 
-	});
-
-	$( "#cancel" ).live( "click", function() {
-		removeBookings.apply( this ); 
-	});
-
 	function selectGenre() {
 		$( "#genres li" ).removeClass( "selected" );
 		$( this ).addClass( "selected" );
@@ -114,6 +125,30 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 		getMovies( pageIndex );
 	}
 
+	function sort() {
+		var compare = compareName, reverse = false;
+		cart.sortBy = $( "#sort select" ).val();
+		switch ( $( "#sort select" ).val() ) {
+			case "1":
+				reverse = true;
+				break;
+			case "2":
+				compare = compareDate;
+				break;
+		} 
+		var data = cart.array;
+		data = data.sort( compare );
+
+		bookingCtxs = $.tmplCmd( "replace", data, bookingCtxs );
+	
+		function compareName( a, b ) {
+			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
+		}
+		function compareDate( a, b ) {
+			return a.date - b.date;
+		}
+	}
+		
 	function getMovies( index ) {
 		var query = "http://odata.netflix.com/Catalog/Genres('" + genre + "')/Titles" +
 			"?$format=json" +
@@ -148,56 +183,53 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 	}
 
 	function buyTickets( movie ) {
-		// Add item to bookings list
-		if ( bookings.movies[movie.Id] ) {
-			bookings.movies[movie.Id].quantity++;
+		// Add item to cart
+		var booking = cart.bookings[movie.Id];
+		if ( booking ) {
+			booking.quantity++;
 		} else {
-			bookings.count++;
-			cartCtx.update();
-			bookings.movies[movie.Id] = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
+			cart.count++;
+			$.tmplCmd( "update", cartCtx );
+			booking = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
 		}
-		selectBooking( bookings.movies[movie.Id] );
+		selectBooking( booking );
 	}
 
 	function selectBooking( booking ) {
-		var selected = bookings.selected;
-		if ( selected === booking ) {
-			updateBooking( booking.ctx );
-			return;
-		}
-		// Make new booking selected, and render in edit view
-		bookings.selected = booking;
-		renderEditView( booking );
-		
-		if ( selected ) {
+		if ( selectedBooking ) {
+			if ( selectedBooking === booking ) {
+				updateBooking( bookingCtx( selectedBooking ));
+				return;
+			}
 			// Collapse previously selected booking, and switch to non-edit view
-			$( "div", selected.ctx.nodes ).animate( { height: 0 }, 500, function() { 
-				switchView( selected.ctx );
+			var oldSelected = selectedBooking; 
+			$( "div", bookingCtx( oldSelected ).nodes ).animate( { height: 0 }, 500, function() { 
+				switchView( oldSelected );
 			});
 		}
-	}
-
-	function switchView( ctx, edit ) {
-		if ( edit ) {  
-			ctx.update({ 
-				tmpl: "#bookingEditTmpl", 
-				rendered: onBookingEditRendered 
-			}); 
-		} else {
-			ctx.update({ 
-				tmpl: "#bookingTitleTmpl", 
-				rendered: onBookingRendered 
-			}); 
-		}
-	}
-	function renderEditView( booking ) {
+		selectedBooking = booking;
 		if ( !booking ) {
 			return;
 		}
-		if ( booking.ctx ) {
-			switchView( booking.ctx, true );
+		if ( cart.bookings[booking.movie.Id] ) {
+			switchView( booking, true );
 		} else {
-			$( "#bookingsList" ).append( "#bookingEditTmpl", booking, { animate: true, rendered: onBookingEditRendered } );
+			cart.bookings[booking.movie.Id] = booking;
+			cart.array.push( booking );
+			$( "#bookingsList" ).append( "#bookingEditTmpl", booking, { animate: true, rendered: onBookingEditRendered, newCtxs: bookingCtxs } );
+		}
+	}
+
+	function switchView( booking, edit ) {
+		if ( !booking ) {
+			return;
+		}
+		var ctx = bookingCtx( booking ),
+			rendered = edit ? onBookingEditRendered  : onBookingRendered;
+		if ( ctx.rendered !== rendered) {
+			ctx.tmpl = edit ? "#bookingEditTmpl" : "#bookingTitleTmpl"; 
+			ctx.rendered = rendered; 
+			$.tmplCmd( "update", ctx );
 		}
 	}
 
@@ -209,7 +241,6 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 	}
 
 	function onBookingRendered( ctx ) {
-		ctx.data.ctx = ctx;
 		$( ctx.nodes ).click( function() { 
 			selectBooking( ctx.data );
 		});
@@ -218,8 +249,7 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 
 	function onBookingEditRendered( ctx ) {
 		var data = ctx.data, nodes = ctx.nodes;
-		data.ctx = ctx;
-
+		
 		$( nodes[0] ).click( function() { 
 			selectBooking();
 		});
@@ -249,35 +279,37 @@ This is a demo of updates to the jQuery templating feature being proposed by Mic
 
 	function updateBooking( ctx ) {
 		ctx.animate = false;
-		ctx.update();
+		$.tmplCmd( "update", ctx );
 		ctx.animate = true;
-	}	
-	
+	}
+
 	function removeBooking() {
-		var ctx = $.tmpl(this);
-		if ( ctx.data === bookings.selected ) {
-			ctx = ctx.parent;
-			bookings.selected = null;
+		var booking = $.tmpl(this).data;
+		if ( booking === selectedBooking ) {
+			selectedBooking = null;
 		}
-		delete bookings.movies[ctx.data.movie.Id];
-		bookings.count--;
-		cartCtx.update();
-		ctx.remove();
+		delete cart.bookings[booking.movie.Id];
+		cart.count--;
+		$.tmplCmd( "update", cartCtx );
+		$.tmplCmd( "remove", booking, bookingCtxs );
 		return false; 
-	}			
+	}
 	
 	function removeBookings() {
-		for (var movie in bookings.movies) {
-			bookings.movies[movie].ctx.remove();
-		}
-		bookings.selected = null;
-		bookings.count = 0;
-		bookings.movies = {};
-		cartCtx.update();
-	}			
+		$.tmplCmd( "remove", bookingCtxs );
+		bookingCtxs = [];
+		cart.count = 0;
+		cart.bookings = {};
+		selectedBooking = null;
+		$.tmplCmd( "update", cartCtx );
+	}
 	
 	function formatDate( date ) {
 		return date.toLocaleDateString();
+	}
+
+	function bookingCtx( booking ) {
+		return $.tmplCmd( "find", booking, bookingCtxs)[0];
 	}
 </script>
 

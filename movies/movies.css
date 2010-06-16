@@ -5,6 +5,16 @@
 	font-size: 12px;
 }
 
+#about 
+{
+	text-align:center;
+	margin: auto;
+	margin-bottom: 5px;
+	background-color: #F9F5FA;
+	padding: 3px;
+	width: 50%;
+}
+
 #pageBody
 {
 	display: block;
@@ -154,12 +164,9 @@
 .cart td
 {
 	height: 30px;
-	text-align:center;
-	font-size:  14px;
-	font-style: italic;
-	line-height:30px;	
 	border: 3px double #00509f;
 	background-color: #F9F5FA;
+	text-align:center;
 }
 
 .cart .cart-true
@@ -167,14 +174,35 @@
 	background-color: #E8DAEB;
 }
 
-.cart input
+.cart span.text
 {
-	float: right;
-	height:26px;
-	margin: 2px 15px 2px;
+	color: #2F5071;
+	float:none;
+	height: 25px;
+	line-height: 25px;
+	font-size:  14px;
+	font-style: italic;
+	border: none;
 }
 
-#cancel 
+#submit, #cancel, #sort
+{
+	color: #2F5071;
+	font-weight: 700;
+	float: right;
+	height: 25px;
+	line-height: 25px;
+	font-style: italic;
+	margin: 0 15px;
+}
+
+#submit, #cancel, #sortBtn
+{
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+#submit 
 {
 	float: left;
 } 
