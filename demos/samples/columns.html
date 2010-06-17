@@ -1,0 +1,52 @@
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="../../jquery.tmpl.js" type="text/javascript"></script>
+<script>
+	var people = [ 
+		{
+			firstName: "John",
+			lastName: "Resig",
+			url: "http://ejohn.org/"
+		},
+		{
+			firstName: "Dave",
+			lastName: "Reed",
+			url: "http://dave.org/"
+		},
+		{
+			firstName: "Boris",
+			lastName: "Moore",
+			url: "http://boris.org/"
+		}
+	];
+
+	jQuery(function(){
+		$("#tableBody").append( "#tmpl_row", people );
+	});
+
+	function getTemplate(column) {
+		return $.tmpl('#tmpl_' + column);
+	}
+ </script>
+
+<script id="tmpl_firstName" type="text/html">
+	Name: ${$data}
+</script>
+
+<script id="tmpl_lastName" type="text/html">
+	${$data}...
+</script>
+
+<script id="tmpl_url" type="text/html">
+	Url: ${$data}
+</script>
+
+<script id="tmpl_row" type="text/html">
+	<tr>
+		{{each(column, value) $data}}
+			<td>{{tmpl(value) getTemplate(column)}}</td>   
+		{{/each}}
+	</tr>
+</script>
+
+
+<table><tbody id="tableBody"></tbody></table>
