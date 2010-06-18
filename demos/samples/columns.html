@@ -1,7 +1,17 @@
+<!--
+ Iterating through fields of a JavaScript object, and 
+ dynamically / selecting 'field templates'
+ Based on a sample proposed by Jon Campbell
+-->
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../../jquery.tmpl.js" type="text/javascript"></script>
 <script>
 	var people = [ 
+		{
+			firstName: "Jon",
+			lastName: "Campbell",
+			url: "http://jon.org/"
+		},
 		{
 			firstName: "John",
 			lastName: "Resig",
@@ -20,7 +30,9 @@
 	];
 
 	jQuery(function(){
-		$("#tableBody").append( "#tmpl_row", people );
+		$("#tableBody")
+            .append( "#tmpl_row", people )
+		    .append( "#tmpl_row2", people );
 	});
 
 	function getTemplate(column) {
@@ -29,21 +41,30 @@
  </script>
 
 <script id="tmpl_firstName" type="text/html">
-	Name: ${$data}
+	<td>Name: <strong>${$data}
 </script>
 
 <script id="tmpl_lastName" type="text/html">
-	${$data}...
+	${$data}</strong></td>
 </script>
 
 <script id="tmpl_url" type="text/html">
-	Url: ${$data}
+	<td>Url: ${$data}</td>
 </script>
 
 <script id="tmpl_row" type="text/html">
 	<tr>
-		{{each(column, value) $data}}
-			<td>{{tmpl(value) getTemplate(column)}}</td>   
+		{{each $data}}
+			{{tmpl($value) getTemplate($index)}}   
+		{{/each}}
+	</tr>
+</script>
+
+<!-- alternatively, can specify index and value variables, accessed within the 'each' loop -->
+<script id="tmpl_row2" type="text/html">
+	<tr>
+		{{each(col, val) $data}}
+			{{tmpl(val) getTemplate(col)}}   
 		{{/each}}
 	</tr>
 </script>

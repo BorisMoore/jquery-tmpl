@@ -46,20 +46,20 @@
 		domManip: function( args, table, callback ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
-			var ctxs, parentCtx, cloneIndex = -1, dmArgs = jQuery.makeArray( arguments );
-			if ( args.length > 1 && args[0].nodeType ) {
+			var ctxs, parentCtx, cloneIndex = -1, dmArgs = jQuery.makeArray( arguments ), arg0 = args[0];
+			if ( args.length > 1 && arg0.nodeType ) {
 				dmArgs[0] = [jQuery.makeArray( args )];
 			} 
-			else if ( args.length >= 2 && typeof args[1] === "object" && !args[1].nodeType ) {
+			else if ( args.length >= 2 && typeof args[1] === "object" && !args[1].nodeType && !(args[1] instanceof jQuery)) {
 				// args[1] is data, for a template. Eval template to obtain fragment to clone and insert
 				parentCtx = args[3] || topCtx;
 				newCtxs = {};
-				dmArgs[0] = [ jQuery.tmpl( args[0], parentCtx, args[1], args[2], true ) ]; 
+				dmArgs[0] = [ jQuery.tmpl( arg0, parentCtx, args[1], args[2], true ) ]; 
 			} 
-			else if ( args.length === 1 && typeof args[0] === "object" && !args[0].nodeType && !(args[0] instanceof jQuery) ) {
+			else if ( args.length === 1 && typeof arg0 === "object" && !arg0.nodeType && !(arg0 instanceof jQuery) ) {
 				// args[0] is template context (already inserted in DOM) to be refreshed
 				newCtxs = {};
-				parentCtx = args[0];
+				parentCtx = arg0;
 				newCtxs[parentCtx.key] = parentCtx;
 				dmArgs[0] = [ jQuery.tmpl( null, parentCtx ) ];
 				dmArgs[1] = parentCtx.data; 
@@ -250,7 +250,7 @@
 							fnargs = unescape( fnargs );
 							return "');" + 
 								cmd[ slash ? "suffix" : "prefix" ]
-									.split( "$defined_1" ).join( "typeof("+ target  +")!=='undefined'" )
+									.split( "$notnull_1" ).join( "typeof("+ target  +")!=='undefined' && (" + target + ")!=null" )
 									.split( "$1" ).join( expr )
 									.split( "$2" ).join( fnargs ? 
 										fnargs.replace( /\s*([^\(]+)\s*(\((.*?)\))?/g, function( all, name, parens, params ) {
@@ -277,26 +277,26 @@
 		tmplTags: {
 			"tmpl": {
 				_default: { $2: "null" },
-				prefix: "if($defined_1){_=_.concat($.tmpl($1,$ctx,$2));}"
+				prefix: "if($notnull_1){_=_.concat($.tmpl($1,$ctx,$2));}"
 			},
 			"each": {
 				_default: { $2: "$index, $value" },
-				prefix: "if($defined_1){$.each($1,function($2){with(this){",
+				prefix: "if($notnull_1){$.each($1,function($2){with(this){",
 				suffix: "}});}"
 			},
 			"if": {
-				prefix: "if(($defined_1) && $1){",
+				prefix: "if(($notnull_1) && $1){",
 				suffix: "}"
 			},
 			"else": {
 				prefix: "}else{"
 			},
 			"html": {
-				prefix: "if($defined_1){_.push($1);}"
+				prefix: "if($notnull_1){_.push($1);}"
 			},
 			"=": {
 				_default: { $1: "$data" },
-				prefix: "if($defined_1){_.push($.encode($1));}"
+				prefix: "if($notnull_1){_.push($.encode($1));}"
 			}
 		},
 		encode: function( text ) {
