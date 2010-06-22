@@ -6,8 +6,8 @@
  */
 (function(jQuery){
 	// Override the DOM manipulation function
-	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", filterAll = "[" + tCtxAtt + "]", itm, ob,
-		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs, topCtx = { key: 0 }, ctxKey = 0;
+	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", itm, ob,
+		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs, topCtx = { key: 0 }, ctxKey = 0; 
 		
 	function newCtx( options, parentCtx, fn, data ) { 
 		// Returns a template context for a new instance of a template. 
@@ -91,35 +91,55 @@
 			function tmplCallback( fragClone ) { 	
 				// Called by oldManip when $.template has been used to create content. 
 				// Provides cloned fragment ready for fixup prior to and after insertion into DOM 
-				var i, l, ctx, key, keySuffix, parent,
-				
-				content = jQuery( fragClone.nodeType === 11 ? fragClone.childNodes : fragClone );
 				cloneIndex++;
-				keySuffix = "_" + cloneIndex;
-						 
+				var ctx, key, keySuffix = "_" + cloneIndex, elems,
+
+				content = fragClone.nodeType === 11 ? 
+					jQuery.makeArray(fragClone.childNodes) : 
+					fragClone.nodeType === 1 ? [fragClone] : [];
+				
 				// Return fragment to original caller (e.g. append) for DOM insertion
 				callback.call( this, fragClone ); 
 
 				// Fragment has been inserted:- Add inserted nodes to context. Replace inserted element annotations by jQuery.data. 
-				content.find( filterAll ).add( content.filter( filterAll )).each( function() {
-					key = jQuery.attr(this, tCtxAtt);
-					if ( !jQuery( this.parentNode ).closest( "[" + tCtxAtt + "=" + key + "]" ).length ) {
-						parent = ctx = newCtxs[key];
-						if ( cloneIndex ) {
-							key = key + keySuffix;
-							newCtxs[key] = newCtxs[key] || newCtx( ctx, newCtxs[ctx.parent.key + keySuffix] || ctx.parent, null, true );
-						} 
-						parentNodeCtx = jQuery.attr(this.parentNode, tCtxAtt) || 0;
-						while ( parent && parent.key != parentNodeCtx ) {
-							parent.nodes.push( this );
-							parent = parent.parent;
-						}
-						delete ctx.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
-						jQuery.data( this, "tmplCtx", ctx );
+				for ( var i = 0, l = content.length; i < l; i++ ) {
+					if ( (elem = content[i]).nodeType !== 1 ) {
+						continue;
 					}
-				}).removeAttr( tCtxAtt );
-				
+					elems = elem.getElementsByTagName("*");
+					for ( var j = 0, m = elems.length; j < m; j++) {
+						processCtxKey( elems[j] );
+					}
+					processCtxKey( elem );
+				}
 				delete parentCtx.content;
+
+				function processCtxKey( elem ) {
+					if ( key = elem.getAttribute( tCtxAtt )) {
+						// Ensure that each rendered template inserted into the DOM has its own template context, 
+						var prntKey, prntNode = elem, prntCtx, prntNodeCtxKey;
+						while ((prntNode = prntNode.parentNode).nodeType === 1 && !(prntKey = prntNode.getAttribute( tCtxAtt ))) { }
+						if ( prntKey !== key ) {
+							// This is a top-level element within this template context
+							prntCtx = ctx = newCtxs[key];
+							if ( cloneIndex ) {
+								// Clone context, so each rendered template has its own template context
+								key = key + keySuffix;
+								newCtxs[key] = newCtxs[key] || newCtx(ctx, newCtxs[ctx.parent.key + keySuffix] || ctx.parent, null, true);
+							}
+							prntNodeCtxKey = elem.parentNode.getAttribute( tCtxAtt ) || 0; // The template context of the parent element
+							while ( prntCtx && prntCtx.key != prntNodeCtxKey ) {
+								// Add this element as a top-level node for this context, as well as for any 
+								// ancestor contexts between this context and the context of its parent element
+								prntCtx.nodes.push( elem );
+								prntCtx = prntCtx.parent;
+							}
+							delete ctx.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
+							jQuery.data( elem, "tmplCtx", ctx );
+						}
+						elem.removeAttribute( elem, tCtxAtt );
+					}
+				}
 			}
 		}
 	});
@@ -151,7 +171,7 @@
 			if ( tmpl instanceof jQuery ) {
 				tmpl = tmpl.get(0);
 			} 
-			if ( tmpl.nodeType && arguments.length === 1 && jQuery.attr( tmpl, "type") !== "text/html" ) {
+			if ( tmpl.nodeType && arguments.length === 1 && tmpl.getAttribute( "type" ) !== "text/html" ) {
 				// Return template context for an element, unless element is a script block template declaration.
 				while ( tmpl && !(tmplCtx = jQuery.data( tmpl, "tmplCtx" )) && (tmpl = tmpl.parentNode) ) {}
 				return tmplCtx || topCtx;
