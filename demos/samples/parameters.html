@@ -1,29 +1,25 @@
+<!--
+This sample illustrates using the {{if}} and 
+{{each}} template tags, with parameters.
+-->
 <style type="text/css">
 	*[data-tmpl], .html-template {   
 		display:none;    
 	}
-	.citiesTable td { border:2px solid #555; text-align:left; padding:3px; }   
-	.row{ background-color:#AFA; }   
-	.rowAlt{ background-color:#9ED; }   
-	.citiesTable { border-collapse:collapse; border:2px solid #555; margin:10px }   
-	#allCitiesBtn { margin:10px }
-	.center td { text-align:center; }   
+	.peopleTable td { border:2px solid #555; text-align:center; }   
+	.person{ background-color:#AFA; }   
+	.personAlt{ background-color:#9ED; }   
+	.separator { background-color:#C77; height:6px;}   
+	.cityseparator { background-color:#CCC; height:4px;}   
+	.peopleTable { border-collapse:collapse; border:2px solid #555; }   
 </style>
 
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../../jquery.tmpl.js" type="text/javascript"></script>
 <script>
 $(function(){
-	$("#favoriteCities")
-		.append("#tmplFavorites", people, {allCities: allCities} );
-
-	$("#allCitiesBtn").click(function() {  
-		$("#allCities")
-			.empty()
-			.append("#tmplAll", people, {
-				allCities: allCities 
-			});
-	});
+	$(".peopleTable")
+		.append("#tmplPeople", people, {allCities: allCities} );
 });
 
 var people = [
@@ -31,110 +27,75 @@ var people = [
 		firstName: "John",
 		lastName: "Resig",
 		url: "http://ejohn.org/",
-		cities: [ "BSTN", "NY", "SF" ],
-		favoriteCity: 0
+		cities: [ "BSTN", "NY", "SF" ]
 	},
 	{
 		firstName: "Dave",
 		lastName: "Reed",
 		url: "http://dave.org/",
-		cities: [ "RDMD", "STL", "SF", "LA" ],
-		favoriteCity: 3,
-		invertName: true
+		cities: [ "RDMD", "STL", "SF", "LA" ]
 	},
 	{
 		firstName: "Boris",
 		lastName: "Moore",
 		url: "http://boris.org/",
-		cities: [ "RDMD" ],
-		favoriteCity: 0,
-		invertName: true
+		cities: [ "RDMD" ]
 	}
 ];
 
 var allCities = {
-	BSTN: { name: "Boston", state: "MA", weather: "Cold", averageTemp: 30 },
-	SF: { name: "San Francisco", state: "CA", weather: "Hot", averageTemp: 70 },
-	STL: { name: "Seattle", state: "WA", weather: "Wet", averageTemp: 60 },
-	RDMD: { name: "Redmond", state: "WA", weather: "Wet", averageTemp: 60 },
-	LA: { name: "Los Angeles", state: "CA", weather: "Hot", averageTemp: 95 },
-	NY: { name: "New York", state: "NY", weather: "Variable", averageTemp: 50 }
+	BSTN: { name: "Boston", state: "MA", weather: "Cold" },
+	SF: { name: "San Francisco", state: "CA", weather: "Warm" },
+	STL: { name: "Seattle", state: "WA", weather: "Wet" },
+	RDMD: { name: "Redmond", state: "WA", weather: "Wet" },
+	LA: { name: "Los Angeles", state: "CA", weather: "Hot" },
+	NY: { name: "New York", state: "NY", weather: "Variable" }
 };
 
 function getName() {
-	return this.data.invertName ? "<b>" + this.data.lastName + "</b>, " + this.data.firstName : this.data.firstName + " " + this.data.lastName;
+	return this.data.firstName + " " + this.data.lastName;
 }
 
-function getCity( index ) {
-	return this.allCities[this.data.cities[index]];
-}
-
-function getCities( cities ) {
-	return $.map(cities, function(index) { 
-		return this.allCities[index]; 
+function getCities( begin, end ) {
+	return $.map(this.data.cities.slice(begin, end), function(city) {
+		return allCities[city];
 	});
 }
 
-function getTemplate( key ) {
-	return $.tmpl("#tmpl" + key);
-}
-
-function cityRendered( ctx ) {
-	$(".temperature", this.nodes)
-		.animate({"width":"+=" + (this.data.averageTemp*2 - 50)}, 2000)
-		.click(function(){ 
-			alert(ctx.data.averageTemp); 
-		});
+function getCityCount( begin, end ) {
+	return this.data.cities.slice(begin, end).length;
 }
 
 function alternate() {
-	return ($.inArray( this.data, people ) % 2) ? "rowAlt" : "row";
+	return ($.inArray( this.data, people ) % 2) ? "personAlt" : "person";
 }
 
-$( ".weather" ).live( "click", function() {
-	var ctx = $.tmpl(this);
-	alert(ctx.data.weather); 
-});
-
+var startIndex = 1, endIndex = 3;
 </script>
 
-<script id="tmplFavorites" type="text/html">
-	{{tmpl(
-		getCity(favoriteCity), 
-		{ 
-			owner: this, 
-			title: "Favorite city for",
-			rendered: cityRendered 
-		}
-	) 
-	getTemplate("City")}}
+<script id="tmplPeople" type="text/html">
+	<tr class="${alternate}"><td colspan="3"><a href="${url}">${getName}</a></td></tr>
+	{{tmpl "#tmplSeparator"}}
+	{{if getCityCount(startIndex, endIndex)}}
+		<tr class="${alternate}"><td colspan="3"><i>Favorite Cities</i></td></tr>
+		{{each getCities(startIndex, endIndex)}}
+			{{tmpl(null, {type:"city"}) "#tmplSeparator"}}
+			<tr class="${alternate}">
+				<td>${$index + 1}</td>
+				<td><b>${name}</b></td>
+				<td>${state}</td>
+			</tr>
+			<tr class="${alternate}"><td colspan="3"><i>${weather}...</i></td></tr>
+		{{/each}}
+		{{tmpl "#tmplSeparator"}}
+	{{/if}}
 </script>
 
-<script id="tmplAll" type="text/html">
-	<tr class="${alternate()} center"><td colspan="4">Cities for ${getName()}</td></tr>
-	{{tmpl(
-		getCities(cities), 
-		{ 
-			rendered: cityRendered 
-		}
-	) 
-	getTemplate("City")}}
+<script id="tmplSeparator" type="text/html">
+	<tr class="${$ctx.type}separator"><td colspan="3"></td></tr>
 </script>
 
-<script id="tmplCity" type="text/html">
-	<tr class="row${alternate()}">
-		{{if owner}}
-			<td>${this.title} ${getName(this.owner)} </td>
-		{{/if}}
-		<td><b>${name}</b>
-		</td><td>${state}</td>
-		<td><input type="button" value="Local Weather" class="weather"/></td>
-		<td width="320px"><input type="button" value="Local Temperature" class="temperature"/></td>
-	</tr>
-</script>
-
-<table id="favoriteCities" class="citiesTable"></table>
-
-<input id="allCitiesBtn" type="button" value="All cities" /> 
-<table id="allCities" class="citiesTable"></table>
+<table class="peopleTable"><tbody>
+	<tr class="separator"><td colspan="3"></td></tr>
+</tbody></table>
 

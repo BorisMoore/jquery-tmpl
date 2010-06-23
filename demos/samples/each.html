@@ -1,3 +1,7 @@
+<!--
+This sample illustrates using the {{each}} template tag, 
+for iterative rendering of nested markup within a template.
+-->
 <style type="text/css">
 	*[data-tmpl], .html-template {   
 		display:none;    
@@ -5,8 +9,8 @@
 	.peopleTable td { border:2px solid #555; text-align:center; }   
 	.person{ background-color:#AFA; }   
 	.personAlt{ background-color:#9ED; }   
-	.personSeparator { background-color:#C77; height:6px;}   
-	.citySeparator { background-color:#CCC; height:4px;}   
+	.separator { background-color:#C77; height:6px;}   
+	.cityseparator { background-color:#CCC; height:4px;}   
 	.peopleTable { border-collapse:collapse; border:2px solid #555; }   
 </style>
 
@@ -49,6 +53,10 @@ var people = [
 	}
 ];
 
+function index( item, array ) {
+	return $.inArray( item, array ) + 1;
+}
+
 function getName() {
 	return this.data.firstName + " " + this.data.lastName;
 }
@@ -59,16 +67,16 @@ function alternate( item, array ) {
 </script>
 
 <script id="tmplPeople" type="text/html">
-	<tr class="${alternate($data, people)}"><td colspan="2"><a href="${url}">${getName()}</a></td></tr>
+	<tr class="${alternate($data, people)}"><td colspan="2"><a href="${url}">${getName}</a></td></tr>
 	{{each cities}}
-		<tr class="citySeparator"><td colspan="2"></td></tr>
-		<tr class="${alternate($data, people)}"><td colspan="2"><b><i>City ${index()}:</i></b></td></tr>
+		<tr class="cityseparator"><td colspan="2"></td></tr>
+		<tr class="${alternate($data, people)}"><td colspan="2"><b><i>City ${index($value, cities)}:</i></b></td></tr>
 		<tr class="${alternate($data, people)}"><td><b>${name}</b></td><td>${state}</td></tr>
 	{{/each}}
-	<tr class="personSeparator"><td colspan="2"></td></tr>
+	<tr class="separator"><td colspan="2"></td></tr>
 </script>
 
 <table class="peopleTable"><tbody>
-	<tr class="personSeparator"><td colspan="2"></td></tr>
+	<tr class="separator"><td colspan="2"></td></tr>
 </tbody></table>
 

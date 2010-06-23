@@ -263,7 +263,8 @@
 							if ( target ) {
 								target = unescape( target ); 
 								args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
-								expr = args ? ("(" + target + ").call($ctx" + args) : target;
+								expr = args ? ("(" + target + ").call($ctx" + args) : target; 
+								exprAutoFnDetect = args ? expr: "(typeof(" +  target + ")==='function'?(" +  target + ").call($ctx):(" +  target + "))";
 							} else {
 								expr = def["$1"] || "null";
 							}
@@ -271,6 +272,7 @@
 							return "');" + 
 								cmd[ slash ? "suffix" : "prefix" ]
 									.split( "$notnull_1" ).join( "typeof("+ target  +")!=='undefined' && (" + target + ")!=null" )
+									.split( "$1a" ).join( exprAutoFnDetect )
 									.split( "$1" ).join( expr )
 									.split( "$2" ).join( fnargs ? 
 										fnargs.replace( /\s*([^\(]+)\s*(\((.*?)\))?/g, function( all, name, parens, params ) {
@@ -298,6 +300,9 @@
 			"tmpl": {
 				_default: { $2: "null" },
 				prefix: "if($notnull_1){_=_.concat($.tmpl($1,$ctx,$2));}"
+				// tmpl target parameter can be of type function, so use $1, not $1a (so not auto detection of functions)
+				// This means that {{tmpl foo}} treats foo as a template (function). 
+				// Explicit parens can be used if foo is a function that returns a template: {{tmpl foo()}}. 
 			},
 			"each": {
 				_default: { $2: "$index, $value" },
@@ -305,18 +310,18 @@
 				suffix: "}});}"
 			},
 			"if": {
-				prefix: "if(($notnull_1) && $1){",
+				prefix: "if(($notnull_1) && $1a){",
 				suffix: "}"
 			},
 			"else": {
 				prefix: "}else{"
 			},
 			"html": {
-				prefix: "if($notnull_1){_.push($1);}"
+				prefix: "if($notnull_1){_.push($1a);}"
 			},
 			"=": {
 				_default: { $1: "$data" },
-				prefix: "if($notnull_1){_.push($.encode($1));}"
+				prefix: "if($notnull_1){_.push($.encode($1a));}"
 			}
 		},
 		encode: function( text ) {

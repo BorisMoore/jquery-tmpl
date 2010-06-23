@@ -1,3 +1,6 @@
+<!--
+This sample illustrates template composition, including passing parameters to a {{tmpl}} tag.
+-->
 <style type="text/css">
 	*[data-tmpl], .html-template {   
 		display:none;    
@@ -5,8 +8,7 @@
 	.peopleTable td { border:2px solid #555; text-align:center; }   
 	.person{ background-color:#AFA; }   
 	.personAlt{ background-color:#9ED; }   
-	.personSeparator { background-color:#C77; height:6px;}   
-	.citySeparator { background-color:#CCC; height:4px;}   
+	.separator { background-color:#C77; height:6px;}   
 	.peopleTable { border-collapse:collapse; border:2px solid #555; }   
 </style>
 
@@ -56,28 +58,35 @@ function getTemplate( key ) {
 	return $.tmpl("#tmpl" + key);
 }
 
-
 $(function(){
 	$(".peopleTable")
 		.append("#tmplPeople", people );
+	$(".peopleTable")
+		.append("#tmplSeparator", {});
 });
 </script>
 
 <script id="tmplPeople" type="text/html">
-	<tr class="${alternate(this.data, people)}"><td colspan="2"><a href="${url}">${getName()}</a></td></tr>
+	{{tmpl "#tmplSeparator"}}
+	<tr class="${alternate(this.data, people)}"><td colspan="2"><a href="${url}">${getName}</a></td></tr>
 	{{if cities}}
 		{{tmpl(cities) getTemplate("City")}}
 	{{/if}}
-	<tr class="personSeparator"><td colspan="2"></td></tr>
+</script>
+
+<script id="tmplSeparator" type="text/html">
+	<tr class="separator"><td colspan="2"></td></tr>
+</script>
+
+<script id="tmplCitySeparator" type="text/html">
+	<tr class="cityseparator"><td colspan="2"></td></tr>
 </script>
 
 <script id="tmplCity" type="text/html">
-	<tr class="citySeparator"><td colspan="2"></td></tr>
-	<tr class="${alternate(this.parent.data, people)}"><td colspan="2"><b><i>City ${cityNumber()}:</i></b></td></tr>
+	{{tmpl "#tmplCitySeparator"}}
+	<tr class="${alternate(this.parent.data, people)}"><td colspan="2"><b><i>City ${cityNumber}:</i></b></td></tr>
 	<tr class="${alternate(this.parent.data, people)}"><td><b>${name}</b></td><td>${state}</td></tr>
 </script>
 
-<table class="peopleTable"><tbody>
-	<tr class="personSeparator"><td colspan="2"></td></tr>
-</tbody></table>
+<table class="peopleTable"><tbody></tbody></table>
 
