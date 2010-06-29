@@ -1,11 +1,7 @@
 <!--
-This sample illustrates using the {{if}} and 
-{{each}} template tags, with parameters.
+This sample illustrates using the {{if}}, {{each}} and {{tmpl}} template tags, with parameters.
 -->
 <style type="text/css">
-	*[data-tmpl], .html-template {   
-		display:none;    
-	}
 	.peopleTable td { border:2px solid #555; text-align:center; }   
 	.person{ background-color:#AFA; }   
 	.personAlt{ background-color:#9ED; }   
@@ -79,7 +75,7 @@ var startIndex = 1, endIndex = 3;
 	{{if getCityCount(startIndex, endIndex)}}
 		<tr class="${alternate}"><td colspan="3"><i>Favorite Cities</i></td></tr>
 		{{each getCities(startIndex, endIndex)}}
-			{{tmpl(null, {type:"city"}) "#tmplSeparator"}}
+			{{tmpl({}, {type:"city"}) "#tmplSeparator"}}
 			<tr class="${alternate}">
 				<td>${$index + 1}</td>
 				<td><b>${name}</b></td>

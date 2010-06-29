@@ -1,4 +1,14 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+This sample illustrates using templates for a more complete and 
+realistic scenario. 
+
+It uses the NetFlix OData JSONP services as a source of data. 
+
+This version of the movies sample demo uses the 
+	$( targetSelector ).append( templateSelector, data ) 
+pattern, and also uses the tmplCmd plugin and the rendered event.
+-->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>jQuery + OData + Netflix Catalog API</title>
@@ -69,7 +79,7 @@
 </script>
 
 <script id="bookingTitleTmpl" type="text/html">
-	<tr class="bookingTitle${$ctx.mode}" >
+	<tr class="bookingTitle${$ctx.mode}">
 		<td>${movie.Name}</td><td>${movieTheater}</td>
 		<td>${formatDate(date)}</td>
 		<td>
@@ -81,7 +91,7 @@
 
 <script id="bookingEditTmpl" type="text/html">
 	{{tmpl(this.data, {mode: "Edit"}) "#bookingTitleTmpl"}}
-	<tr class="bookingEdit" >
+	<tr class="bookingEdit">
 		<td colspan="4">
 			<div class="fields">
 				<span>Movie Theater: </span><input class="theater" type="text" value="${movieTheater}" /><br/>
@@ -95,7 +105,7 @@
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		cart = { bookings: {}, array: [], count: 0, sortBy:0 }, bookingCtxs = [], selectedBooking;
+		cart = { bookings: {}, count: 0, sortBy:0 }, bookingCtxs = [], selectedBooking;
 		
 	getMovies( pageIndex );
 
@@ -126,7 +136,7 @@
 	}
 
 	function sort() {
-		var compare = compareName, reverse = false;
+		var compare = compareName, reverse = false, data = [];
 		cart.sortBy = $( "#sort select" ).val();
 		switch ( $( "#sort select" ).val() ) {
 			case "1":
@@ -136,7 +146,10 @@
 				compare = compareDate;
 				break;
 		} 
-		var data = cart.array;
+
+		for ( var item in cart.bookings ) {
+			data.push( cart.bookings[item] ); 
+		}
 		data = data.sort( compare );
 
 		bookingCtxs = $.tmplCmd( "replace", data, bookingCtxs );
@@ -215,8 +228,10 @@
 			switchView( booking, true );
 		} else {
 			cart.bookings[booking.movie.Id] = booking;
-			cart.array.push( booking );
-			$( "#bookingsList" ).append( "#bookingEditTmpl", booking, { animate: true, rendered: onBookingEditRendered, newCtxs: bookingCtxs } );
+			$( "#bookingsList" ).append( "#bookingEditTmpl", booking, { animate: true, rendered: onBookingEditRendered } );
+			
+			var newCtx = $( "#bookingsList tr:last" ).tmpl();
+			bookingCtxs.push( newCtx );			
 		}
 	}
 

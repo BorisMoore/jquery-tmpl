@@ -1,5 +1,5 @@
 <!--
-This sample illustrates some basic temlating features and scenarios.
+This sample illustrates some basic templating features and scenarios.
 -->
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../../jquery.tmpl.js" type="text/javascript"></script>
@@ -16,7 +16,8 @@ var dataObject = {
 };
 
 var arrayOfDataObjects = [ 
-	dataObject, 
+	dataObject
+	, 
 	{
 		firstName: "Dave",
 		lastName: "Reed",
@@ -55,18 +56,24 @@ jQuery(function(){
 	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
 	$.templates.myTmpl = $.tmpl('<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>');
 		
-	// Appends one LI, filled with data, into the UL
-	$("ul").append( tmpl, dataObject );
+	// Renders one LI, filled with data, then appends it into the UL
+	$.tmpl( tmpl, dataObject ).appendTo( "ul" );
 
-	var cityCtxs;
-	// Appends multiple LIs for each item. Use options referenced in tmpl string
-	$("ul").prepend( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true, newCtxs: cityCtxs } );
+	// Use template from $.templates. 
+	// Renders template stored under $.templates, then inserts after target. 
+	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
+	$.tmpl( "myTmpl", dataObject ).insertAfter( ".multiple" );
+	$(".multiple").after( "myTmpl", dataObject );
+
+	// Appends multiple LIs for each item. Set option: showCities, referenced within the template.
+	$( "#sometmpl" ).tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ).prependTo( "ul" );
+	$.tmpl( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ).prependTo( "ul" );
+	$("ul").prepend( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } );
 
 	// Example of template that has leading or trailing text
-	$("div").before( "#leadingOrTrailingText", arrayOfDataObjects );
+	$( "#leadingOrTrailingText" ).tmpl( arrayOfDataObjects ).insertBefore( "#target" );
+	$("#target").before( "#leadingOrTrailingText", arrayOfDataObjects );
 
-	// Use template from $.templates. Target wrapped set has more than one element, so rendered template cloned into two places in DOM
-	$(".multiple").after( "myTmpl", dataObject );
 });
 </script>
 
@@ -85,5 +92,6 @@ jQuery(function(){
 </script>
 
 <ul><li class="multiple">first</li><li class="multiple">last</li></ul>
+<ul><li class="multiple">first</li><li class="multiple">last</li></ul>
 
-<div></div>
+<div id="target"></div>
