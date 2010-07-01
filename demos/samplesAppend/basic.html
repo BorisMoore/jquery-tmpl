@@ -57,23 +57,18 @@ jQuery(function(){
 	$.templates.myTmpl = $.tmpl('<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>');
 		
 	// Renders one LI, filled with data, then appends it into the UL
-	$.tmpl( tmpl, dataObject ).appendTo( "ul" );
+	$("ul").append( tmpl, dataObject );
 
 	// Use template from $.templates. 
 	// Renders template stored under $.templates, then inserts after target. 
 	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
-	$.tmpl( "myTmpl", dataObject ).insertAfter( ".multiple" );
 	$(".multiple").after( "myTmpl", dataObject );
 
 	// Appends multiple LIs for each item. Set option: showCities, referenced within the template.
-	$( "#sometmpl" ).tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ).prependTo( "ul" );
-	$.tmpl( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ).prependTo( "ul" );
 	$("ul").prepend( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } );
 
 	// Example of template that has leading or trailing text
-	$( "#leadingOrTrailingText" ).tmpl( arrayOfDataObjects ).insertBefore( "#target" );
 	$("#target").before( "#leadingOrTrailingText", arrayOfDataObjects );
-
 });
 </script>
 

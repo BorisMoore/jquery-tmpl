@@ -7,14 +7,13 @@ It uses the NetFlix OData JSONP services as a source of data.
 
 This version of the movies sample demo uses the 
 	$( templateSelector ).tmpl( data ).appendTo( targetSelector ) 
-pattern, and also uses the tmplCmd plugin. 
-It does not use the rendered event.
+pattern, and does not use the tmplCmd plugin or the rendered event.
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>jQuery + OData + Netflix Catalog API</title>
-    <link href="css/jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" />
-    <link href="css/movies.css" rel="stylesheet" type="text/css" />
+    <link href="../css/jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" />
+    <link href="../css/movies.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="about">
@@ -44,10 +43,9 @@ It does not use the rendered event.
 	<br/>
 </div>
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="../../jquery.tmpl.js" type="text/javascript"></script>
-<script src="../../jquery.tmplCmd.js" type="text/javascript"></script>
-<script src="components/jquery.pager.js" type="text/javascript"></script>
-<script src="components/jquery-ui-1.8.1.custom.js" type="text/javascript"></script>
+<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+<script src="../components/jquery.pager.js" type="text/javascript"></script>
+<script src="../components/jquery-ui-1.8.1.custom.js" type="text/javascript"></script>
 
 <script id="movieTmpl" type="text/html">
 	<div>
@@ -106,7 +104,7 @@ It does not use the rendered event.
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		cart = { bookings: {}, count: 0, sortBy:0 }, bookingCtxs = [], selectedBooking;
+		cart = { bookings: {}, count: 0, sortBy:0 }, bookingCtxs = {}, selectedBooking;
 		
 	getMovies( pageIndex );
 
@@ -123,6 +121,7 @@ It does not use the rendered event.
 			removeBookings(); 
 		})
 		.empty();
+
 	$( "#cartTmpl" )
 		.tmpl( cart )
 		.appendTo( ".cart", cart );
@@ -155,7 +154,9 @@ It does not use the rendered event.
 		}
 		data = data.sort( compare );
 
-		bookingCtxs = $.tmplCmd( "replace", data, bookingCtxs );
+		for ( var i = 0, l = data.length; i < l; i++ ) {
+			$( bookingCtxs[data[i].movie.Id].nodes ).appendTo( "#bookingsList" );
+		}
 	
 		function compareName( a, b ) {
 			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
@@ -212,7 +213,7 @@ It does not use the rendered event.
 			booking.quantity++;
 		} else {
 			cart.count++;
-			$.tmplCmd( "update", cartCtx );
+			updateContext( cartCtx );
 			booking = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
 		}
 		selectBooking( booking );
@@ -221,12 +222,12 @@ It does not use the rendered event.
 	function selectBooking( booking ) {
 		if ( selectedBooking ) {
 			if ( selectedBooking === booking ) {
-				updateBooking( bookingCtx( selectedBooking ));
+				updateBooking( bookingCtxs[selectedBooking.movie.Id]);
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
 			var oldSelected = selectedBooking; 
-			$( "div", bookingCtx( oldSelected ).nodes ).animate( { height: 0 }, 500, function() { 
+			$( "div", bookingCtxs[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() { 
 				switchView( oldSelected );
 			});
 		}
@@ -245,7 +246,7 @@ It does not use the rendered event.
 			// Attach handlers etc. on the rendered template.
 			// Pass the template context of the second tr, which the context for the "bookingEditTmpl" template
 			var newCtx = $.tmpl( bookingNode );
-			bookingCtxs.push( newCtx );
+			bookingCtxs[booking.movie.Id] = newCtx;
 			bookingEditRendered( newCtx ); 
 		}
 	}
@@ -291,18 +292,18 @@ It does not use the rendered event.
 		if ( !booking ) {
 			return;
 		}
-		var ctx = bookingCtx( booking ),
+		var ctx = bookingCtxs[booking.movie.Id],
 			tmpl = $.tmpl(edit ? "#bookingEditTmpl" : "#bookingTitleTmpl"); 
 		if ( ctx.tmpl !== tmpl) {
 			ctx.tmpl = tmpl; 
-			$.tmplCmd( "update", ctx );
+			updateContext( ctx );
 			(edit ? bookingEditRendered : bookingRendered)( ctx );
 		}
 	}
 
 	function updateBooking( ctx ) {
 		ctx.animate = false;
-		$.tmplCmd( "update", ctx );
+		updateContext( ctx );
 		(ctx.data === selectedBooking ? bookingEditRendered : bookingRendered)( ctx );
 		ctx.animate = true;
 	}
@@ -314,26 +315,36 @@ It does not use the rendered event.
 		}
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
-		$.tmplCmd( "update", cartCtx );
-		$.tmplCmd( "remove", booking, bookingCtxs );
+		updateContext( cartCtx );
+		$( bookingCtxs[booking.movie.Id].nodes ).remove();
+		delete bookingCtxs[booking.movie.Id];
 		return false; 
 	}
 	
 	function removeBookings() {
-		$.tmplCmd( "remove", bookingCtxs );
-		bookingCtxs = [];
+		for ( var ctx in bookingCtxs ) {
+			$( bookingCtxs[ctx].nodes ).remove();
+			delete bookingCtxs[ctx];
+		}
+		bookingCtxs = {};
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
-		$.tmplCmd( "update", cartCtx );
+		updateContext( cartCtx );
 	}
 	
 	function formatDate( date ) {
 		return date.toLocaleDateString();
 	}
 
-	function bookingCtx( booking ) {
-		return $.tmplCmd( "find", booking, bookingCtxs)[0];
+	function updateContext( ctx ) {
+		var coll = ctx.nodes;
+		$( coll[0] ).before( ctx);
+		$( coll ).remove();
+	}
+
+	function removeContext( ctx ) {
+		$( ctx.nodes ).remove();
 	}
 </script>
 

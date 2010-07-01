@@ -1,0 +1,93 @@
+<!--
+This sample illustrates some basic templating features and scenarios.
+-->
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="../../jquery.tmpl.js" type="text/javascript"></script>
+<script>
+
+var dataObject = {
+	firstName: "John",
+	lastName: "Resig",
+	url: "http://ejohn.org/",
+	cities: [
+		"Boston, MA",
+		"San Francisco, CA"
+	]
+};
+
+var arrayOfDataObjects = [ 
+	dataObject
+	, 
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/",
+		cities: [
+			"Seattle, WA",
+			"Los Angeles, CA",
+			"New York, NY"
+		]
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [
+			"Redmond, WA",
+			"Seattle, WA",
+			"New York, NY"
+		]
+	}
+];
+
+function cityJoin( separator ) {
+	return this.data.cities.join( separator || ", " );
+}
+
+function getName() {
+	return this.data.firstName + " " + this.data.lastName;
+}
+
+function index( array ) {
+	return $.inArray( this.data, array ) + 1;
+}
+
+jQuery(function(){
+	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
+	$.templates.myTmpl = $.tmpl('<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>');
+		
+	// Renders one LI, filled with data, then appends it into the UL
+	$.tmpl( tmpl, dataObject ).appendTo( "ul" );
+
+	// Use template from $.templates. 
+	// Renders template stored under $.templates, then inserts after target. 
+	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
+	$.tmpl( "myTmpl", dataObject ).insertAfter( ".multiple" );
+
+	// Appends multiple LIs for each item. Set option: showCities, referenced within the template.
+	$( "#sometmpl" ).tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ).prependTo( "ul" );
+	$.tmpl( "#sometmpl", arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } ).prependTo( "ul" );
+
+	// Example of template that has leading or trailing text
+	$( "#leadingOrTrailingText" ).tmpl( arrayOfDataObjects ).insertBefore( "#target" );
+});
+</script>
+
+<script id="sometmpl" type="text/html">
+	<li>${index($ctx.array)} of ${$ctx.array.length}) <a href="${url}">${getName()}</a>
+	{{if $ctx.showCities}}
+		Cities: {{each cities}} ${this} {{/each}}
+	{{else}}
+		No Cities
+	{{/if}}
+	</li>
+</script>
+
+<script id="leadingOrTrailingText" type="text/html">
+	${firstName} <strong>${lastName}</strong> <br/>
+</script>
+
+<ul><li class="multiple">first</li><li class="multiple">last</li></ul>
+<ul><li class="multiple">first</li><li class="multiple">last</li></ul>
+
+<div id="target"></div>

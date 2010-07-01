@@ -15,9 +15,9 @@ for iterative rendering of nested markup within a template.
 <script src="../../jquery.tmpl.js" type="text/javascript"></script>
 <script>
 $(function(){
-	$(".peopleTable")
-		.append("#tmplPeople", people );
-
+	$("#tmplPeople")
+		.tmpl( people )
+		.appendTo(".peopleTable");
 });
 
 var people = [

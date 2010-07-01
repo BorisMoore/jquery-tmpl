@@ -7,9 +7,9 @@
 (function(jQuery){
 	// Override the DOM manipulation function
 	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", itm, ob,
-		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs, topCtx = { key: 0 }, ctxKey = 0, cloneIndex = 0, tmplDomManip;
+		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs = {}, appendToCtxs, topCtx = { key: 0 }, ctxKey = 0, cloneIndex = 0;
 
-	function newCtx( options, parentCtx, fn, data ) {
+	function newCtx( options, parentCtx, fn, data, ctxs ) {
 		// Returns a template context for a new instance of a template. 
 		// The content field is a hierarchical array of strings and nested contexts (to be
 		// removed and replaced by nodes field of dom elements, once inserted in DOM).
@@ -28,8 +28,8 @@
 			// Build the hierarchical content to be used during insertion into DOM
 			newCtx.tmpl = fn;
 			newCtx.content = newCtx.tmpl( jQuery, newCtx );
-			// Keep track of contexts created during this domManip.
 			newCtx.key = ++ctxKey;
+			// Keep track of new context, until it is stored as jQuery Data on DOM element
 			newCtxs[ctxKey] = newCtx;
 		}
 		return newCtx;
@@ -51,13 +51,11 @@
 			var ret = [], insert = jQuery( selector ),
 				parent = this.length === 1 && this[0].parentNode;
 
+			appendToCtxs = newCtxs || {};
 			if ( parent && parent.nodeType === 11 && parent.childNodes.length === 1 && insert.length === 1 ) {
 				insert[ original ]( this[0] );
-				return this;
-
+				ret = this;
 			} else {
-				tmplDomManip = true;
-				newCtxs = newCtxs || {};
 				for ( var i = 0, l = insert.length; i < l; i++ ) {
 					cloneIndex = i;
 					var elems = (i > 0 ? this.clone(true) : this).get();
@@ -65,10 +63,11 @@
 					ret = ret.concat( elems );
 				}
 				cloneIndex = 0;
-				tmplDomManip = false;
-				invokeRendered();
-				return this.pushStack( ret, name, insert.selector );
+				ret = this.pushStack( ret, name, insert.selector );
 			}
+			jQuery.tmpl.complete( appendToCtxs );
+			appendToCtxs = null;
+			return ret;
 		};
 	});
 
@@ -77,7 +76,6 @@
 			if ( arguments.length ) {
 				// Use wrapped elements as template markup.
 				// Return wrapped set of fragments obtained by evaluating template against data.
-				newCtxs = {};
 				return this.map( function( i, tmpl ){
 					return jQuery.tmpl( tmpl, data, options, parentCtx || topCtx, true );
 				});
@@ -87,11 +85,13 @@
 		},
 
 		// This will allow us to do: .append( "template", dataObject )
-		domManip: function( args, table, callback ) {
+		domManip: function( args, table, callback, options ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
 			var ctxs, parentCtx, dmArgs = jQuery.makeArray( arguments ),
-			 arg0 = args[0], argsLength = args.length, i = 0, ctx;
+				arg0 = args[0], argsLength = args.length, i = 0, ctx;
+			
+			newCtxs = appendToCtxs || {};
 			if ( arg0.nodeType ) {
 				while ( i < argsLength && !(ctx = jQuery.data( args[i++], "tmplCtx" ))) {};
 				parentCtx = ctx ? topCtx : null;
@@ -101,16 +101,14 @@
 			}
 			else if ( args.length >= 2 && typeof args[1] === "object" && !args[1].nodeType && !(args[1] instanceof jQuery)) {
 				// args[1] is data, for a template. Eval template to obtain fragment to clone and insert
-				newCtxs = {};
 				parentCtx = args[3] || topCtx;
 				dmArgs[0] = [ jQuery.tmpl( arg0, args[1], args[2], parentCtx, true ) ];
 			}
 			else if ( argsLength === 1 && typeof arg0 === "object" && !(arg0 instanceof jQuery) ) {
 				// args[0] is template context (already inserted in DOM) to be refreshed
-				newCtxs = {};
 				parentCtx = arg0;
 				newCtxs[parentCtx.key] = parentCtx;
-				dmArgs[0] = [ jQuery.tmpl( null, null, null, parentCtx ) ];
+				dmArgs[0] = jQuery.tmpl( null, null, null, parentCtx );
 				dmArgs[1] = parentCtx.data;
 			}
  
@@ -121,9 +119,10 @@
 			oldManip.apply( this, dmArgs );
 
 			cloneIndex = 0;
-			if ( !tmplDomManip) {
-				invokeRendered();
+			if ( !appendToCtxs ) {
+				jQuery.tmpl.complete( newCtxs );
 			}
+			newCtxs = {};
 			return this;
 
 			function tmplCallback( fragClone ) {
@@ -144,76 +143,6 @@
 		}
 	});
 
-	// Call onRendered for each inserted template instance. 
-	function invokeRendered() {
-		if ( newCtxs ) {
-			ctxs = newCtxs;
-			newCtxs = null;
-			for ( itm in ctxs ) {
-				ob =  ctxs[itm]; // Could test for hasOwnProperty...
-				if ( ob.rendered ) {
-					ob.rendered( ob );
-				}
-			}
-		}
-	}
-
-	// Store template contexts in jQuery.data(), ensuring a unique context for each rendered template instance. 
-	function storeContexts( content ) {
-		var keySuffix = "_" + cloneIndex, elem, elems, newClonedCtx = {};
-		for ( var i = 0, l = content.length; i < l; i++ ) {
-			if ( (elem = content[i]).nodeType !== 1 ) {
-				continue;
-			}
-			elems = elem.getElementsByTagName("*");
-			for ( var j = 0, m = elems.length; j < m; j++) {
-				processCtxKey( elems[j] );
-			}
-			processCtxKey( elem );
-		}
-
-		function processCtxKey( el ) {
-			var pntKey, pntNode = el, pntCtx, pntNodeCtx, ctx, key;
-			// Ensure that each rendered template inserted into the DOM has its own template context,
-			if ( key = el.getAttribute( tCtxAtt )) {
-				while ((pntNode = pntNode.parentNode).nodeType === 1 && !(pntKey = pntNode.getAttribute( tCtxAtt ))) { }
-				if ( pntKey !== key ) {
-					// This is a top-level element within this template context
-					ctx = newCtxs[key];
-					if ( cloneIndex ) {
-						cloneContext( key );
-					}
-					pntNodeCtx = el.parentNode;
-					pntNodeCtx = pntNodeCtx.nodeType === 11 ? 0 : (pntNodeCtx.getAttribute( tCtxAtt ) || 0);
-				}
-				el.removeAttribute( tCtxAtt );
-			} else if ( cloneIndex && (ctx = jQuery.data( el, "tmplCtx" )) ) {
-				// This was a rendered element, cloned during appendTo etc.
-				// Ctx stored in jQuery data has already been cloned in cloneCopyEvent. We must replace it with a fresh cloned context. 
-				cloneContext( ctx.key );
-				pntNodeCtx = jQuery.data( el.parentNode, "tmplCtx" );
-				pntNodeCtx = pntNodeCtx ? pntNodeCtx.key : 0;
-			}
-			if ( ctx ) {
-				pntCtx = ctx;
-				// The template context of the parent element
-				while ( pntCtx && pntCtx.key != pntNodeCtx ) {
-					// Add this element as a top-level node for this context, as well as for any
-					// ancestor contexts between this context and the context of its parent element
-					pntCtx.nodes.push( el );
-					pntCtx = pntCtx.parent;
-				}
-				delete ctx.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
-				// Store template context as jQuery data on the element
-				jQuery.data( el, "tmplCtx", ctx );
-			}
-			function cloneContext( key ) {
-				key = key + keySuffix;
-				ctx = newClonedCtx[key] = newClonedCtx[key] || newCtx(ctx, newCtxs[ctx.parent.key + keySuffix] || ctx.parent, null, true);
-			}
-		}
-	}
-
 	jQuery.extend({
 		tmpl: function( tmpl, data, options, parentCtx, domFrag ) {
 			var fn, targetCtx, coll, ret, wrapped;
@@ -223,8 +152,8 @@
 				tmpl =  parentCtx.tmpl;
 				data = parentCtx.data;
 			} else if ( data && !parentCtx ) {
+				// This is a top-level tmpl call (not from nesting using {{tmpl}})
 				parentCtx = topCtx;
-				newCtxs = {};
 				wrapped = true;
 			}
 			if ( typeof tmpl === "string" ) {
@@ -265,7 +194,7 @@
 				// The context is already associated with DOM - this is a refresh.
 				targetCtx.tmpl = fn;
 				targetCtx.nodes = [];
-				return build( targetCtx, null, targetCtx.tmpl( jQuery, targetCtx ) );
+				return jQuery( build( targetCtx, null, targetCtx.tmpl( jQuery, targetCtx ) ));
 			}
 			if ( !data ) {
 				return fn;
@@ -407,4 +336,65 @@
 			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
 		}
 	});
+
+	jQuery.extend( jQuery.tmpl, {
+		complete: jQuery.noop
+	});
+
+	// Store template contexts in jQuery.data(), ensuring a unique context for each rendered template instance. 
+	function storeContexts( content ) {
+		var keySuffix = "_" + cloneIndex, elem, elems, newClonedCtx = {};
+		for ( var i = 0, l = content.length; i < l; i++ ) {
+			if ( (elem = content[i]).nodeType !== 1 ) {
+				continue;
+			}
+			elems = elem.getElementsByTagName("*");
+			for ( var j = 0, m = elems.length; j < m; j++) {
+				processCtxKey( elems[j] );
+			}
+			processCtxKey( elem );
+		}
+
+		function processCtxKey( el ) {
+			var pntKey, pntNode = el, pntCtx, pntNodeCtx, ctx, key;
+			// Ensure that each rendered template inserted into the DOM has its own template context,
+			if ( key = el.getAttribute( tCtxAtt )) {
+				while ((pntNode = pntNode.parentNode).nodeType === 1 && !(pntKey = pntNode.getAttribute( tCtxAtt ))) { }
+				if ( pntKey !== key ) {
+					// This is a top-level element within this template context
+					ctx = newCtxs[key];
+					if ( cloneIndex ) {
+						cloneContext( key );
+					}
+					pntNodeCtx = el.parentNode;
+					pntNodeCtx = pntNodeCtx.nodeType === 11 ? 0 : (pntNodeCtx.getAttribute( tCtxAtt ) || 0);
+				}
+				el.removeAttribute( tCtxAtt );
+			} else if ( cloneIndex && (ctx = jQuery.data( el, "tmplCtx" )) ) {
+				// This was a rendered element, cloned during append or appendTo etc.
+				// Ctx stored in jQuery data has already been cloned in cloneCopyEvent. We must replace it with a fresh cloned context. 
+				cloneContext( ctx.key );
+				newCtxs[ctx.key] = ctx;
+				pntNodeCtx = jQuery.data( el.parentNode, "tmplCtx" );
+				pntNodeCtx = pntNodeCtx ? pntNodeCtx.key : 0;
+			}
+			if ( ctx ) {
+				pntCtx = ctx;
+				// The template context of the parent element
+				while ( pntCtx && pntCtx.key != pntNodeCtx ) {
+					// Add this element as a top-level node for this context, as well as for any
+					// ancestor contexts between this context and the context of its parent element
+					pntCtx.nodes.push( el );
+					pntCtx = pntCtx.parent;
+				}
+				delete ctx.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
+				// Store template context as jQuery data on the element
+				jQuery.data( el, "tmplCtx", ctx );
+			}
+			function cloneContext( key ) {
+				key = key + keySuffix;
+				ctx = newClonedCtx[key] = newClonedCtx[key] || newCtx(ctx, newCtxs[ctx.parent.key + keySuffix] || ctx.parent, null, true);
+			}
+		}
+	}
 })(jQuery);

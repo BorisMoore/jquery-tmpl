@@ -1,7 +1,22 @@
 /*
- * jQuery Templating Plugin Commands
- */
-(function(jQuery){
+* Additional templating features or support for more advanced/less common scenarios.
+* Requires jquery.tmpl.js 
+*/
+(function (jQuery) {
+	var oldComplete = jQuery.tmpl.complete;
+
+	// Override jQuery.tmpl.complete in order to provide rendered event.
+	jQuery.tmpl.complete = function( ctxs ) {
+		for ( var ctx in ctxs ) {
+			ctx =  ctxs[ctx]; 
+			// Raise rendered event
+			if ( ctx.rendered ) {
+				ctx.rendered( ctx );
+			}
+		}
+		oldComplete( ctxs);
+	}
+	
 	jQuery.extend({
 		tmplCmd: function( command, data, contexts ) {
 			var retCtxs = [], before; 
@@ -45,7 +60,10 @@
 					}
 				}
 				return found;
-			}		
+			}
 		}
 	});
 })(jQuery);
+
+
+

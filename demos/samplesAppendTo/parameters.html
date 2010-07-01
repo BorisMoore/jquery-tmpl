@@ -1,0 +1,98 @@
+<!--
+This sample illustrates using the {{if}}, {{each}} and {{tmpl}} template tags, with parameters.
+-->
+<style type="text/css">
+	.peopleTable td { border:2px solid #555; text-align:center; }   
+	.person{ background-color:#AFA; }   
+	.personAlt{ background-color:#9ED; }   
+	.separator { background-color:#C77; height:6px;}   
+	.cityseparator { background-color:#CCC; height:4px;}   
+	.peopleTable { border-collapse:collapse; border:2px solid #555; }   
+</style>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="../../jquery.tmpl.js" type="text/javascript"></script>
+<script>
+$(function(){
+	$("#tmplPeople")
+		.tmpl( people, {allCities: allCities} )
+		.appendTo(".peopleTable");
+});
+
+var people = [
+	{
+		firstName: "John",
+		lastName: "Resig",
+		url: "http://ejohn.org/",
+		cities: [ "BSTN", "NY", "SF" ]
+	},
+	{
+		firstName: "Dave",
+		lastName: "Reed",
+		url: "http://dave.org/",
+		cities: [ "RDMD", "STL", "SF", "LA" ]
+	},
+	{
+		firstName: "Boris",
+		lastName: "Moore",
+		url: "http://boris.org/",
+		cities: [ "RDMD" ]
+	}
+];
+
+var allCities = {
+	BSTN: { name: "Boston", state: "MA", weather: "Cold" },
+	SF: { name: "San Francisco", state: "CA", weather: "Warm" },
+	STL: { name: "Seattle", state: "WA", weather: "Wet" },
+	RDMD: { name: "Redmond", state: "WA", weather: "Wet" },
+	LA: { name: "Los Angeles", state: "CA", weather: "Hot" },
+	NY: { name: "New York", state: "NY", weather: "Variable" }
+};
+
+function getName() {
+	return this.data.firstName + " " + this.data.lastName;
+}
+
+function getCities( begin, end ) {
+	return $.map(this.data.cities.slice(begin, end), function(city) {
+		return allCities[city];
+	});
+}
+
+function getCityCount( begin, end ) {
+	return this.data.cities.slice(begin, end).length;
+}
+
+function alternate() {
+	return ($.inArray( this.data, people ) % 2) ? "personAlt" : "person";
+}
+
+var startIndex = 1, endIndex = 3;
+</script>
+
+<script id="tmplPeople" type="text/html">
+	<tr class="${alternate}"><td colspan="3"><a href="${url}">${getName}</a></td></tr>
+	{{tmpl "#tmplSeparator"}}
+	{{if getCityCount(startIndex, endIndex)}}
+		<tr class="${alternate}"><td colspan="3"><i>Favorite Cities</i></td></tr>
+		{{each getCities(startIndex, endIndex)}}
+			{{tmpl({}, {type:"city"}) "#tmplSeparator"}}
+			<tr class="${alternate}">
+				<td>${$index + 1}</td>
+				<td><b>${name}</b></td>
+				<td>${state}</td>
+			</tr>
+			<tr class="${alternate}"><td colspan="3"><i>${weather}...</i></td></tr>
+		{{/each}}
+		{{tmpl "#tmplSeparator"}}
+	{{/if}}
+</script>
+
+<script id="tmplSeparator" type="text/html">
+	<tr class="${$ctx.type}separator"><td colspan="3"></td></tr>
+</script>
+
+<table class="peopleTable"><tbody>
+	<tr class="separator"><td colspan="3"></td></tr>
+</tbody></table>
+
