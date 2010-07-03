@@ -65,8 +65,9 @@
 				cloneIndex = 0;
 				ret = this.pushStack( ret, name, insert.selector );
 			}
-			jQuery.tmpl.complete( appendToCtxs );
+			var ctxs = appendToCtxs;
 			appendToCtxs = null;
+			jQuery.tmpl.complete( ctxs );
 			return ret;
 		};
 	});
@@ -84,62 +85,30 @@
 			return jQuery.tmpl( this[0] );
 		},
 
-		// This will allow us to do: .append( "template", dataObject )
 		domManip: function( args, table, callback, options ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
-			var ctxs, parentCtx, dmArgs = jQuery.makeArray( arguments ),
-				arg0 = args[0], argsLength = args.length, i = 0, ctx;
-			
-			newCtxs = appendToCtxs || {};
-			if ( arg0.nodeType ) {
+			if ( args[0].nodeType ) {
+				var dmArgs = jQuery.makeArray( arguments ), argsLength = args.length, i = 0, ctx;
 				while ( i < argsLength && !(ctx = jQuery.data( args[i++], "tmplCtx" ))) {};
-				parentCtx = ctx ? topCtx : null;
 				if ( argsLength > 1 ) {
 					dmArgs[0] = [jQuery.makeArray( args )];
 				}
+				if ( ctx && cloneIndex ) {
+					dmArgs[2] = function( fragClone ) {
+						// Handler called by oldManip when rendered template has been inserted into DOM.
+						jQuery.tmpl.afterManip( topCtx, this, fragClone, callback );
+					}
+				}
+				oldManip.apply( this, dmArgs );
+			} else {
+				oldManip.apply( this, arguments );
 			}
-			else if ( args.length >= 2 && typeof args[1] === "object" && !args[1].nodeType && !(args[1] instanceof jQuery)) {
-				// args[1] is data, for a template. Eval template to obtain fragment to clone and insert
-				parentCtx = args[3] || topCtx;
-				dmArgs[0] = [ jQuery.tmpl( arg0, args[1], args[2], parentCtx, true ) ];
-			}
-			else if ( argsLength === 1 && typeof arg0 === "object" && !(arg0 instanceof jQuery) ) {
-				// args[0] is template context (already inserted in DOM) to be refreshed
-				parentCtx = arg0;
-				newCtxs[parentCtx.key] = parentCtx;
-				dmArgs[0] = jQuery.tmpl( null, null, null, parentCtx );
-				dmArgs[1] = parentCtx.data;
-			}
- 
-			if ( parentCtx ) {
-				dmArgs[2] = tmplCallback;
-			}
-
-			oldManip.apply( this, dmArgs );
-
 			cloneIndex = 0;
 			if ( !appendToCtxs ) {
 				jQuery.tmpl.complete( newCtxs );
 			}
-			newCtxs = {};
 			return this;
-
-			function tmplCallback( fragClone ) {
-				// Called by oldManip when $.template has been used to create content.
-				// Provides cloned fragment ready for fixup prior to and after insertion into DOM
-				var content = fragClone.nodeType === 11 ?
-					jQuery.makeArray(fragClone.childNodes) :
-					fragClone.nodeType === 1 ? [fragClone] : [];
-
-				// Return fragment to original caller (e.g. append) for DOM insertion
-				callback.call( this, fragClone );
-
-				// Fragment has been inserted:- Add inserted nodes to context. Replace inserted element annotations by jQuery.data.
-				storeContexts( content );
-				cloneIndex++;
-				delete parentCtx.content;
-			}
 		}
 	});
 
@@ -150,9 +119,9 @@
 				// Re-evaluate rendered template for the parentCtx
 				targetCtx = parentCtx;
 				tmpl =  parentCtx.tmpl;
-				data = parentCtx.data;
+				newCtxs[parentCtx.key] = parentCtx;
 			} else if ( data && !parentCtx ) {
-				// This is a top-level tmpl call (not from nesting using {{tmpl}})
+				// This is a top-level tmpl call (not from a nested template using {{tmpl}})
 				parentCtx = topCtx;
 				wrapped = true;
 			}
@@ -173,7 +142,7 @@
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
 			if ( tmpl instanceof jQuery ) {
-				tmpl = tmpl.get(0);
+				tmpl = tmpl.get(0) || {};
 			}
 			if ( tmpl.nodeType && arguments.length === 1 && tmpl.nodeType === 1 && tmpl.getAttribute( "type" ) !== "text/html" ) {
 				// Return template context for an element, unless element is a script block template declaration.
@@ -194,6 +163,7 @@
 				// The context is already associated with DOM - this is a refresh.
 				targetCtx.tmpl = fn;
 				targetCtx.nodes = [];
+				// Rebuild, without creating new a new template context
 				return jQuery( build( targetCtx, null, targetCtx.tmpl( jQuery, targetCtx ) ));
 			}
 			if ( !data ) {
@@ -218,7 +188,7 @@
 			function build( ctx, parent, content ) {
 				// Convert hierarchical content into flat string array 
 				// and finally return array of fragments ready for DOM insertion
-				var frag, ret = jQuery.map( content, function( item ) {
+				var frag, el, ret = jQuery.map( content, function( item ) {
 					return (typeof item === "string") ? 
 						// Insert context annotations, to be converted to jQuery.data( "tmplCtx" ) when elems are inserted into DOM.
 						item.replace( /(<\w+)([^>]*)/g, "$1 " + tCtxAtt + "=\"" + ctx.key + "\" $2" ) : 
@@ -241,7 +211,7 @@
 					storeContexts( frag );
 					if ( !!before ) frag.unshift( document.createTextNode( before ));
 					if ( !!after ) frag.push( document.createTextNode( after ));
-				});
+ 				});
 				return frag ? frag : document.createTextNode( ret );
 			}
 
@@ -338,7 +308,23 @@
 	});
 
 	jQuery.extend( jQuery.tmpl, {
-		complete: jQuery.noop
+		complete: function( ctxs ) {
+			newCtxs = {};
+		},
+		afterManip: function afterManip( parentCtx, elem, fragClone, callback ) {
+			// Provides cloned fragment ready for fixup prior to and after insertion into DOM
+			var content = fragClone.nodeType === 11 ?
+				jQuery.makeArray(fragClone.childNodes) :
+				fragClone.nodeType === 1 ? [fragClone] : [];
+
+			// Return fragment to original caller (e.g. append) for DOM insertion
+			callback.call( elem, fragClone );
+
+			// Fragment has been inserted:- Add inserted nodes to context. Replace inserted element annotations by jQuery.data.
+			storeContexts( content );
+			cloneIndex++;
+			delete parentCtx.content;
+		}
 	});
 
 	// Store template contexts in jQuery.data(), ensuring a unique context for each rendered template instance. 

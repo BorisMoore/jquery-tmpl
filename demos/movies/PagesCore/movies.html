@@ -125,9 +125,9 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 	$( "#cartTmpl" )
 		.tmpl( cart )
 		.appendTo( ".cart", cart );
-	
-	var cartCtx = $.tmpl( ".cart td" );
-	
+
+	var cartCtx = $( ".cart td" ).tmpl();
+
 	function selectGenre() {
 		$( "#genres li" ).removeClass( "selected" );
 		$( this ).addClass( "selected" );
@@ -293,7 +293,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			return;
 		}
 		var ctx = bookingCtxs[booking.movie.Id],
-			tmpl = $.tmpl(edit ? "#bookingEditTmpl" : "#bookingTitleTmpl"); 
+			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).tmpl(); 
 		if ( ctx.tmpl !== tmpl) {
 			ctx.tmpl = tmpl; 
 			updateContext( ctx );
@@ -339,7 +339,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 
 	function updateContext( ctx ) {
 		var coll = ctx.nodes;
-		$( coll[0] ).before( ctx);
+		$.tmpl( null, null, null, ctx ).insertBefore( coll[0] );
 		$( coll ).remove();
 	}
 

@@ -125,9 +125,9 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	$( "#cartTmpl" )
 		.tmpl( cart )
 		.appendTo( ".cart", cart );
-	
-	var cartCtx = $.tmpl( ".cart td" );
-	
+
+	var cartCtx = $( ".cart td" ).tmpl();
+
 	function selectGenre() {
 		$( "#genres li" ).removeClass( "selected" );
 		$( this ).addClass( "selected" );
@@ -249,7 +249,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		var ctx = bookingCtx( booking ),
 			rendered = edit ? onBookingEditRendered  : onBookingRendered;
 		if ( ctx.rendered !== rendered) {
-			ctx.tmpl = edit ? "#bookingEditTmpl" : "#bookingTitleTmpl"; 
+			ctx.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).tmpl(); 
 			ctx.rendered = rendered; 
 			$.tmplCmd( "update", ctx );
 		}

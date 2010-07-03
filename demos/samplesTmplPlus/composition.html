@@ -12,6 +12,7 @@ This sample illustrates template composition, including passing parameters to a 
 
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="../../jquery.tmpl.js" type="text/javascript"></script>
+<script src="../../jquery.tmplPlus.js" type="text/javascript"></script>
 <script>
 var people = [
 	{
@@ -57,12 +58,10 @@ function getTemplate( key ) {
 }
 
 $(function(){
-	$("#tmplPeople")
-		.tmpl( people )
-		.appendTo(".peopleTable");
-	$("#tmplSeparator")
-		.tmpl( {} )
-		.appendTo(".peopleTable");
+	$(".peopleTable")
+		.append("#tmplPeople", people );
+	$(".peopleTable")
+		.append("#tmplSeparator", {});
 });
 </script>
 

@@ -3,10 +3,11 @@
 * Requires jquery.tmpl.js 
 */
 (function (jQuery) {
-	var oldComplete = jQuery.tmpl.complete;
+	var oldComplete = jQuery.tmpl.complete, oldManip = jQuery.fn.domManip;
 
 	// Override jQuery.tmpl.complete in order to provide rendered event.
 	jQuery.tmpl.complete = function( ctxs ) {
+		oldComplete( ctxs);
 		for ( var ctx in ctxs ) {
 			ctx =  ctxs[ctx]; 
 			// Raise rendered event
@@ -14,9 +15,8 @@
 				ctx.rendered( ctx );
 			}
 		}
-		oldComplete( ctxs);
 	}
-	
+
 	jQuery.extend({
 		tmplCmd: function( command, data, contexts ) {
 			var retCtxs = [], before; 
@@ -31,7 +31,7 @@
 				coll = ctx.nodes;
 				switch ( command ) {
 					case "update":
-						jQuery( coll[0] ).before( ctx );
+						jQuery.tmpl( null, null, null, ctx ).insertBefore( coll[0] );
 						jQuery( coll ).remove();
 						break;
 					case "remove":
@@ -61,6 +61,26 @@
 				}
 				return found;
 			}
+		}
+	});
+
+	jQuery.fn.extend({
+		domManip: function (args, table, callback, options) {
+			var parentCtx, data = args[1], tmpl = args[0], dmArgs;
+			if ( args.length >= 2 && typeof data === "object" && !data.nodeType && !(data instanceof jQuery)) {
+				dmArgs = jQuery.makeArray( arguments );
+				// args[1] is data, for a template. Eval template to obtain fragment to clone and insert
+				parentCtx = args[3] || { key: 0 };
+				
+				dmArgs[0] = [ jQuery.tmpl( tmpl, data, args[2], parentCtx, true ) ];
+				
+				dmArgs[2] = function( fragClone ) {
+					// Handler called by oldManip when rendered template has been inserted into DOM.
+					jQuery.tmpl.afterManip( parentCtx, this, fragClone, callback );
+				}
+				return oldManip.apply( this, dmArgs );
+			}
+			return oldManip.apply( this, arguments );
 		}
 	});
 })(jQuery);

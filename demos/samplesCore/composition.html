@@ -53,14 +53,19 @@ function cityNumber() {
 }
 
 function getTemplate( key ) {
-	return $.tmpl("#tmpl" + key);
+	return $("#tmpl" + key).tmpl();
 }
 
 $(function(){
-	$(".peopleTable")
-		.append("#tmplPeople", people );
-	$(".peopleTable")
-		.append("#tmplSeparator", {});
+	// Create named template, to be used in composition below
+	$.templates.citySeparator = $.tmpl( '<tr class="citySeparator"><td colspan="2"></td></tr>' );
+	
+	$("#tmplPeople")
+		.tmpl( people )
+		.appendTo(".peopleTable");
+	$("#tmplSeparator")
+		.tmpl( {} )
+		.appendTo(".peopleTable");
 });
 </script>
 
@@ -76,12 +81,8 @@ $(function(){
 	<tr class="separator"><td colspan="2"></td></tr>
 </script>
 
-<script id="tmplCitySeparator" type="text/html">
-	<tr class="citySeparator"><td colspan="2"></td></tr>
-</script>
-
 <script id="tmplCity" type="text/html">
-	{{tmpl "#tmplCitySeparator"}}
+	{{tmpl "citySeparator"}}
 	<tr class="${alternate(this.parent.data, people)}"><td colspan="2"><b><i>City ${cityNumber}:</i></b></td></tr>
 	<tr class="${alternate(this.parent.data, people)}"><td><b>${name}</b></td><td>${state}</td></tr>
 </script>

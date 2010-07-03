@@ -123,13 +123,13 @@ It does not use the rendered event.
 			removeBookings(); 
 		})
 		.empty();
-	
+
 	$( "#cartTmpl" )
 		.tmpl( cart )
 		.appendTo( ".cart", cart );
-	
-	var cartCtx = $.tmpl( ".cart td" );
-	
+
+	var cartCtx = $( ".cart td" ).tmpl();
+
 	function selectGenre() {
 		$( "#genres li" ).removeClass( "selected" );
 		$( this ).addClass( "selected" );
@@ -293,7 +293,7 @@ It does not use the rendered event.
 			return;
 		}
 		var ctx = bookingCtx( booking ),
-			tmpl = $.tmpl(edit ? "#bookingEditTmpl" : "#bookingTitleTmpl"); 
+			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).tmpl(); 
 		if ( ctx.tmpl !== tmpl) {
 			ctx.tmpl = tmpl; 
 			$.tmplCmd( "update", ctx );
