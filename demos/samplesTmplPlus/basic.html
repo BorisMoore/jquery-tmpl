@@ -54,16 +54,16 @@ function index( array ) {
 }
 
 jQuery(function(){
-	
+	// A template string
 	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
-	// Store a compiled template for later use
-	$.templates.myTmpl = $.tmpl( '<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>' );
 		
 	// Renders one LI, filled with data, then appends it into the UL
-	$("ul").append( tmpl, dataObject );
+	$("ul").append( tmpl, dataObject, null );
 
-	// Use template from $.templates. 
-	// Renders template stored under $.templates, then inserts after target. 
+	// Store a string as a compiled template for later use
+	$.templates( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>' );
+	
+	// Render stored template and insert after target. 
 	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
 	$(".multiple").after( "myTmpl", dataObject );
 

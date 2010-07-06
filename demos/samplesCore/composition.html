@@ -58,7 +58,7 @@ function getTemplate( key ) {
 
 $(function(){
 	// Create named template, to be used in composition below
-	$.templates.citySeparator = $.tmpl( '<tr class="citySeparator"><td colspan="2"></td></tr>' );
+	$.templates( "citySeparator", '<tr class="citySeparator"><td colspan="2"></td></tr>' );
 	
 	$( "#tmplPeople" )
 		.tmpl( people )

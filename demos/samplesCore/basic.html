@@ -61,34 +61,37 @@ function index( array ) {
 jQuery(function(){
 	// A template string
 	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
-	
+
 	// Renders one LI, filled with data, then appends it into the UL
 	$.tmpl( tmpl, dataObject )
 		.appendTo( "ul" );
-	
-	// Store a compiled template for later use
-	$.templates.myTmpl = $.tmpl( '<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>' );
-		
+
+	// Store a string as a compiled template for later use
+	$.templates( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>' );
+
 	// Render stored template and insert after target. 
 	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
 	$.tmpl( "myTmpl", dataObject )
 		.insertAfter( ".multiple" );
 
 	// Use a template declared in a script block
-	// Appends multiple LIs - one for each item. 
+	// Appends multiple LIs - one for each item.
 	$( "#sometmpl" )
 		.tmpl( arrayOfDataObjects )
 		.appendTo( "ul" );
-	
-	// Alternative syntax
-	$.tmpl( "#sometmpl", arrayOfDataObjects )
+
+	// Store a template declared in a script block as a named template for later use.
+	$( "#sometmpl" ).templates( "peopleList" );
+
+	// Use the named template
+	$.tmpl( "peopleList", arrayOfDataObjects )
 		.appendTo( "ul" );
 
 	// Set options: showCities and array, referenced within the template.
 	$( "#sometmpl" )
 		.tmpl( arrayOfDataObjects, { array: arrayOfDataObjects, showCities: true } )
 		.prependTo( "ul" );
-	
+
 	// Getting to the data in a click event.
 	$( "#sometmpl" )
 		.tmpl( arrayOfDataObjects )
@@ -99,7 +102,7 @@ jQuery(function(){
 			var ctx = $.tmpl(this); 
 			alert( ctx.data.firstName + " at " + ctx.data.url );
 		});
-	
+
 	// Example of template that has leading or trailing text
 	$( "#leadingOrTrailingText" )
 		.tmpl( arrayOfDataObjects )

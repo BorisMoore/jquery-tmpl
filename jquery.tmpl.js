@@ -7,7 +7,7 @@
 (function(jQuery){
 	// Override the DOM manipulation function
 	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", itm, ob,
-		htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/, newCtxs = {}, appendToCtxs, topCtx = { key: 0 }, ctxKey = 0, cloneIndex = 0;
+		newCtxs = {}, appendToCtxs, topCtx = { key: 0 }, ctxKey = 0, cloneIndex = 0;
 
 	function newCtx( options, parentCtx, fn, data, ctxs ) {
 		// Returns a template context for a new instance of a template. 
@@ -35,7 +35,7 @@
 		return newCtx;
 		function nest( tmpl, data, options ) {
 			// nested template, using {{tmpl}} tag
-			return jQuery.tmpl( tmpl, data || {}, options, this );
+			return jQuery.tmpl( typeof tmpl === "string" ? jQuery.templates( tmpl ) : tmpl, data || {}, options, this );
 		}
 	}
 
@@ -86,6 +86,10 @@
 			return jQuery.tmpl( this[0] );
 		},
 
+		templates: function( name ) {
+			return jQuery.templates( name, this[0] );
+		},
+
 		domManip: function( args, table, callback, options ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
@@ -127,17 +131,12 @@
 				wrapped = true;
 			}
 			if ( typeof tmpl === "string" ) {
-				if ( htmlExpr.test( tmpl) ) {
-					// This is an HTML string being passed directly in.
-					// Assume the user doesn't want it cached.
-					// They can stick it in jQuery.templates to cache it.
-					tmpl = tmplFn( tmpl )
-				} else if ( fn = jQuery.templates[ tmpl ] ) {
-					// Use a pre-defined template, if available
+				if ( fn = jQuery.templates[ tmpl ] ) {
+				 	// Use a pre-defined template, if available
 					tmpl = fn;
 				} else {
-					// It's a selector
-					tmpl = jQuery( tmpl )[0];
+					// This is an HTML string being passed directly in.
+					tmpl = tmplFn( tmpl )
 				}
 			}
 			// Generate a reusable function that will serve as a template
@@ -277,10 +276,12 @@
 			}
 		},
 
-		// You can cache a named template using $.templates( name, tmpl );
-		// which is equivalent to $.templates[name] = $.tmpl( tmpl);
-		// tmpl is a string, a script element or a selector to a script element, etc.
-		// To get a cached template, use $.templates( name ) where name is a selector or a previously named template.
+		// Use $.templates( name, tmpl ) to cache a named template, 
+		// where tmpl is a string, a script element or a selector to a script element, etc.
+		// Use $( "selector" ).templates( name ) to provide access by name to a script block template declaration.
+
+		// Use $.templates( name ) to access a cached template.
+		// Also $.templates( selectorToScriptBlock ) or $( selectorToScriptBlock ).templates() will return the cached compiled template.  
 		templates: function( name, tmpl ) {
 			if (tmpl) {
 				return jQuery.templates[name] = jQuery.tmpl( tmpl );
