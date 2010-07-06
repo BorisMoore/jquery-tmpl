@@ -54,14 +54,14 @@ function cityNumber() {
 }
 
 function getTemplate( key ) {
-	return $.tmpl("#tmpl" + key);
+	return $( "#tmpl" + key ).tmpl();
 }
 
 $(function(){
-	$(".peopleTable")
-		.append("#tmplPeople", people );
-	$(".peopleTable")
-		.append("#tmplSeparator", {});
+	$( ".peopleTable" )
+		.append( "#tmplPeople", people );
+	$( ".peopleTable" )
+		.append( "#tmplSeparator", {} );
 });
 </script>
 

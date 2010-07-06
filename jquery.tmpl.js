@@ -81,7 +81,8 @@
 					return jQuery.tmpl( tmpl, data, options, parentCtx || topCtx, true );
 				});
 			}	
-			// If no arguments, used to get template context of first wrapped DOM element
+			// If no arguments, used to get template context of first wrapped DOM element, 
+			// or, if it is a template script block, the compiled template
 			return jQuery.tmpl( this[0] );
 		},
 
@@ -97,7 +98,7 @@
 				if ( ctx && cloneIndex ) {
 					dmArgs[2] = function( fragClone ) {
 						// Handler called by oldManip when rendered template has been inserted into DOM.
-						jQuery.tmpl.afterManip( topCtx, this, fragClone, callback );
+						jQuery.tmpl.afterManip( this, fragClone, callback );
 					}
 				}
 				oldManip.apply( this, dmArgs );
@@ -132,7 +133,7 @@
 					// They can stick it in jQuery.templates to cache it.
 					tmpl = tmplFn( tmpl )
 				} else if ( fn = jQuery.templates[ tmpl ] ) {
-				 	// Use a pre-defined template, if available
+					// Use a pre-defined template, if available
 					tmpl = fn;
 				} else {
 					// It's a selector
@@ -202,17 +203,28 @@
 				// top-level template
 				ret = ret.join("");
 
-				// Support templates which have initial or final text nodes
+				// Support templates which have initial or final text nodes, or consist only of text
+				// Also support HTML entities within the HTML markup.
 				ret.replace( /^\s*([^<\s][^<]*)?(<[\w\W]+>)([^>]*[^>\s])?\s*$/, function( all, before, middle, after) {
 					frag = jQuery( middle ).get(); // For now use get(), since buildFragment is not current public
 //					frag = jQuery.buildFragment( [middle] ); // If buildFragment was public, could do these two lines instead
 //					frag = frag.cacheable ? frag.fragment.cloneNode(true) : frag.fragment;
 
 					storeContexts( frag );
-					if ( !!before ) frag.unshift( document.createTextNode( before ));
-					if ( !!after ) frag.push( document.createTextNode( after ));
- 				});
-				return frag ? frag : document.createTextNode( ret );
+					if ( !!before ) {
+						frag = unencode( before ).concat(frag);
+					}
+					if ( !!after ) {
+						frag = frag.concat(unencode( after ));
+					}
+				});
+				return frag ? frag : unencode( ret );
+				function unencode( text ) {
+					// createTextNode will not render HTML entities correctly
+					var el = document.createElement( "<span></span>");
+					el.innerHTML = text;
+					return jQuery.makeArray(el.childNodes);
+				}
 			}
 
 			function tmplFn( markup ) {
@@ -265,14 +277,16 @@
 			}
 		},
 
-		// You can stick pre-built template functions here
-		templates: {},
-		/*
-		 * For example, someone could do:
-		 *   jQuery.templates.foo = jQuery.tmpl("some long templating string");
-		 *   $("#test").append("foo", data);
-		 */
-
+		// You can cache a named template using $.templates( name, tmpl );
+		// which is equivalent to $.templates[name] = $.tmpl( tmpl);
+		// tmpl is a string, a script element or a selector to a script element, etc.
+		// To get a cached template, use $.templates( name ) where name is a selector or a previously named template.
+		templates: function( name, tmpl ) {
+			if (tmpl) {
+				return jQuery.templates[name] = jQuery.tmpl( tmpl );
+			}
+			return jQuery.templates[name] || jQuery( name ).tmpl();
+		},
 		tmplTags: {
 			"tmpl": {
 				_default: { $2: "{}" },
@@ -302,8 +316,8 @@
 			}
 		},
 		encode: function( text ) {
-			// This should probably do HTML encoding replacing < > & and' and " by corresponding entities.
-			return text != null ? document.createTextNode( text.toString() ).nodeValue : "";
+			// Do HTML encoding replacing < > & and ' and " by corresponding entities.
+			return ("" + text).split("<").join("&lt;").split(">").join("&gt;").split('"').join("&#34;").split("'").join("&#39;");
 		}
 	});
 
@@ -311,7 +325,7 @@
 		complete: function( ctxs ) {
 			newCtxs = {};
 		},
-		afterManip: function afterManip( parentCtx, elem, fragClone, callback ) {
+		afterManip: function afterManip( elem, fragClone, callback ) {
 			// Provides cloned fragment ready for fixup prior to and after insertion into DOM
 			var content = fragClone.nodeType === 11 ?
 				jQuery.makeArray(fragClone.childNodes) :
@@ -323,7 +337,6 @@
 			// Fragment has been inserted:- Add inserted nodes to context. Replace inserted element annotations by jQuery.data.
 			storeContexts( content );
 			cloneIndex++;
-			delete parentCtx.content;
 		}
 	});
 

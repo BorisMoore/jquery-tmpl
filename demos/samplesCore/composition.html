@@ -53,19 +53,19 @@ function cityNumber() {
 }
 
 function getTemplate( key ) {
-	return $("#tmpl" + key).tmpl();
+	return $( "#tmpl" + key ).tmpl();
 }
 
 $(function(){
 	// Create named template, to be used in composition below
 	$.templates.citySeparator = $.tmpl( '<tr class="citySeparator"><td colspan="2"></td></tr>' );
 	
-	$("#tmplPeople")
+	$( "#tmplPeople" )
 		.tmpl( people )
-		.appendTo(".peopleTable");
-	$("#tmplSeparator")
+		.appendTo( ".peopleTable" );
+	$( "#tmplSeparator" )
 		.tmpl( {} )
-		.appendTo(".peopleTable");
+		.appendTo( ".peopleTable" );
 });
 </script>
 

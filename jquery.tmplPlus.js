@@ -66,17 +66,17 @@
 
 	jQuery.fn.extend({
 		domManip: function (args, table, callback, options) {
-			var parentCtx, data = args[1], tmpl = args[0], dmArgs;
+			var data = args[1], tmpl = args[0], dmArgs;
 			if ( args.length >= 2 && typeof data === "object" && !data.nodeType && !(data instanceof jQuery)) {
+				// args[1] is data, for a template.
 				dmArgs = jQuery.makeArray( arguments );
-				// args[1] is data, for a template. Eval template to obtain fragment to clone and insert
-				parentCtx = args[3] || { key: 0 };
 				
-				dmArgs[0] = [ jQuery.tmpl( tmpl, data, args[2], parentCtx, true ) ];
+				// Eval template to obtain fragment to clone and insert
+				dmArgs[0] = [ jQuery.tmpl( tmpl, data, args[2], args[3], true ) ];
 				
 				dmArgs[2] = function( fragClone ) {
 					// Handler called by oldManip when rendered template has been inserted into DOM.
-					jQuery.tmpl.afterManip( parentCtx, this, fragClone, callback );
+					jQuery.tmpl.afterManip( this, fragClone, callback );
 				}
 				return oldManip.apply( this, dmArgs );
 			}
