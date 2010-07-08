@@ -4,8 +4,7 @@
  * Copyright 2010, John Resig
  * Dual licensed under the MIT or GPL Version 2 licenses.
  */
-(function(jQuery){
-	// Override the DOM manipulation function
+(function( jQuery, undefined ){
 	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", itm, ob,
 		newCtxs = {}, appendToCtxs, topCtx = { key: 0 }, ctxKey = 0, cloneIndex = 0;
 
@@ -75,11 +74,9 @@
 	jQuery.fn.extend({
 		tmpl: function( data, options, parentCtx ) {
 			if ( arguments.length ) {
-				// Use wrapped elements as template markup.
+				// Use first wrapped element as template markup.
 				// Return wrapped set of fragments obtained by evaluating template against data.
-				return this.map( function( i, tmpl ){
-					return jQuery.tmpl( tmpl, data, options, parentCtx || topCtx, true );
-				});
+				return jQuery.tmpl( this[0], data, options, parentCtx, true );
 			}	
 			// If no arguments, used to get template context of first wrapped DOM element, 
 			// or, if it is a template script block, the compiled template
@@ -120,6 +117,9 @@
 	jQuery.extend({
 		tmpl: function( tmpl, data, options, parentCtx, domFrag ) {
 			var fn, targetCtx, coll, ret, wrapped;
+			if ( data === undefined ) { 
+				data = {};
+			}
 			if ( parentCtx && !tmpl && !data && !options ) {
 				// Re-evaluate rendered template for the parentCtx
 				targetCtx = parentCtx;
@@ -163,14 +163,11 @@
 				// The context is already associated with DOM - this is a refresh.
 				targetCtx.tmpl = fn;
 				targetCtx.nodes = [];
-				// Rebuild, without creating new a new template context
+				// Rebuild, without creating a new template context
 				return jQuery( build( targetCtx, null, targetCtx.tmpl( jQuery, targetCtx ) ));
 			}
-			if ( !data ) {
-				return fn;
-			}
 			if ( !parentCtx ) {
-				return []; //Could throw...
+				return fn; 
 			}
 			if ( typeof data === "function" ) {
 				data = data.call( parentCtx.data || {}, parentCtx );
@@ -220,7 +217,7 @@
 				return frag ? frag : unencode( ret );
 				function unencode( text ) {
 					// createTextNode will not render HTML entities correctly
-					var el = document.createElement( "<span></span>");
+					var el = document.createElement( "span" );
 					el.innerHTML = text;
 					return jQuery.makeArray(el.childNodes);
 				}
@@ -243,7 +240,7 @@
 							function unescape( args ) {
 								return args ? args.replace( /\\'/g, "'").replace(/\\\\/g, "\\" ) : null;
 							}
-							var cmd = jQuery.tmplTags[ type ], def, expr;
+							var cmd = jQuery.tmpl.tags[ type ], def, expr;
 							if ( !cmd ) {
 								throw "Template command not found: " + type;
 							}
@@ -259,7 +256,7 @@
 							fnargs = unescape( fnargs );
 							return "');" + 
 								cmd[ slash ? "suffix" : "prefix" ]
-									.split( "$notnull_1" ).join( "typeof("+ target  +")!=='undefined' && (" + target + ")!=null" )
+									.split( "$notnull_1" ).join( "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" )
 									.split( "$1a" ).join( exprAutoFnDetect )
 									.split( "$1" ).join( expr )
 									.split( "$2" ).join( fnargs ?
@@ -284,11 +281,18 @@
 		// Also $.templates( selectorToScriptBlock ) or $( selectorToScriptBlock ).templates() will return the cached compiled template.  
 		templates: function( name, tmpl ) {
 			if (tmpl) {
-				return jQuery.templates[name] = jQuery.tmpl( tmpl );
+				return jQuery.templates[name] = jQuery.tmpl( tmpl, null );
 			}
-			return jQuery.templates[name] || jQuery( name ).tmpl();
+			return jQuery.templates[name] || jQuery( name ).tmpl( null );
 		},
-		tmplTags: {
+		encode: function( text ) {
+			// Do HTML encoding replacing < > & and ' and " by corresponding entities.
+			return ("" + text).split("<").join("&lt;").split(">").join("&gt;").split('"').join("&#34;").split("'").join("&#39;");
+		}
+	});
+
+	jQuery.extend( jQuery.tmpl, {
+		tags: {
 			"tmpl": {
 				_default: { $2: "{}" },
 				prefix: "if($notnull_1){_=_.concat($ctx.nest($1,$2));}"
@@ -316,13 +320,6 @@
 				prefix: "if($notnull_1){_.push($.encode($1a));}"
 			}
 		},
-		encode: function( text ) {
-			// Do HTML encoding replacing < > & and ' and " by corresponding entities.
-			return ("" + text).split("<").join("&lt;").split(">").join("&gt;").split('"').join("&#34;").split("'").join("&#39;");
-		}
-	});
-
-	jQuery.extend( jQuery.tmpl, {
 		complete: function( ctxs ) {
 			newCtxs = {};
 		},

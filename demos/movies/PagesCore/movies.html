@@ -293,7 +293,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			return;
 		}
 		var ctx = bookingCtxs[booking.movie.Id],
-			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).tmpl(); 
+			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
 		if ( ctx.tmpl !== tmpl) {
 			ctx.tmpl = tmpl; 
 			updateContext( ctx );

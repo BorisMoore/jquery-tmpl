@@ -242,7 +242,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		var ctx = bookingCtx( booking ),
 			rendered = edit ? onBookingEditRendered  : onBookingRendered;
 		if ( ctx.rendered !== rendered) {
-			ctx.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).tmpl(); 
+			ctx.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
 			ctx.rendered = rendered; 
 			$.tmplCmd( "update", ctx );
 		}
