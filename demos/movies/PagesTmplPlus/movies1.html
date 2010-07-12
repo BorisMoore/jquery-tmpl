@@ -53,7 +53,7 @@ It does not use the rendered event.
 	<div>
 		<div><img src="${BoxArt.LargeUrl}" /> </div>
 		<strong>${Name}</strong>
-		<p>${Synopsis}</p>
+		<p>{{html Synopsis}}</p>
 		<input type="button" title="Buy tickets for '${Name}'" value="Add to cart..." class="buyButton"/>
 		<br/>
 	</div>
@@ -91,7 +91,7 @@ It does not use the rendered event.
 </script>
 
 <script id="bookingEditTmpl" type="text/html">
-	{{tmpl(this.data, {mode: "Edit"}) "#bookingTitleTmpl"}}
+	{{tmpl($data, {mode: "Edit"}) "#bookingTitleTmpl"}}
 	<tr class="bookingEdit">
 		<td colspan="4">
 			<div class="fields">

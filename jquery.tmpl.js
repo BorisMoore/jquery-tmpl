@@ -6,20 +6,20 @@
  */
 (function( jQuery, undefined ){
 	var oldManip = jQuery.fn.domManip, tCtxAtt = "_tmplctx", itm, ob,
-		newCtxs = {}, appendToCtxs, topCtx = { key: 0 }, ctxKey = 0, cloneIndex = 0;
+		newCtxs = {}, appendToCtxs, topCtx = { key: 0, data: {} }, ctxKey = 0, cloneIndex = 0;
 
-	function newCtx( options, parentCtx, fn, data, ctxs ) {
+	function newCtx( options, parentCtx, fn, data ) {
 		// Returns a template context for a new instance of a template. 
 		// The content field is a hierarchical array of strings and nested contexts (to be
 		// removed and replaced by nodes field of dom elements, once inserted in DOM).
 		var newCtx = { 
-			data: data || null,
+			data: data || (parentCtx ? parentCtx.data : {}),
 			tmpl: null,
 			parent: parentCtx || null,
 			nodes: [],
 			nest: nest
 		};
-		if ( options) {
+		if ( options ) {
 			jQuery.extend( newCtx, options, { nodes: [], parent: parentCtx } );
 			fn = fn || (typeof options.tmpl === "function" ? options.tmpl : null);
 		}
@@ -32,13 +32,9 @@
 			newCtxs[ctxKey] = newCtx;
 		}
 		return newCtx;
-		function nest( tmpl, data, options ) {
-			// nested template, using {{tmpl}} tag
-			return jQuery.tmpl( typeof tmpl === "string" ? jQuery.templates( tmpl ) : tmpl, data || {}, options, this );
-		}
 	}
 
-	// Override appendTo etc., in order to provide support for targeting multiple elements.
+	// Override appendTo etc., in order to provide support for targeting multiple elements. (This code would disappear if integrated in jquery core).
 	jQuery.each({
 		appendTo: "append",
 		prependTo: "prepend",
@@ -76,7 +72,7 @@
 			if ( arguments.length ) {
 				// Use first wrapped element as template markup.
 				// Return wrapped set of fragments obtained by evaluating template against data.
-				return jQuery.tmpl( this[0], data, options, parentCtx, true );
+				return jQuery.tmpl( this[0], data, options, parentCtx, parentCtx === undefined );
 			}	
 			// If no arguments, used to get template context of first wrapped DOM element, 
 			// or, if it is a template script block, the compiled template
@@ -117,15 +113,12 @@
 	jQuery.extend({
 		tmpl: function( tmpl, data, options, parentCtx, domFrag ) {
 			var fn, targetCtx, coll, ret, wrapped;
-			if ( data === undefined ) { 
-				data = {};
-			}
 			if ( parentCtx && !tmpl && !data && !options ) {
 				// Re-evaluate rendered template for the parentCtx
 				targetCtx = parentCtx;
 				tmpl =  parentCtx.tmpl;
 				newCtxs[parentCtx.key] = parentCtx;
-			} else if ( data && !parentCtx ) {
+			} else if ( domFrag || arguments.length === 2 ) {
 				// This is a top-level tmpl call (not from a nested template using {{tmpl}})
 				parentCtx = topCtx;
 				wrapped = true;
@@ -136,25 +129,24 @@
 					tmpl = fn;
 				} else {
 					// This is an HTML string being passed directly in.
-					tmpl = tmplFn( tmpl )
+					tmpl = buildTmplFn( tmpl )
 				}
 			}
-			// Generate a reusable function that will serve as a template
-			// generator (and which will be cached).
 			if ( tmpl instanceof jQuery ) {
 				tmpl = tmpl.get(0) || {};
 			}
-			if ( tmpl.nodeType && arguments.length === 1 && tmpl.nodeType === 1 && tmpl.getAttribute( "type" ) !== "text/html" ) {
-				// Return template context for an element, unless element is a script block template declaration.
+			if ( tmpl.nodeType && arguments.length === 1 && tmpl.nodeType === 1 ) {
+				// Return template context for an element.
 				while ( tmpl && !(tmplCtx = jQuery.data( tmpl, "tmplCtx" )) && (tmpl = tmpl.parentNode) ) {}
 				return tmplCtx || topCtx;
 			}
+			
 			// If arguments.length > 1, render template against data, and return fragments ready for DOM insertion.
 			if ( typeof tmpl === "function" ) {
 				fn = tmpl;
 			} else if ( tmpl.nodeType ) {
-				// If this is a template block, cache
-				fn = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", tmplFn( tmpl.innerHTML ));
+				// If this is a template block, generate tmpl function and cache.
+				fn = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", buildTmplFn( tmpl.innerHTML ));
 			}
 			if ( !fn ) {
 				return []; //Could throw...
@@ -166,7 +158,7 @@
 				// Rebuild, without creating a new template context
 				return jQuery( build( targetCtx, null, targetCtx.tmpl( jQuery, targetCtx ) ));
 			}
-			if ( !parentCtx ) {
+			if ( !parentCtx && arguments.length > 3) {
 				return fn; 
 			}
 			if ( typeof data === "function" ) {
@@ -181,110 +173,26 @@
 
 			ret = domFrag || wrapped ? build( parentCtx, null, ret ) : ret;
 			return wrapped ? jQuery( ret) : ret;
-
-			function build( ctx, parent, content ) {
-				// Convert hierarchical content into flat string array 
-				// and finally return array of fragments ready for DOM insertion
-				var frag, el, ret = jQuery.map( content, function( item ) {
-					return (typeof item === "string") ? 
-						// Insert context annotations, to be converted to jQuery.data( "tmplCtx" ) when elems are inserted into DOM.
-						item.replace( /(<\w+)([^>]*)/g, "$1 " + tCtxAtt + "=\"" + ctx.key + "\" $2" ) : 
-						// This is a child template context. Build nested template.
-						build( item, ctx, item.content );
-				});
-				if ( parent ) {
-					// nested template
-					return ret;
-				}
-				// top-level template
-				ret = ret.join("");
-
-				// Support templates which have initial or final text nodes, or consist only of text
-				// Also support HTML entities within the HTML markup.
-				ret.replace( /^\s*([^<\s][^<]*)?(<[\w\W]+>)([^>]*[^>\s])?\s*$/, function( all, before, middle, after) {
-					frag = jQuery( middle ).get(); // For now use get(), since buildFragment is not current public
-//					frag = jQuery.buildFragment( [middle] ); // If buildFragment was public, could do these two lines instead
-//					frag = frag.cacheable ? frag.fragment.cloneNode(true) : frag.fragment;
-
-					storeContexts( frag );
-					if ( !!before ) {
-						frag = unencode( before ).concat(frag);
-					}
-					if ( !!after ) {
-						frag = frag.concat(unencode( after ));
-					}
-				});
-				return frag ? frag : unencode( ret );
-				function unencode( text ) {
-					// createTextNode will not render HTML entities correctly
-					var el = document.createElement( "span" );
-					el.innerHTML = text;
-					return jQuery.makeArray(el.childNodes);
-				}
-			}
-
-			function tmplFn( markup ) {
-				return new Function("jQuery","$ctx",
-					"var $=jQuery,_=[],$data=$ctx.data;" +
-
-					// Introduce the data as local variables using with(){}
-					"with($data){_.push('" +
-
-					// Convert the template into pure JavaScript
-					$.trim(markup)
-						.replace( /([\\'])/g, "\\$1" )
-						.replace( /[\r\t\n]/g, " " )
-						.replace( /\${([^}]*)}/g, "{{= $1}}" )
-						.replace( /{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?}}/g,
-						function( all, slash, type, fnargs, target, parens, args ) {
-							function unescape( args ) {
-								return args ? args.replace( /\\'/g, "'").replace(/\\\\/g, "\\" ) : null;
-							}
-							var cmd = jQuery.tmpl.tags[ type ], def, expr;
-							if ( !cmd ) {
-								throw "Template command not found: " + type;
-							}
-							def = cmd._default || [];
-							if ( target ) {
-								target = unescape( target ); 
-								args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
-								expr = args ? ("(" + target + ").call($ctx" + args) : target;
-								exprAutoFnDetect = args ? expr: "(typeof(" +  target + ")==='function'?(" +  target + ").call($ctx):(" +  target + "))";
-							} else {
-								expr = def["$1"] || "null";
-							}
-							fnargs = unescape( fnargs );
-							return "');" + 
-								cmd[ slash ? "suffix" : "prefix" ]
-									.split( "$notnull_1" ).join( "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" )
-									.split( "$1a" ).join( exprAutoFnDetect )
-									.split( "$1" ).join( expr )
-									.split( "$2" ).join( fnargs ?
-										fnargs.replace( /\s*([^\(]+)\s*(\((.*?)\))?/g, function( all, name, parens, params ) {
-											params = params ? ("," + params + ")") : (parens ? ")" : "");
-											return params ? ("(" + name + ").call($ctx" + params) : all;
-										})
-										: (def["$2"]||"")
-									) +
-								"_.push('";
-						}) +
-					"');}return _;"
-				);
-			}
 		},
 
 		// Use $.templates( name, tmpl ) to cache a named template, 
-		// where tmpl is a string, a script element or a selector to a script element, etc.
+		// where tmpl is a template string, a script element or a jQuery instance wrapping a script element, etc.
 		// Use $( "selector" ).templates( name ) to provide access by name to a script block template declaration.
 
 		// Use $.templates( name ) to access a cached template.
-		// Also $.templates( selectorToScriptBlock ) or $( selectorToScriptBlock ).templates() will return the cached compiled template.  
+		// Also $( selectorToScriptBlock ).templates(), or $.templates( null, templateString ) 
+		// will return the compiled template, without adding a name reference.  
 		templates: function( name, tmpl ) {
 			if (tmpl) {
-				return jQuery.templates[name] = jQuery.tmpl( tmpl, null );
+				// Compile template and associate with name
+				return jQuery.templates[name] = jQuery.tmpl( tmpl, null, null, null );
 			}
-			return jQuery.templates[name] || jQuery( name ).tmpl( null );
+			// Return named compiled template
+			return jQuery.templates[name] || 
+				// Could use htmlExpr.test( tmpl) ? ... : null; to avoid spurious scenarios of html instead of selector
+				jQuery( name ).tmpl( null, null, null ); 
 		},
+
 		encode: function( text ) {
 			// Do HTML encoding replacing < > & and ' and " by corresponding entities.
 			return ("" + text).split("<").join("&lt;").split(">").join("&gt;").split('"').join("&#34;").split("'").join("&#39;");
@@ -294,7 +202,7 @@
 	jQuery.extend( jQuery.tmpl, {
 		tags: {
 			"tmpl": {
-				_default: { $2: "{}" },
+				_default: { $2: "null" },
 				prefix: "if($notnull_1){_=_.concat($ctx.nest($1,$2));}"
 				// tmpl target parameter can be of type function, so use $1, not $1a (so not auto detection of functions)
 				// This means that {{tmpl foo}} treats foo as a template (which IS a function). 
@@ -320,9 +228,14 @@
 				prefix: "if($notnull_1){_.push($.encode($1a));}"
 			}
 		},
+
+		// This stub can be overridden, e.g. in jquery.tmplPlus for providing rendered events
 		complete: function( ctxs ) {
 			newCtxs = {};
 		},
+
+		// Call this from code which overrides domManip, or equivalent
+		// Manage cloning/storing template contexts etc.
 		afterManip: function afterManip( elem, fragClone, callback ) {
 			// Provides cloned fragment ready for fixup prior to and after insertion into DOM
 			var content = fragClone.nodeType === 11 ?
@@ -337,6 +250,112 @@
 			cloneIndex++;
 		}
 	});
+
+	//========================== Private helper functions, used by code above ========================== 
+	  
+	function build( ctx, parent, content ) {
+		// Convert hierarchical content into flat string array 
+		// and finally return array of fragments ready for DOM insertion
+		var frag, el, ret = jQuery.map( content, function( item ) {
+			return (typeof item === "string") ? 
+				// Insert context annotations, to be converted to jQuery.data( "tmplCtx" ) when elems are inserted into DOM.
+				item.replace( /(<\w+)([^>]*)/g, "$1 " + tCtxAtt + "=\"" + ctx.key + "\" $2" ) : 
+				// This is a child template context. Build nested template.
+				build( item, ctx, item.content );
+		});
+		if ( parent ) {
+			// nested template
+			return ret;
+		}
+		// top-level template
+		ret = ret.join("");
+
+		// Support templates which have initial or final text nodes, or consist only of text
+		// Also support HTML entities within the HTML markup.
+		ret.replace( /^\s*([^<\s][^<]*)?(<[\w\W]+>)([^>]*[^>\s])?\s*$/, function( all, before, middle, after) {
+			frag = jQuery( middle ).get(); // For now use get(), since buildFragment is not current public
+//					frag = jQuery.buildFragment( [middle] ); // If buildFragment was public, could do these two lines instead
+//					frag = frag.cacheable ? frag.fragment.cloneNode(true) : frag.fragment;
+
+			storeContexts( frag );
+			if ( before ) {
+				frag = unencode( before ).concat(frag);
+			}
+			if ( after ) {
+				frag = frag.concat(unencode( after ));
+			}
+		});
+		return frag ? frag : unencode( ret );
+	}
+
+	function unencode( text ) {
+		// createTextNode will not render HTML entities correctly
+		var el = document.createElement( "div" );
+		el.innerHTML = text;
+		return jQuery.makeArray(el.childNodes);
+	}
+
+	// Generate a reusable function that will serve to render a template against data
+	function buildTmplFn( markup ) {
+		return new Function("jQuery","$ctx",
+			"var $=jQuery,_=[],$data=$ctx.data;" +
+
+			// Introduce the data as local variables using with(){}
+			"with($data){_.push('" +
+
+			// Convert the template into pure JavaScript
+			$.trim(markup)
+				.replace( /([\\'])/g, "\\$1" )
+				.replace( /[\r\t\n]/g, " " )
+				.replace( /\${([^}]*)}/g, "{{= $1}}" )
+				.replace( /{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?\s*}}/g,
+				function( all, slash, type, fnargs, target, parens, args ) {
+					var cmd = jQuery.tmpl.tags[ type ], def, expr;
+					if ( !cmd ) {
+						throw "Template command not found: " + type;
+					}
+					def = cmd._default || [];
+					if ( target ) {
+						target = unescape( target ); 
+						args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
+						if ( parens && target.indexOf(".") > -1 ) {
+							// Support for target being things like a.toLowerCase(); 
+							// In that case don't call with ctx as this pointer. Just evaluate...
+							target += parens;
+							args = "";
+						}
+						expr = args ? ("(" + target + ").call($ctx" + args) : target;
+						exprAutoFnDetect = args ? expr: "(typeof(" +  target + ")==='function'?(" +  target + ").call($ctx):(" +  target + "))";
+					} else {
+						expr = def["$1"] || "null";
+					}
+					fnargs = unescape( fnargs );
+					return "');" + 
+						cmd[ slash ? "suffix" : "prefix" ]
+							.split( "$notnull_1" ).join( "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" )
+							.split( "$1a" ).join( exprAutoFnDetect )
+							.split( "$1" ).join( expr )
+							.split( "$2" ).join( fnargs ?
+								fnargs.replace( /\s*([^\(]+)\s*(\((.*?)\))?/g, function( all, name, parens, params ) {
+									params = params ? ("," + params + ")") : (parens ? ")" : "");
+									return params ? ("(" + name + ").call($ctx" + params) : all;
+								})
+								: (def["$2"]||"")
+							) +
+						"_.push('";
+				}) +
+			"');}return _;"
+		);
+	}
+
+	function unescape( args ) {
+		return args ? args.replace( /\\'/g, "'").replace(/\\\\/g, "\\" ) : null;
+	}
+
+	function nest( tmpl, data, options ) {
+		// nested template, using {{tmpl}} tag
+		return jQuery.tmpl( typeof tmpl === "string" ? jQuery.templates( tmpl ) : tmpl, data, options, this );
+	}
 
 	// Store template contexts in jQuery.data(), ensuring a unique context for each rendered template instance. 
 	function storeContexts( content ) {
@@ -358,7 +377,8 @@
 			if ( key = el.getAttribute( tCtxAtt )) {
 				while ((pntNode = pntNode.parentNode).nodeType === 1 && !(pntKey = pntNode.getAttribute( tCtxAtt ))) { }
 				if ( pntKey !== key ) {
-					// This is a top-level element within this template context
+					// The next ancestor with a _tmplctx expando is on a different key than this one.
+					// So this is a top-level element within this template context
 					ctx = newCtxs[key];
 					if ( cloneIndex ) {
 						cloneContext( key );
@@ -377,7 +397,7 @@
 			}
 			if ( ctx ) {
 				pntCtx = ctx;
-				// The template context of the parent element
+				// Find the template context of the parent element
 				while ( pntCtx && pntCtx.key != pntNodeCtx ) {
 					// Add this element as a top-level node for this context, as well as for any
 					// ancestor contexts between this context and the context of its parent element
