@@ -79,7 +79,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 </script>
 
 <script id="bookingTitleTmpl" type="text/html">
-	<tr class="bookingTitle${$ctx.mode}">
+	<tr class="bookingTitle${$item.mode}">
 		<td>${movie.Name}</td><td>${movieTheater}</td>
 		<td>${formatDate(date)}</td>
 		<td>
@@ -105,7 +105,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		cart = { bookings: {}, count: 0, sortBy:0 }, bookingCtxs = [], selectedBooking;
+		cart = { bookings: {}, count: 0, sortBy:0 }, bookingItems = [], selectedBooking;
 		
 	getMovies( pageIndex );
 
@@ -126,7 +126,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		.tmpl( cart )
 		.appendTo( ".cart", cart );
 
-	var cartCtx = $( ".cart td" ).tmpl();
+	var cartTmplItem = $( ".cart td" ).tmplItem();
 
 	function selectGenre() {
 		$( "#genres li" ).removeClass( "selected" );
@@ -154,7 +154,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		}
 		data = data.sort( compare );
 
-		bookingCtxs = $.tmplCmd( "replace", data, bookingCtxs );
+		bookingItems = $.tmplCmd( "replace", data, bookingItems );
 	
 		function compareName( a, b ) {
 			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
@@ -207,7 +207,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 			booking.quantity++;
 		} else {
 			cart.count++;
-			$.tmplCmd( "update", cartCtx );
+			$.tmplCmd( "update", cartTmplItem );
 			booking = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
 		}
 		selectBooking( booking );
@@ -216,12 +216,12 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	function selectBooking( booking ) {
 		if ( selectedBooking ) {
 			if ( selectedBooking === booking ) {
-				updateBooking( bookingCtx( selectedBooking ));
+				updateBooking( bookingItem( selectedBooking ));
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
 			var oldSelected = selectedBooking; 
-			$( "div", bookingCtx( oldSelected ).nodes ).animate( { height: 0 }, 500, function() { 
+			$( "div", bookingItem( oldSelected ).nodes ).animate( { height: 0 }, 500, function() { 
 				switchView( oldSelected );
 			});
 		}
@@ -237,8 +237,8 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 				.tmpl( booking, { animate: true, rendered: onBookingEditRendered } )
 				.appendTo( "#bookingsList" ).last()[0];
 			
-			var newCtx = $.tmpl( bookingNode );
-			bookingCtxs.push( newCtx );
+			var newItem = $.tmplItem( bookingNode );
+			bookingItems.push( newItem );
 		}
 	}
 
@@ -246,31 +246,31 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		if ( !booking ) {
 			return;
 		}
-		var ctx = bookingCtx( booking ),
+		var item = bookingItem( booking ),
 			rendered = edit ? onBookingEditRendered  : onBookingRendered;
-		if ( ctx.rendered !== rendered) {
-			ctx.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
-			ctx.rendered = rendered; 
-			$.tmplCmd( "update", ctx );
+		if ( item.rendered !== rendered) {
+			item.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
+			item.rendered = rendered; 
+			$.tmplCmd( "update", item );
 		}
 	}
 
-	function onMovieRendered( ctx ) { 
-      	$( "div", ctx.nodes ).fadeIn( 4000 );
-		$( ".buyButton", ctx.nodes ).click( function() { 
-			buyTickets( ctx.data ); 
+	function onMovieRendered( item ) { 
+      	$( "div", item.nodes ).fadeIn( 4000 );
+		$( ".buyButton", item.nodes ).click( function() { 
+			buyTickets( item.data ); 
 		});
 	}
 
-	function onBookingRendered( ctx ) {
-		$( ctx.nodes ).click( function() { 
-			selectBooking( ctx.data );
+	function onBookingRendered( item ) {
+		$( item.nodes ).click( function() { 
+			selectBooking( item.data );
 		});
-		$( ".close", ctx.nodes ).click( removeBooking );
+		$( ".close", item.nodes ).click( removeBooking );
 	}
 
-	function onBookingEditRendered( ctx ) {
-		var data = ctx.data, nodes = ctx.nodes;
+	function onBookingEditRendered( item ) {
+		var data = item.data, nodes = item.nodes;
 		
 		$( nodes[0] ).click( function() { 
 			selectBooking();
@@ -280,58 +280,58 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		
 		$( ".date", nodes ).change( function() {
 			data.date = $(this).datepicker( "getDate" );
-			updateBooking( ctx );
+			updateBooking( item );
 		})
 		.datepicker({ dateFormat: "DD, d MM, yy" });
 
 		$( ".quantity", nodes ).change( function() {
 			data.quantity = $(this).val();
-			updateBooking( ctx );
+			updateBooking( item );
 		});
 
 		$( ".theater", nodes ).change( function() {
 			data.movieTheater = $(this).val();
-			updateBooking( ctx );
+			updateBooking( item );
 		});
 
-		if ( ctx.animate ) {
+		if ( item.animate ) {
 			$( "div", nodes ).css( "height", 0 ).animate( { height: 116 }, 500 );
 		}
 	}
 
-	function updateBooking( ctx ) {
-		ctx.animate = false;
-		$.tmplCmd( "update", ctx );
-		ctx.animate = true;
+	function updateBooking( item ) {
+		item.animate = false;
+		$.tmplCmd( "update", item );
+		item.animate = true;
 	}
 
 	function removeBooking() {
-		var booking = $.tmpl(this).data;
+		var booking = $.tmplItem(this).data;
 		if ( booking === selectedBooking ) {
 			selectedBooking = null;
 		}
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
-		$.tmplCmd( "update", cartCtx );
-		$.tmplCmd( "remove", booking, bookingCtxs );
+		$.tmplCmd( "update", cartTmplItem );
+		$.tmplCmd( "remove", booking, bookingItems );
 		return false; 
 	}
 	
 	function removeBookings() {
-		$.tmplCmd( "remove", bookingCtxs );
-		bookingCtxs = [];
+		$.tmplCmd( "remove", bookingItems );
+		bookingItems = [];
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
-		$.tmplCmd( "update", cartCtx );
+		$.tmplCmd( "update", cartTmplItem );
 	}
 	
 	function formatDate( date ) {
 		return date.toLocaleDateString();
 	}
 
-	function bookingCtx( booking ) {
-		return $.tmplCmd( "find", booking, bookingCtxs)[0];
+	function bookingItem( booking ) {
+		return $.tmplCmd( "find", booking, bookingItems)[0];
 	}
 </script>
 

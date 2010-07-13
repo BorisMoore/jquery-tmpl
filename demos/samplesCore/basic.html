@@ -60,14 +60,14 @@ function index( array ) {
 
 jQuery(function(){
 	// A template string
-	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>';
+	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $item.showCities}}(${cityJoin()}){{/if}}</li>';
 
 	// Renders one LI, filled with data, then appends it into the UL
 	$.tmpl( tmpl, dataObject )
 		.appendTo( "ul" );
 
 	// Store a string as a compiled template for later use
-	$.templates( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $ctx.showCities}}(${cityJoin()}){{/if}}</li>' );
+	$.templates( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $item.showCities}}(${cityJoin()}){{/if}}</li>' );
 
 	// Render stored template and insert after target. 
 	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
@@ -99,8 +99,8 @@ jQuery(function(){
 		.find( "span" )
 		.addClass( "clickable" )
 		.click( function() {
-			var ctx = $.tmpl(this); 
-			alert( ctx.data.firstName + " at " + ctx.data.url );
+			var item = $.tmplItem(this); 
+			alert( item.data.firstName + " at " + item.data.url );
 		});
 
 	// Example of template that has leading or trailing text
@@ -112,11 +112,11 @@ jQuery(function(){
 
 <script id="sometmpl" type="text/html">
 	<li>
-		{{if $ctx.array}}
-			${index($ctx.array)} of ${$ctx.array.length})
+		{{if $item.array}}
+			${index($item.array)} of ${$item.array.length})
 		{{/if}}
 		 <span>${getName()}</span>
-		{{if $ctx.showCities}}
+		{{if $item.showCities}}
 			Cities: {{each cities}} ${this} {{/each}}
 		{{else}}
 			No Cities

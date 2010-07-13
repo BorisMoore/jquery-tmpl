@@ -78,7 +78,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 </script>
 
 <script id="bookingTitleTmpl" type="text/html">
-	<tr class="bookingTitle${$ctx.mode}">
+	<tr class="bookingTitle${$item.mode}">
 		<td>${movie.Name}</td><td>${movieTheater}</td>
 		<td>${formatDate(date)}</td>
 		<td>
@@ -104,7 +104,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		cart = { bookings: {}, count: 0, sortBy:0 }, bookingCtxs = {}, selectedBooking;
+		cart = { bookings: {}, count: 0, sortBy:0 }, bookingItems = {}, selectedBooking;
 		
 	getMovies( pageIndex );
 
@@ -126,7 +126,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		.tmpl( cart )
 		.appendTo( ".cart", cart );
 
-	var cartCtx = $( ".cart td" ).tmpl();
+	var cartTmplItem = $( ".cart td" ).tmplItem();
 
 	function selectGenre() {
 		$( "#genres li" ).removeClass( "selected" );
@@ -155,7 +155,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		data = data.sort( compare );
 
 		for ( var i = 0, l = data.length; i < l; i++ ) {
-			$( bookingCtxs[data[i].movie.Id].nodes ).appendTo( "#bookingsList" );
+			$( bookingItems[data[i].movie.Id].nodes ).appendTo( "#bookingsList" );
 		}
 	
 		function compareName( a, b ) {
@@ -200,7 +200,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			.appendTo( "#movieList" )
 			.find( "div" ).fadeIn( 4000 ).end()
 			.find( ".buyButton" ).click( function() { 
-				buyTickets( $(this).tmpl().data ); 
+				buyTickets( $(this).tmplItem().data ); 
 			});
 		
 		$( "#movieList" ).fadeIn( "medium" )
@@ -213,7 +213,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			booking.quantity++;
 		} else {
 			cart.count++;
-			updateContext( cartCtx );
+			updateItem( cartTmplItem );
 			booking = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
 		}
 		selectBooking( booking );
@@ -222,12 +222,12 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 	function selectBooking( booking ) {
 		if ( selectedBooking ) {
 			if ( selectedBooking === booking ) {
-				updateBooking( bookingCtxs[selectedBooking.movie.Id]);
+				updateBooking( bookingItems[selectedBooking.movie.Id]);
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
 			var oldSelected = selectedBooking; 
-			$( "div", bookingCtxs[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() { 
+			$( "div", bookingItems[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() { 
 				switchView( oldSelected );
 			});
 		}
@@ -245,14 +245,14 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 				
 			// Attach handlers etc. on the rendered template.
 			// Pass the template context of the second tr, which the context for the "bookingEditTmpl" template
-			var newCtx = $.tmpl( bookingNode );
-			bookingCtxs[booking.movie.Id] = newCtx;
-			bookingEditRendered( newCtx ); 
+			var newItem = $.tmplItem( bookingNode );
+			bookingItems[booking.movie.Id] = newItem;
+			bookingEditRendered( newItem ); 
 		}
 	}
 
-	function bookingEditRendered( ctx ) {
-		var data = ctx.data, nodes = ctx.nodes;
+	function bookingEditRendered( item ) {
+		var data = item.data, nodes = item.nodes;
 		
 		$( nodes[0] ).click( function() { 
 			selectBooking();
@@ -262,89 +262,89 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		
 		$( ".date", nodes ).change( function() {
 			data.date = $(this).datepicker( "getDate" );
-			updateBooking( ctx );
+			updateBooking( item );
 		})
 		.datepicker({ dateFormat: "DD, d MM, yy" });
 
 		$( ".quantity", nodes ).change( function() {
 			data.quantity = $(this).val();
-			updateBooking( ctx );
+			updateBooking( item );
 		});
 
 		$( ".theater", nodes ).change( function() {
 			data.movieTheater = $(this).val();
-			updateBooking( ctx );
+			updateBooking( item );
 		});
 
-		if ( ctx.animate ) {
+		if ( item.animate ) {
 			$( "div", nodes ).css( "height", 0 ).animate( { height: 116 }, 500 );
 		}
 	}
 	
-	function bookingRendered( ctx ) {
-		$( ctx.nodes ).click( function() { 
-			selectBooking( ctx.data );
+	function bookingRendered( item ) {
+		$( item.nodes ).click( function() { 
+			selectBooking( item.data );
 		});
-		$( ".close", ctx.nodes ).click( removeBooking );
+		$( ".close", item.nodes ).click( removeBooking );
 	}
 
 	function switchView( booking, edit ) {
 		if ( !booking ) {
 			return;
 		}
-		var ctx = bookingCtxs[booking.movie.Id],
+		var item = bookingItems[booking.movie.Id],
 			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
-		if ( ctx.tmpl !== tmpl) {
-			ctx.tmpl = tmpl; 
-			updateContext( ctx );
-			(edit ? bookingEditRendered : bookingRendered)( ctx );
+		if ( item.tmpl !== tmpl) {
+			item.tmpl = tmpl; 
+			updateItem( item );
+			(edit ? bookingEditRendered : bookingRendered)( item );
 		}
 	}
 
-	function updateBooking( ctx ) {
-		ctx.animate = false;
-		updateContext( ctx );
-		(ctx.data === selectedBooking ? bookingEditRendered : bookingRendered)( ctx );
-		ctx.animate = true;
+	function updateBooking( item ) {
+		item.animate = false;
+		updateItem( item );
+		(item.data === selectedBooking ? bookingEditRendered : bookingRendered)( item );
+		item.animate = true;
 	}
 
 	function removeBooking() {
-		var booking = $.tmpl(this).data;
+		var booking = $.tmplItem(this).data;
 		if ( booking === selectedBooking ) {
 			selectedBooking = null;
 		}
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
-		updateContext( cartCtx );
-		$( bookingCtxs[booking.movie.Id].nodes ).remove();
-		delete bookingCtxs[booking.movie.Id];
+		updateItem( cartTmplItem );
+		$( bookingItems[booking.movie.Id].nodes ).remove();
+		delete bookingItems[booking.movie.Id];
 		return false; 
 	}
 	
 	function removeBookings() {
-		for ( var ctx in bookingCtxs ) {
-			$( bookingCtxs[ctx].nodes ).remove();
-			delete bookingCtxs[ctx];
+		for ( var item in bookingItems ) {
+			$( bookingItems[item].nodes ).remove();
+			delete bookingItems[item];
 		}
-		bookingCtxs = {};
+		bookingItems = {};
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
-		updateContext( cartCtx );
+		updateItem( cartTmplItem );
 	}
 	
 	function formatDate( date ) {
 		return date.toLocaleDateString();
 	}
 
-	function updateContext( ctx ) {
-		var coll = ctx.nodes;
-		$.tmpl( null, null, null, ctx ).insertBefore( coll[0] );
+	function updateItem( item ) {
+		var coll = item.nodes;
+		$.tmpl( null, null, null, item ).insertBefore( coll[0] );
 		$( coll ).remove();
 	}
 
-	function removeContext( ctx ) {
-		$( ctx.nodes ).remove();
+	function removeContext( item ) {
+		$( item.nodes ).remove();
 	}
 </script>
 

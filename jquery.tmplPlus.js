@@ -6,56 +6,56 @@
 	var oldComplete = jQuery.tmpl.complete, oldManip = jQuery.fn.domManip;
 
 	// Override jQuery.tmpl.complete in order to provide rendered event.
-	jQuery.tmpl.complete = function( ctxs ) {
-		oldComplete( ctxs);
-		for ( var ctx in ctxs ) {
-			ctx =  ctxs[ctx]; 
+	jQuery.tmpl.complete = function( items ) {
+		oldComplete( items);
+		for ( var item in items ) {
+			item =  items[item]; 
 			// Raise rendered event
-			if ( ctx.rendered ) {
-				ctx.rendered( ctx );
+			if ( item.rendered ) {
+				item.rendered( item );
 			}
 		}
 	}
 
 	jQuery.extend({
-		tmplCmd: function( command, data, contexts ) {
-			var retCtxs = [], before; 
+		tmplCmd: function( command, data, items ) {
+			var retTmplItems = [], before; 
 			data = jQuery.isArray( data ) ? data : [ data ];
 			switch ( command ) {
 				case "find":
-					return find( data, contexts );
+					return find( data, items );
 				case "replace":
 					data.reverse();
 			}
-			jQuery.each( contexts ? find( data, contexts ) : data, function( i, ctx ) { 
-				coll = ctx.nodes;
+			jQuery.each( items ? find( data, items ) : data, function( i, item ) { 
+				coll = item.nodes;
 				switch ( command ) {
 					case "update":
-						jQuery.tmpl( null, null, null, ctx ).insertBefore( coll[0] );
+						jQuery.tmpl( null, null, null, item ).insertBefore( coll[0] );
 						jQuery( coll ).remove();
 						break;
 					case "remove":
 						jQuery( coll ).remove();
-						if ( contexts ) {
-							contexts.splice( jQuery.inArray( ctx, contexts ), 1 );
+						if ( items ) {
+							items.splice( jQuery.inArray( item, items ), 1 );
 						}
 						break;
 					case "replace":
 						before = before ? 
 							jQuery( coll ).insertBefore( before )[0] : 
 							jQuery( coll ).appendTo( coll[0].parentNode )[0];
-						retCtxs.unshift( ctx );
+						retTmplItems.unshift( item );
 				}
 			});
-			return retCtxs;
-			function find( data, ctxs ) {
-				var found = [], ctx, ci, cl = ctxs.length, dataItem, di = 0, dl = data.length;
+			return retTmplItems;
+			function find( data, items ) {
+				var found = [], item, ci, cl = items.length, dataItem, di = 0, dl = data.length;
 				for ( ; di < dl; ) {
 					dataItem = data[di++]; 
 					for ( ci = 0; ci < cl; ) {
-						ctx = ctxs[ci++];
-						if ( ctx.data === dataItem ) {
-							found.push( ctx );
+						item = items[ci++];
+						if ( item.data === dataItem ) {
+							found.push( item );
 						}
 					}
 				}
