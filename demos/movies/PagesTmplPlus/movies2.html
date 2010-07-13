@@ -105,7 +105,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		cart = { bookings: {}, count: 0, sortBy:0 }, bookingItems = [], selectedBooking;
+		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = [], selectedBooking;
 		
 	getMovies( pageIndex );
 
@@ -154,7 +154,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		}
 		data = data.sort( compare );
 
-		bookingItems = $.tmplCmd( "replace", data, bookingItems );
+		bookingTmplItems = $.tmplCmd( "replace", data, bookingTmplItems );
 	
 		function compareName( a, b ) {
 			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
@@ -233,12 +233,12 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 			switchView( booking, true );
 		} else {
 			cart.bookings[booking.movie.Id] = booking;
-			var bookingNode = $( "#bookingEditTmpl" )
-				.tmpl( booking, { animate: true, rendered: onBookingEditRendered } )
-				.appendTo( "#bookingsList" ).last()[0];
-			
-			var newItem = $.tmplItem( bookingNode );
-			bookingItems.push( newItem );
+			$( "#bookingEditTmpl" )
+				.tmpl( booking, { 
+					animate: true, 
+					rendered: onBookingEditRendered, 
+					addedTmplItems: bookingTmplItems 
+				}).appendTo( "#bookingsList" );
 		}
 	}
 
@@ -313,13 +313,13 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
 		$.tmplCmd( "update", cartTmplItem );
-		$.tmplCmd( "remove", booking, bookingItems );
+		$.tmplCmd( "remove", booking, bookingTmplItems );
 		return false; 
 	}
 	
 	function removeBookings() {
-		$.tmplCmd( "remove", bookingItems );
-		bookingItems = [];
+		$.tmplCmd( "remove", bookingTmplItems );
+		bookingTmplItems = [];
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
@@ -331,7 +331,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	}
 
 	function bookingItem( booking ) {
-		return $.tmplCmd( "find", booking, bookingItems)[0];
+		return $.tmplCmd( "find", booking, bookingTmplItems)[0];
 	}
 </script>
 

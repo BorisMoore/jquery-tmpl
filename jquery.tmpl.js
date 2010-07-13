@@ -28,7 +28,7 @@
 			newItem.tmpl = fn;
 			newItem.content = newItem.tmpl( jQuery, newItem );
 			newItem.key = ++itemKey;
-			// Keep track of new item, until it is stored as jQuery Data on DOM element
+			// Keep track of new template item, until it is stored as jQuery Data on DOM element
 			newTmplItems[itemKey] = newItem;
 		}
 		return newItem;
@@ -60,9 +60,9 @@
 				cloneIndex = 0;
 				ret = this.pushStack( ret, name, insert.selector );
 			}
-			var items = appendToTmplItems;
+			var tmplItems = appendToTmplItems;
 			appendToTmplItems = null;
-			jQuery.tmpl.complete( items );
+			jQuery.tmpl.complete( tmplItems );
 			return ret;
 		};
 	});
@@ -88,12 +88,12 @@
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
 			if ( args[0].nodeType ) {
-				var dmArgs = jQuery.makeArray( arguments ), argsLength = args.length, i = 0, item;
-				while ( i < argsLength && !(item = jQuery.data( args[i++], "tmplItem" ))) {};
+				var dmArgs = jQuery.makeArray( arguments ), argsLength = args.length, i = 0, tmplItem;
+				while ( i < argsLength && !(tmplItem = jQuery.data( args[i++], "tmplItem" ))) {};
 				if ( argsLength > 1 ) {
 					dmArgs[0] = [jQuery.makeArray( args )];
 				}
-				if ( item && cloneIndex ) {
+				if ( tmplItem && cloneIndex ) {
 					dmArgs[2] = function( fragClone ) {
 						// Handler called by oldManip when rendered template has been inserted into DOM.
 						jQuery.tmpl.afterManip( this, fragClone, callback );
@@ -120,7 +120,7 @@
 				parentItem = topTmplItem;
 				tmpl = jQuery.templates[tmpl] || jQuery.templates( null, tmpl );
 			} else if ( !tmpl ) {
-				// The item is already associated with DOM - this is a refresh.
+				// The template item is already associated with DOM - this is a refresh.
 				// Re-evaluate rendered template for the parentItem
 				tmpl =  parentItem.tmpl;
 				newTmplItems[parentItem.key] = parentItem;
@@ -311,7 +311,7 @@
 						args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
 						if ( parens && target.indexOf(".") > -1 ) {
 							// Support for target being things like a.toLowerCase(); 
-							// In that case don't call with item as 'this' pointer. Just evaluate...
+							// In that case don't call with template item as 'this' pointer. Just evaluate...
 							target += parens;
 							args = "";
 						}
@@ -368,31 +368,31 @@
 		}
 
 		function processItemKey( el ) {
-			var pntKey, pntNode = el, pntItem, pntNodeItem, item, key;
+			var pntKey, pntNode = el, pntItem, pntNodeItem, tmplItem, key;
 			// Ensure that each rendered template inserted into the DOM has its own template item,
 			if ( key = el.getAttribute( tmplItmAtt )) {
 				while ((pntNode = pntNode.parentNode).nodeType === 1 && !(pntKey = pntNode.getAttribute( tmplItmAtt ))) { }
 				if ( pntKey !== key ) {
 					// The next ancestor with a _tmplitem expando is on a different key than this one.
 					// So this is a top-level element within this template item
-					item = newTmplItems[key];
+					tmplItem = newTmplItems[key];
 					if ( cloneIndex ) {
-						cloneItem( key );
+						cloneTmplItem( key );
 					}
 					pntNodeItem = el.parentNode;
 					pntNodeItem = pntNodeItem.nodeType === 11 ? 0 : (pntNodeItem.getAttribute( tmplItmAtt ) || 0);
 				}
 				el.removeAttribute( tmplItmAtt );
-			} else if ( cloneIndex && (item = jQuery.data( el, "tmplItem" )) ) {
+			} else if ( cloneIndex && (tmplItem = jQuery.data( el, "tmplItem" )) ) {
 				// This was a rendered element, cloned during append or appendTo etc.
 				// TmplItem stored in jQuery data has already been cloned in cloneCopyEvent. We must replace it with a fresh cloned tmplItem. 
-				cloneItem( item.key );
-				newTmplItems[item.key] = item;
+				cloneTmplItem( tmplItem.key );
+				newTmplItems[tmplItem.key] = tmplItem;
 				pntNodeItem = jQuery.data( el.parentNode, "tmplItem" );
 				pntNodeItem = pntNodeItem ? pntNodeItem.key : 0;
 			}
-			if ( item ) {
-				pntItem = item;
+			if ( tmplItem ) {
+				pntItem = tmplItem;
 				// Find the template item of the parent element
 				while ( pntItem && pntItem.key != pntNodeItem ) {
 					// Add this element as a top-level node for this rendered template item, as well as for any
@@ -400,14 +400,14 @@
 					pntItem.nodes.push( el );
 					pntItem = pntItem.parent;
 				}
-				delete item.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
+				delete tmplItem.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
 				// Store template item as jQuery data on the element
-				jQuery.data( el, "tmplItem", item );
+				jQuery.data( el, "tmplItem", tmplItem );
 			}
-			function cloneItem
-			( key ) {
+			function cloneTmplItem( key ) {
 				key = key + keySuffix;
-				item = newClonedItems[key] = newClonedItems[key] || newTmplItem(item, newTmplItems[item.parent.key + keySuffix] || item.parent, null, true);
+				tmplItem = newClonedItems[key] 
+				= (newClonedItems[key] || newTmplItem( tmplItem, newTmplItems[tmplItem.parent.key + keySuffix] || tmplItem.parent, null, true ));
 			}
 		}
 	}

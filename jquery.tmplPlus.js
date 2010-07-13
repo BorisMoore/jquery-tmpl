@@ -6,56 +6,63 @@
 	var oldComplete = jQuery.tmpl.complete, oldManip = jQuery.fn.domManip;
 
 	// Override jQuery.tmpl.complete in order to provide rendered event.
-	jQuery.tmpl.complete = function( items ) {
-		oldComplete( items);
-		for ( var item in items ) {
-			item =  items[item]; 
+	jQuery.tmpl.complete = function( tmplItems ) {
+		var tmplItem;
+		oldComplete( tmplItems);
+		for ( tmplItem in tmplItems ) {
+			tmplItem =  tmplItems[tmplItem]; 
+			if ( tmplItem.addedTmplItems && jQuery.inArray( tmplItem, tmplItem.addedTmplItems ) === -1  ) {
+				tmplItem.addedTmplItems.push( tmplItem );
+			}
+		}
+		for ( tmplItem in tmplItems ) {
+			tmplItem =  tmplItems[tmplItem]; 
 			// Raise rendered event
-			if ( item.rendered ) {
-				item.rendered( item );
+			if ( tmplItem.rendered ) {
+				tmplItem.rendered( tmplItem );
 			}
 		}
 	}
 
 	jQuery.extend({
-		tmplCmd: function( command, data, items ) {
+		tmplCmd: function( command, data, tmplItems ) {
 			var retTmplItems = [], before; 
 			data = jQuery.isArray( data ) ? data : [ data ];
 			switch ( command ) {
 				case "find":
-					return find( data, items );
+					return find( data, tmplItems );
 				case "replace":
 					data.reverse();
 			}
-			jQuery.each( items ? find( data, items ) : data, function( i, item ) { 
-				coll = item.nodes;
+			jQuery.each( tmplItems ? find( data, tmplItems ) : data, function( i, tmplItem ) { 
+				coll = tmplItem.nodes;
 				switch ( command ) {
 					case "update":
-						jQuery.tmpl( null, null, null, item ).insertBefore( coll[0] );
+						jQuery.tmpl( null, null, null, tmplItem ).insertBefore( coll[0] );
 						jQuery( coll ).remove();
 						break;
 					case "remove":
 						jQuery( coll ).remove();
-						if ( items ) {
-							items.splice( jQuery.inArray( item, items ), 1 );
+						if ( tmplItems ) {
+							tmplItems.splice( jQuery.inArray( tmplItem, tmplItems ), 1 );
 						}
 						break;
 					case "replace":
 						before = before ? 
 							jQuery( coll ).insertBefore( before )[0] : 
 							jQuery( coll ).appendTo( coll[0].parentNode )[0];
-						retTmplItems.unshift( item );
+						retTmplItems.unshift( tmplItem );
 				}
 			});
 			return retTmplItems;
-			function find( data, items ) {
-				var found = [], item, ci, cl = items.length, dataItem, di = 0, dl = data.length;
+			function find( data, tmplItems ) {
+				var found = [], tmplItem, ti, tl = tmplItems.length, dataItem, di = 0, dl = data.length;
 				for ( ; di < dl; ) {
 					dataItem = data[di++]; 
-					for ( ci = 0; ci < cl; ) {
-						item = items[ci++];
-						if ( item.data === dataItem ) {
-							found.push( item );
+					for ( ti = 0; ti < tl; ) {
+						tmplItem = tmplItems[ti++];
+						if ( tmplItem.data === dataItem ) {
+							found.push( tmplItem );
 						}
 					}
 				}

@@ -106,7 +106,7 @@ It does not use the rendered event.
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		cart = { bookings: {}, count: 0, sortBy:0 }, bookingItems = [], selectedBooking;
+		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = [], selectedBooking;
 		
 	getMovies( pageIndex );
 
@@ -156,7 +156,7 @@ It does not use the rendered event.
 		}
 		data = data.sort( compare );
 
-		bookingItems = $.tmplCmd( "replace", data, bookingItems );
+		bookingTmplItems = $.tmplCmd( "replace", data, bookingTmplItems );
 	
 		function compareName( a, b ) {
 			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
@@ -246,7 +246,7 @@ It does not use the rendered event.
 			// Attach handlers etc. on the rendered template.
 			// Pass the template context of the second tr, which the context for the "bookingEditTmpl" template
 			var newItem = $.tmplItem( bookingNode );
-			bookingItems.push( newItem );
+			bookingTmplItems.push( newItem );
 			bookingEditRendered( newItem ); 
 		}
 	}
@@ -316,13 +316,13 @@ It does not use the rendered event.
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
 		$.tmplCmd( "update", cartTmplItem );
-		$.tmplCmd( "remove", booking, bookingItems );
+		$.tmplCmd( "remove", booking, bookingTmplItems );
 		return false; 
 	}
 	
 	function removeBookings() {
-		$.tmplCmd( "remove", bookingItems );
-		bookingItems = [];
+		$.tmplCmd( "remove", bookingTmplItems );
+		bookingTmplItems = [];
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
@@ -334,7 +334,7 @@ It does not use the rendered event.
 	}
 
 	function bookingItem( booking ) {
-		return $.tmplCmd( "find", booking, bookingItems)[0];
+		return $.tmplCmd( "find", booking, bookingTmplItems)[0];
 	}
 </script>
 

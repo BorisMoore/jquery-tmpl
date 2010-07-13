@@ -104,7 +104,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
-		cart = { bookings: {}, count: 0, sortBy:0 }, bookingItems = {}, selectedBooking;
+		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = {}, selectedBooking;
 		
 	getMovies( pageIndex );
 
@@ -155,7 +155,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		data = data.sort( compare );
 
 		for ( var i = 0, l = data.length; i < l; i++ ) {
-			$( bookingItems[data[i].movie.Id].nodes ).appendTo( "#bookingsList" );
+			$( bookingTmplItems[data[i].movie.Id].nodes ).appendTo( "#bookingsList" );
 		}
 	
 		function compareName( a, b ) {
@@ -222,12 +222,12 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 	function selectBooking( booking ) {
 		if ( selectedBooking ) {
 			if ( selectedBooking === booking ) {
-				updateBooking( bookingItems[selectedBooking.movie.Id]);
+				updateBooking( bookingTmplItems[selectedBooking.movie.Id]);
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
 			var oldSelected = selectedBooking; 
-			$( "div", bookingItems[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() { 
+			$( "div", bookingTmplItems[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() { 
 				switchView( oldSelected );
 			});
 		}
@@ -246,7 +246,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			// Attach handlers etc. on the rendered template.
 			// Pass the template context of the second tr, which the context for the "bookingEditTmpl" template
 			var newItem = $.tmplItem( bookingNode );
-			bookingItems[booking.movie.Id] = newItem;
+			bookingTmplItems[booking.movie.Id] = newItem;
 			bookingEditRendered( newItem ); 
 		}
 	}
@@ -292,7 +292,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		if ( !booking ) {
 			return;
 		}
-		var item = bookingItems[booking.movie.Id],
+		var item = bookingTmplItems[booking.movie.Id],
 			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
 		if ( item.tmpl !== tmpl) {
 			item.tmpl = tmpl; 
@@ -316,17 +316,17 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
 		updateItem( cartTmplItem );
-		$( bookingItems[booking.movie.Id].nodes ).remove();
-		delete bookingItems[booking.movie.Id];
+		$( bookingTmplItems[booking.movie.Id].nodes ).remove();
+		delete bookingTmplItems[booking.movie.Id];
 		return false; 
 	}
 	
 	function removeBookings() {
-		for ( var item in bookingItems ) {
-			$( bookingItems[item].nodes ).remove();
-			delete bookingItems[item];
+		for ( var item in bookingTmplItems ) {
+			$( bookingTmplItems[item].nodes ).remove();
+			delete bookingTmplItems[item];
 		}
-		bookingItems = {};
+		bookingTmplItems = {};
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
