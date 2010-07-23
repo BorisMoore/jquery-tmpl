@@ -103,7 +103,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 </script>
 
 <script type="text/javascript">
-	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
+	var genre="Cartoons", pageIndex = 1, pageSize = 3, pageCount = 0,
 		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = {}, selectedBooking;
 		
 	getMovies( pageIndex );
@@ -192,13 +192,19 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		
 		$( "#pager" ).pager({ pagenumber: pageIndex, pagecount: pageCount, buttonClickCallback: getMovies });
 		
-		// show movies in template
 		$( "#movieList" ).empty();
 		
 		$( "#movieTmpl" )
-			.tmpl( movies ) //, { rendered: onMovieRendered } )
+			// Render movies using the movieTemplate
+			.tmpl( movies ) 
+			
+			// Display rendered movies in the movieList container
 			.appendTo( "#movieList" )
+			
+			// Animate
 			.find( "div" ).fadeIn( 4000 ).end()
+			
+			// Add click handler
 			.find( ".buyButton" ).click( function() { 
 				buyTickets( $(this).tmplItem().data ); 
 			});
@@ -239,14 +245,23 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			switchView( booking, true );
 		} else {
 			cart.bookings[booking.movie.Id] = booking;
+
 			var bookingNode = $( "#bookingEditTmpl" )
+	
+				// Render the booking for the chosen movie using the bookingEditTemplate
 				.tmpl( booking, { animate: true } ) 
-				.appendTo( "#bookingsList" ).last()[0];
+	
+				// Append the rendered booking to the bookings list
+				.appendTo( "#bookingsList" )
 				
-			// Attach handlers etc. on the rendered template.
-			// Pass the template context of the second tr, which the context for the "bookingEditTmpl" template
+				// Get the 2nd <tr> of the appended booking
+				.last()[0];
+				
+			// Get the template item for the 2nd <tr>, which is the template item for the "bookingEditTmpl" template
 			var newItem = $.tmplItem( bookingNode );
 			bookingTmplItems[booking.movie.Id] = newItem;
+
+			// Attach handlers etc. on the rendered template.
 			bookingEditRendered( newItem ); 
 		}
 	}

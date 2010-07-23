@@ -104,7 +104,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 </script>
 
 <script type="text/javascript">
-	var genre="Cartoons", pageIndex=1, pageSize=3, pageCount=0,
+	var genre="Cartoons", pageIndex = 1, pageSize = 3, pageCount = 0,
 		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = [], selectedBooking;
 		
 	getMovies( pageIndex );
@@ -194,7 +194,10 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		$( "#movieList" ).empty();
 		
 		$( "#movieTmpl" )
+			// Render movies using the movieTemplate
 			.tmpl( movies, { rendered: onMovieRendered } )
+	
+			// Display rendered movies in the movieList container
 			.appendTo( "#movieList" );
 		
 		$( "#movieList" ).fadeIn( "medium" )
@@ -233,12 +236,18 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 			switchView( booking, true );
 		} else {
 			cart.bookings[booking.movie.Id] = booking;
+
 			$( "#bookingEditTmpl" )
+
+				// Render the booking for the chosen movie using the bookingEditTemplate
 				.tmpl( booking, { 
 					animate: true, 
 					rendered: onBookingEditRendered, 
 					addedTmplItems: bookingTmplItems 
-				}).appendTo( "#bookingsList" );
+				})
+				
+				// Append the rendered booking to the bookings list
+				.appendTo( "#bookingsList" );
 		}
 	}
 
