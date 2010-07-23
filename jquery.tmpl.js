@@ -359,8 +359,8 @@
 				continue;
 			}
 			elems = elem.getElementsByTagName("*");
-			for ( var j = 0, m = elems.length; j < m; j++) {
-				processItemKey( elems[j] );
+			for ( var m = elems.length - 1; m >= 0; m-- ) {
+				processItemKey( elems[m] );
 			}
 			processItemKey( elem );
 		}
