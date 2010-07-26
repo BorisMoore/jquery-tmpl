@@ -5,7 +5,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  */
 (function( jQuery, undefined ){
-	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem",
+	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem", htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/,
 		newTmplItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0;
 
 	function newTmplItem( options, parentItem, fn, data ) {
@@ -175,13 +175,13 @@
 					// If this is a template block, use cached copy, or generate tmpl function and cache.
 					tmpl = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", buildTmplFn( tmpl.innerHTML ));
 				}
-				return name ? (jQuery.templates[name] = tmpl) : tmpl;
+				return typeof name === "string" ? (jQuery.templates[name] = tmpl) : tmpl;
 			}
 			// Return named compiled template
-			return typeof name !== "string" ? null : 
+			return typeof name !== "string" ? jQuery.templates( null, name ): 
 				(jQuery.templates[name] || 
-					// If not in map, treat as a selector. 
-					jQuery.templates( null, jQuery( name ))); 
+					// If not in map, treat as a selector. (If integrated with core, use quickExpr.exec) 
+					jQuery.templates( null, htmlExpr.test( name ) ? name : jQuery( name ))); 
 		},
 
 		encode: function( text ) {
