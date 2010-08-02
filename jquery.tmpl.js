@@ -1,4 +1,4 @@
-/*
+	/*
  * jQuery Templating Plugin
  *   NOTE: Created for demonstration purposes.
  * Copyright 2010, John Resig
@@ -9,10 +9,10 @@
 		newTmplItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0;
 
 	function newTmplItem( options, parentItem, fn, data ) {
-		// Returns a template item data structure for a new rendered instance of a template (a 'template item'). 
+		// Returns a template item data structure for a new rendered instance of a template (a 'template item').
 		// The content field is a hierarchical array of strings and nested items (to be
 		// removed and replaced by nodes field of dom elements, once inserted in DOM).
-		var newItem = { 
+		var newItem = {
 			data: data || (parentItem ? parentItem.data : {}),
 			tmpl: null,
 			parent: parentItem || null,
@@ -71,15 +71,15 @@
 		// Use first wrapped element as template markup.
 		// Return wrapped set of template items, obtained by rendering template against data.
 		tmpl: function( data, options, parentItem ) {
-			return jQuery.tmpl( this[0], data, options, parentItem, parentItem === undefined );
+			return jQuery.tmpl( this[0], data, options, parentItem );
 		},
 
-		// Find which rendered template item the first wrapped DOM element belongs to 
+		// Find which rendered template item the first wrapped DOM element belongs to
 		tmplItem: function() {
 			return jQuery.tmplItem( this[0] );
 		},
 
-		// Consider the first wrapped element as a template declaration, and get the compiled template or store it as a named template. 
+		// Consider the first wrapped element as a template declaration, and get the compiled template or store it as a named template.
 		templates: function( name ) {
 			return jQuery.templates( name, this[0] );
 		},
@@ -153,15 +153,17 @@
 			return tmplItem || topTmplItem;
 		},
 
-		// Set: 
-		// Use $.templates( name, tmpl ) to cache a named template, 
+		// Set:
+		// Use $.templates( name, tmpl ) to cache a named template,
 		// where tmpl is a template string, a script element or a jQuery instance wrapping a script element, etc.
 		// Use $( "selector" ).templates( name ) to provide access by name to a script block template declaration.
 
-		// Get: 
+		// Get:
 		// Use $.templates( name ) to access a cached template.
-		// Also $( selectorToScriptBlock ).templates(), or $.templates( null, templateString ) 
-		// will return the compiled template, without adding a name reference.  
+		// Also $( selectorToScriptBlock ).templates(), or $.templates( null, templateString )
+		// will return the compiled template, without adding a name reference.
+		// If templateString includes at least one HTML tag, $.templates( templateString ) is equivalent
+		// to $.templates( null, templateString )
 		templates: function( name, tmpl ) {
 			if (tmpl) {
 				// Compile template and associate with name
@@ -170,7 +172,7 @@
 					tmpl = buildTmplFn( tmpl )
 				} else if ( tmpl instanceof jQuery ) {
 					tmpl = tmpl[0] || {};
-				} 
+				}
 				if ( tmpl.nodeType ) {
 					// If this is a template block, use cached copy, or generate tmpl function and cache.
 					tmpl = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", buildTmplFn( tmpl.innerHTML ));
@@ -242,9 +244,9 @@
 		}
 	});
 
-	//========================== Private helper functions, used by code above ========================== 
-	  
-	function build( tmplItem, parent, content ) {
+	//========================== Private helper functions, used by code above ==========================
+
+	function build( tmplItem, nested, content ) {
 		// Convert hierarchical content into flat string array 
 		// and finally return array of fragments ready for DOM insertion
 		var frag, ret = jQuery.map( content, function( item ) {
@@ -254,8 +256,7 @@
 				// This is a child template item. Build nested template.
 				build( item, tmplItem, item.content );
 		});
-		if ( parent ) {
-			// nested template
+		if ( nested ) {
 			return ret;
 		}
 		// top-level template
@@ -264,7 +265,7 @@
 		// Support templates which have initial or final text nodes, or consist only of text
 		// Also support HTML entities within the HTML markup.
 		ret.replace( /^\s*([^<\s][^<]*)?(<[\w\W]+>)([^>]*[^>\s])?\s*$/, function( all, before, middle, after) {
-			frag = jQuery( middle ).get(); 
+			frag = jQuery( middle ).get();
 
 			storeTmplItems( frag );
 			if ( before ) {
@@ -314,7 +315,7 @@
 							args = "";
 						}
 						expr = args ? ("(" + target + ").call($item" + args) : target;
-						exprAutoFnDetect = args ? expr: "(typeof(" +  target + ")==='function'?(" +  target + ").call($item):(" +  target + "))";
+						exprAutoFnDetect = args ? expr : "(typeof(" + target + ")==='function'?(" + target + ").call($item):(" + target + "))";
 					} else {
 						expr = def["$1"] || "null";
 					}
@@ -343,15 +344,10 @@
 
 	function nest( tmpl, data, options ) {
 		// nested template, using {{tmpl}} tag
-		return jQuery.tmpl( 
-			typeof tmpl === "string" ? jQuery.templates( tmpl ) : tmpl, 
-			data, 
-			options, 
-			this 
-		);
+		return jQuery.tmpl( jQuery.templates( tmpl ), data, options, this );
 	}
 
-	// Store template items in jQuery.data(), ensuring a unique tmplItem data data structure for each rendered template instance. 
+	// Store template items in jQuery.data(), ensuring a unique tmplItem data data structure for each rendered template instance.
 	function storeTmplItems( content ) {
 		var keySuffix = "_" + cloneIndex, elem, elems, newClonedItems = {};
 		for ( var i = 0, l = content.length; i < l; i++ ) {
@@ -398,13 +394,14 @@
 					pntItem.nodes.push( el );
 					pntItem = pntItem.parent;
 				}
-				delete tmplItem.content; // Could keep this available. Currently deleting to reduce API surface area, and memory use...
+				// Delete content built during rendering - reduce API surface area and memory use, and avoid exposing of stale data after rendering...
+				delete tmplItem._content;
 				// Store template item as jQuery data on the element
 				jQuery.data( el, "tmplItem", tmplItem );
 			}
 			function cloneTmplItem( key ) {
 				key = key + keySuffix;
-				tmplItem = newClonedItems[key] 
+				tmplItem = newClonedItems[key]
 				= (newClonedItems[key] || newTmplItem( tmplItem, newTmplItems[tmplItem.parent.key + keySuffix] || tmplItem.parent, null, true ));
 			}
 		}

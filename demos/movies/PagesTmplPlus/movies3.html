@@ -1,25 +1,25 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
-This sample illustrates using templates for a more complete and 
-realistic scenario. 
+This sample illustrates using templates for a more complete and
+realistic scenario.
 
-It uses the NetFlix OData JSONP services as a source of data. 
+It uses the NetFlix OData JSONP services as a source of data.
 
-This version of the movies sample demo uses the 
-	$( targetSelector ).append( templateSelector, data ) 
+This version of the movies sample demo uses the
+	$( targetSelector ).append( templateSelector, data )
 pattern, and also uses the tmplCmd plugin and the rendered event.
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>jQuery + OData + Netflix Catalog API</title>
-    <link href="../css/jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" />
-    <link href="../css/movies.css" rel="stylesheet" type="text/css" />
+	<link href="../css/jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" />
+	<link href="../css/movies.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="about">
 	This is a demo of updates to the jQuery templating feature, proposed by Microsoft.<br/>
 	The source can be viewed here: <a href="http://github.com/nje/jquery-tmpl/">NJE Templating Branch on GitHub</a>
-</div>	
+</div>
 <div id="pageBody">
 <h1>Netflix: Book a Movie...</h1>
 
@@ -31,13 +31,13 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		<li>Horror</li>
 		<li>Sci-Fi Cult Classics</li>
 	</ul>
-	
+
 	<div id="pager"><ul class="pages"><li class="pgEmpty">first</li><li class="pgEmpty">prev</li></ul></div>
-	
+
 	<div id="movieList"></div>
 	<table id="bookingsList">
 		<tbody><tr class="cart"><td class="cart-false" colspan="4">
-			<span class="text">0 items in Cart...</span> 
+			<span class="text">0 items in Cart...</span>
 		</td></tr></tbody>
 	</table>
 	<br/>
@@ -60,11 +60,11 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 
 <script id="cartTmpl" type="text/html">
 	<td class="cart-${!!count}" colspan="4">
-		<span class="text">${count} items in Cart...</span> 
+		<span class="text">${count} items in Cart...</span>
 		{{if count}} 
-			<span id="submit">Checkout</span> 
+			<span id="submit">Checkout</span>
 			<span id="cancel">Remove All</span>
-			{{if count>1}} 
+			{{if count>1}}
 				<span id="sort"><span id="sortBtn">Sort</span>:
 					<select>
 						<option value="0" {{if sortBy==="0"}}selected{{/if}}>Name A-Z</option>
@@ -75,7 +75,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 			{{/if}}
 			</select>
 		{{/if}}
-	</td>   
+	</td>
 </script>
 
 <script id="bookingTitleTmpl" type="text/html">
@@ -116,10 +116,10 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		.delegate( "#sortBtn", "click", sort )
 		.delegate( "#submit", "click", function() {
 			alert( cart.count + " bookings submitted for payment...");
-			removeBookings(); 
+			removeBookings();
 		})
 		.delegate( "#cancel", "click", function() {
-			removeBookings(); 
+			removeBookings();
 		})
 		.empty()
 		.append( "#cartTmpl", cart );
@@ -131,7 +131,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		$( this ).addClass( "selected" );
 
 		pageIndex = 1;
-		genre = encodeURI( $(this).text() ); 
+		genre = encodeURI( $(this).text() );
 		getMovies( pageIndex );
 	}
 
@@ -148,7 +148,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		} 
 
 		for ( var item in cart.bookings ) {
-			data.push( cart.bookings[item] ); 
+			data.push( cart.bookings[item] );
 		}
 		data = data.sort( compare );
 
@@ -181,11 +181,11 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 				});
 			});
 	}
-	
+
 	function showMovies( data ) {
 		pageCount = Math.ceil( data.d.__count/pageSize ),
 			movies = data.d.results;
-		
+
 		$( "#pager" ).pager({ pagenumber: pageIndex, pagecount: pageCount, buttonClickCallback: getMovies });
 		
 		$( "#movieList" )
@@ -218,7 +218,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 			}
 			// Collapse previously selected booking, and switch to non-edit view
 			var oldSelected = selectedBooking; 
-			$( "div", bookingItem( oldSelected ).nodes ).animate( { height: 0 }, 500, function() { 
+			$( "div", bookingItem( oldSelected ).nodes ).animate( { height: 0 }, 500, function() {
 				switchView( oldSelected );
 			});
 		}
@@ -232,10 +232,10 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 			cart.bookings[booking.movie.Id] = booking;
 
 			// Render the booking for the chosen movie using the bookingEditTemplate, and append the rendered booking to the bookings list
-			$( "#bookingsList" ).append( "#bookingEditTmpl", booking, { 
+			$( "#bookingsList" ).append( "#bookingEditTmpl", booking, {
 				animate: true, 
-				rendered: onBookingEditRendered, 
-				addedTmplItems: bookingTmplItems 
+				rendered: onBookingEditRendered,
+				addedTmplItems: bookingTmplItems
 			});
 		}
 	}
@@ -247,21 +247,21 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		var item = bookingItem( booking ),
 			rendered = edit ? onBookingEditRendered  : onBookingRendered;
 		if ( item.rendered !== rendered) {
-			item.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
-			item.rendered = rendered; 
+			item.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates();
+			item.rendered = rendered;
 			$.tmplCmd( "update", item );
 		}
 	}
 
-	function onMovieRendered( item ) { 
-      	$( "div", item.nodes ).fadeIn( 4000 );
-		$( ".buyButton", item.nodes ).click( function() { 
-			buyTickets( item.data ); 
+	function onMovieRendered( item ) {
+		$( "div", item.nodes ).fadeIn( 4000 );
+		$( ".buyButton", item.nodes ).click( function() {
+			buyTickets( item.data );
 		});
 	}
 
 	function onBookingRendered( item ) {
-		$( item.nodes ).click( function() { 
+		$( item.nodes ).click( function() {
 			selectBooking( item.data );
 		});
 		$( ".close", item.nodes ).click( removeBooking );
@@ -270,12 +270,12 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	function onBookingEditRendered( item ) {
 		var data = item.data, nodes = item.nodes;
 		
-		$( nodes[0] ).click( function() { 
+		$( nodes[0] ).click( function() {
 			selectBooking();
 		});
 
 		$( ".close", nodes ).click( removeBooking );
-		
+
 		$( ".date", nodes ).change( function() {
 			data.date = $(this).datepicker( "getDate" );
 			updateBooking( item );
@@ -314,7 +314,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		$.tmplCmd( "remove", booking, bookingTmplItems );
 		return false; 
 	}
-	
+
 	function removeBookings() {
 		$.tmplCmd( "remove", bookingTmplItems );
 		bookingTmplItems = [];
@@ -323,7 +323,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		selectedBooking = null;
 		$.tmplCmd( "update", cartTmplItem );
 	}
-	
+
 	function formatDate( date ) {
 		return date.toLocaleDateString();
 	}

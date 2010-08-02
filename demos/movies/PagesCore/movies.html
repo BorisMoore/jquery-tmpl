@@ -1,25 +1,25 @@
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
-This sample illustrates using templates for a more complete and 
-realistic scenario. 
+This sample illustrates using templates for a more complete and
+realistic scenario.
 
-It uses the NetFlix OData JSONP services as a source of data. 
+It uses the NetFlix OData JSONP services as a source of data.
 
-This version of the movies sample demo uses the 
-	$( templateSelector ).tmpl( data ).appendTo( targetSelector ) 
+This version of the movies sample demo uses the
+	$( templateSelector ).tmpl( data ).appendTo( targetSelector )
 pattern, and does not use the tmplCmd plugin or the rendered event.
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>jQuery + OData + Netflix Catalog API</title>
-    <link href="../css/jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" />
-    <link href="../css/movies.css" rel="stylesheet" type="text/css" />
+	<link href="../css/jquery-ui-1.8.1.custom.css" rel="stylesheet" type="text/css" />
+	<link href="../css/movies.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
 <div id="about">
 	This is a demo of updates to the jQuery templating feature, proposed by Microsoft.<br/>
 	The source can be viewed here: <a href="http://github.com/nje/jquery-tmpl/">NJE Templating Branch on GitHub</a>
-</div>	
+</div>
 <div id="pageBody">
 <h1>Netflix: Book a Movie...</h1>
 
@@ -31,13 +31,13 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		<li>Horror</li>
 		<li>Sci-Fi Cult Classics</li>
 	</ul>
-	
+
 	<div id="pager"><ul class="pages"><li class="pgEmpty">first</li><li class="pgEmpty">prev</li></ul></div>
-	
+
 	<div id="movieList"></div>
 	<table id="bookingsList">
 		<tbody><tr class="cart"><td class="cart-false" colspan="4">
-			<span class="text">0 items in Cart...</span> 
+			<span class="text">0 items in Cart...</span>
 		</td></tr></tbody>
 	</table>
 	<br/>
@@ -59,11 +59,11 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 
 <script id="cartTmpl" type="text/html">
 	<td class="cart-${!!count}" colspan="4">
-		<span class="text">${count} items in Cart...</span> 
-		{{if count}} 
-			<span id="submit">Checkout</span> 
+		<span class="text">${count} items in Cart...</span>
+		{{if count}}
+			<span id="submit">Checkout</span>
 			<span id="cancel">Remove All</span>
-			{{if count>1}} 
+			{{if count>1}}
 				<span id="sort"><span id="sortBtn">Sort</span>:
 					<select>
 						<option value="0" {{if sortBy==="0"}}selected{{/if}}>Name A-Z</option>
@@ -74,7 +74,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			{{/if}}
 			</select>
 		{{/if}}
-	</td>   
+	</td>
 </script>
 
 <script id="bookingTitleTmpl" type="text/html">
@@ -89,7 +89,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 </script>
 
 <script id="bookingEditTmpl" type="text/html">
-	{{tmpl(this.data, {mode: "Edit"}) "#bookingTitleTmpl"}}
+	{{tmpl($data, {mode: "Edit"}) "#bookingTitleTmpl"}}
 	<tr class="bookingEdit">
 		<td colspan="4">
 			<div class="fields">
@@ -105,7 +105,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex = 1, pageSize = 3, pageCount = 0,
 		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = {}, selectedBooking;
-		
+
 	getMovies( pageIndex );
 
 	$( "#genres li" ).click( selectGenre );
@@ -115,10 +115,10 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		.delegate( "#sortBtn", "click", sort )
 		.delegate( "#submit", "click", function() {
 			alert( cart.count + " bookings submitted for payment...");
-			removeBookings(); 
+			removeBookings();
 		})
 		.delegate( "#cancel", "click", function() {
-			removeBookings(); 
+			removeBookings();
 		})
 		.empty();
 
@@ -133,7 +133,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		$( this ).addClass( "selected" );
 
 		pageIndex = 1;
-		genre = encodeURI( $(this).text() ); 
+		genre = encodeURI( $(this).text() );
 		getMovies( pageIndex );
 	}
 
@@ -150,7 +150,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		} 
 
 		for ( var item in cart.bookings ) {
-			data.push( cart.bookings[item] ); 
+			data.push( cart.bookings[item] );
 		}
 		data = data.sort( compare );
 
@@ -165,7 +165,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			return a.date - b.date;
 		}
 	}
-		
+
 	function getMovies( index ) {
 		var query = "http://odata.netflix.com/Catalog/Genres('" + genre + "')/Titles" +
 			"?$format=json" +
@@ -185,30 +185,30 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 				});
 			});
 	}
-	
+
 	function showMovies( data ) {
 		pageCount = Math.ceil( data.d.__count/pageSize ),
 			movies = data.d.results;
-		
+
 		$( "#pager" ).pager({ pagenumber: pageIndex, pagecount: pageCount, buttonClickCallback: getMovies });
-		
+
 		$( "#movieList" ).empty();
-		
+
 		$( "#movieTmpl" )
 			// Render movies using the movieTemplate
 			.tmpl( movies ) 
-			
+
 			// Display rendered movies in the movieList container
 			.appendTo( "#movieList" )
-			
+
 			// Animate
 			.find( "div" ).fadeIn( 4000 ).end()
-			
+
 			// Add click handler
-			.find( ".buyButton" ).click( function() { 
-				buyTickets( $(this).tmplItem().data ); 
+			.find( ".buyButton" ).click( function() {
+				buyTickets( $(this).tmplItem().data );
 			});
-		
+
 		$( "#movieList" ).fadeIn( "medium" )
 	}
 
@@ -233,7 +233,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			}
 			// Collapse previously selected booking, and switch to non-edit view
 			var oldSelected = selectedBooking; 
-			$( "div", bookingTmplItems[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() { 
+			$( "div", bookingTmplItems[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() {
 				switchView( oldSelected );
 			});
 		}
@@ -247,16 +247,16 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			cart.bookings[booking.movie.Id] = booking;
 
 			var bookingNode = $( "#bookingEditTmpl" )
-	
+
 				// Render the booking for the chosen movie using the bookingEditTemplate
 				.tmpl( booking, { animate: true } ) 
-	
+
 				// Append the rendered booking to the bookings list
 				.appendTo( "#bookingsList" )
-				
+
 				// Get the 2nd <tr> of the appended booking
 				.last()[0];
-				
+
 			// Get the template item for the 2nd <tr>, which is the template item for the "bookingEditTmpl" template
 			var newItem = $.tmplItem( bookingNode );
 			bookingTmplItems[booking.movie.Id] = newItem;
@@ -268,13 +268,13 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 
 	function bookingEditRendered( item ) {
 		var data = item.data, nodes = item.nodes;
-		
-		$( nodes[0] ).click( function() { 
+
+		$( nodes[0] ).click( function() {
 			selectBooking();
 		});
 
 		$( ".close", nodes ).click( removeBooking );
-		
+
 		$( ".date", nodes ).change( function() {
 			data.date = $(this).datepicker( "getDate" );
 			updateBooking( item );
@@ -295,7 +295,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			$( "div", nodes ).css( "height", 0 ).animate( { height: 116 }, 500 );
 		}
 	}
-	
+
 	function bookingRendered( item ) {
 		$( item.nodes ).click( function() { 
 			selectBooking( item.data );
@@ -308,9 +308,9 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			return;
 		}
 		var item = bookingTmplItems[booking.movie.Id],
-			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates(); 
+			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates();
 		if ( item.tmpl !== tmpl) {
-			item.tmpl = tmpl; 
+			item.tmpl = tmpl;
 			updateItem( item );
 			(edit ? bookingEditRendered : bookingRendered)( item );
 		}
@@ -335,7 +335,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		delete bookingTmplItems[booking.movie.Id];
 		return false; 
 	}
-	
+
 	function removeBookings() {
 		for ( var item in bookingTmplItems ) {
 			$( bookingTmplItems[item].nodes ).remove();
@@ -347,7 +347,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		selectedBooking = null;
 		updateItem( cartTmplItem );
 	}
-	
+
 	function formatDate( date ) {
 		return date.toLocaleDateString();
 	}
