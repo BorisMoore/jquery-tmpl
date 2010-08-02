@@ -1,0 +1,45 @@
+﻿.treeView, .treeView ul
+{
+	padding: 0;
+	margin: 0;
+}
+
+.treeView li
+{
+	list-style-type: none;
+	padding: 1px;
+	margin: 0;
+}
+
+.treeView li li
+{
+	margin-left: 22px;
+}
+
+.treeView img
+{
+	vertical-align: middle;
+	border: 0px;
+}
+
+.folderItem
+{
+	cursor: pointer;
+	margin: 17px;
+	color:Blue;
+	text-decoration: underline;
+	font-style:italic;
+}
+
+.treeView .folderItem
+{
+	cursor: pointer;
+	padding: 0px 0 3px 16px;
+}
+
+.content_true
+{
+	cursor: pointer;
+	font-weight: bold;
+}
+
