@@ -63,24 +63,14 @@ A tabs control against data, using {{tmpl}}
 	// ******************** Events ********************
 
 	$( "#tabsView" )
-		.delegate( ".tabsView th", "click", function() {
+		.delegate( ".header_false", "click", function() {
 			// Get the 'template item' for this tab
 			var activeHeaderTmplItem = $.tmplItem( this );
 			activeDataItem = activeHeaderTmplItem.data;
 
 			// Update the template item for the whole tabs control
-			update( activeHeaderTmplItem.parent ); // Alternatively use $.tmplCmd( "update", fldrTmplItem ); from tmplPlus.js
+			activeHeaderTmplItem.parent.update();
 		})
-
-	// ******************** Helper functions ********************
-
-	function update( tmplItem ) {
-		// This function is equivalent to $.tmplCmd( "update", fldrTmplItem ) available in the from tmplPlus.js
-		var coll = tmplItem.nodes;
-		$.tmpl( null, null, null, tmplItem ).insertBefore( coll[0] );
-		$( coll ).remove();
-	}
-
 </script>
 
 </body>

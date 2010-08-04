@@ -220,7 +220,7 @@ It does not use the rendered event.
 			booking.quantity++;
 		} else {
 			cart.count++;
-			$.tmplCmd( "update", cartTmplItem );
+			cartTmplItem.update();
 			booking = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
 		}
 		selectBooking( booking );
@@ -312,14 +312,14 @@ It does not use the rendered event.
 			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates();
 		if ( item.tmpl !== tmpl) {
 			item.tmpl = tmpl; 
-			$.tmplCmd( "update", item );
+			item.update();
 			(edit ? bookingEditRendered : bookingRendered)( item );
 		}
 	}
 
 	function updateBooking( item ) {
 		item.animate = false;
-		$.tmplCmd( "update", item );
+		item.update();
 		(item.data === selectedBooking ? bookingEditRendered : bookingRendered)( item );
 		item.animate = true;
 	}
@@ -331,7 +331,7 @@ It does not use the rendered event.
 		}
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
-		$.tmplCmd( "update", cartTmplItem );
+		cartTmplItem.update();
 		$.tmplCmd( "remove", booking, bookingTmplItems );
 		return false; 
 	}
@@ -342,7 +342,7 @@ It does not use the rendered event.
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
-		$.tmplCmd( "update", cartTmplItem );
+		cartTmplItem.update();
 	}
 
 	function formatDate( date ) {

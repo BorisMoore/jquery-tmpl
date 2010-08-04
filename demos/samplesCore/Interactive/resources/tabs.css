@@ -64,6 +64,7 @@
 
 .tabsView th.header_true
 {
+	cursor:default;
 	font-weight: bold;
 	border: solid 1px #0000A6;
 	border-right: solid 2px #1E1ED2;

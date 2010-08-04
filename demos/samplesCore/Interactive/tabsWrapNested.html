@@ -82,11 +82,13 @@ Nested tabs controls against HTML markup, using {{wrap}}
 	}
 	refresh();
 
+
 	// ******************** Events ********************
 
 	$( "#tabsView" )
-		.delegate( ".tabsView th", "click", function() {
-			$.tmplItem( this ).state.activeIndex = $(this).index();
+		.delegate( ".header_false", "click", function() {
+			var ti = $.tmplItem( this );
+			ti.state.activeIndex = $(this).index();
 			refresh();
 		});
 

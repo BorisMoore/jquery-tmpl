@@ -60,18 +60,16 @@ A tabs control against HTML markup, using {{wrap}}
 
 	// ******************** Load UI ********************
 
-	function refresh() {
-		$( "#tabsView" ).empty();
-		$( "#tabsTmpl" ).tmpl().appendTo( "#tabsView" );
-	}
-	refresh();
+	$( "#tabsView" ).empty();
+	$( "#tabsTmpl" ).tmpl().appendTo( "#tabsView" );
 
 	// ******************** Events ********************
 
 	$( "#tabsView" )
-		.delegate( ".tabsView th", "click", function() {
-			$.tmplItem( this ).state.activeIndex = $(this).index();
-			refresh();
+		.delegate( ".header_false", "click", function() {
+			var ti = $.tmplItem( this );
+			ti.state.activeIndex = $(this).index();
+			ti.update();
 		});
 
 	// ******************** Helper functions ********************

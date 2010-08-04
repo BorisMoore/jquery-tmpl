@@ -56,18 +56,16 @@ A tabs control against HTML markup, using imperative API to provide wrapped HTML
 
 	// ******************** Load UI ********************
 
-	function refresh() {
-		$( "#tabsView" ).empty();
-		$( "#tabsWrap" ).tmpl( null, {state: state, wrapped: "#tabsContent"} ).appendTo( "#tabsView" );
-	}
-	refresh();
+	$( "#tabsView" ).empty();
+	$( "#tabsWrap" ).tmpl( null, {state: state, wrapped: "#tabsContent"} ).appendTo( "#tabsView" );
 
 	// ******************** Events ********************
 
 	$( "#tabsView" )
-		.delegate( ".tabsView th", "click", function() {
-			$.tmplItem( this ).state.activeIndex = $(this).index();
-			refresh();
+		.delegate( ".header_false", "click", function() {
+			var ti = $.tmplItem( this );
+			ti.state.activeIndex = $(this).index();
+			ti.update();
 		});
 
 </script>

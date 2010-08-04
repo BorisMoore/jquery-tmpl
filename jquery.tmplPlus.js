@@ -38,8 +38,7 @@
 				coll = tmplItem.nodes;
 				switch ( command ) {
 					case "update":
-						jQuery.tmpl( null, null, null, tmplItem ).insertBefore( coll[0] );
-						jQuery( coll ).remove();
+						tmplItem.update();
 						break;
 					case "remove":
 						jQuery( coll ).remove();

@@ -219,7 +219,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			booking.quantity++;
 		} else {
 			cart.count++;
-			updateItem( cartTmplItem );
+			cartTmplItem.update();
 			booking = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
 		}
 		selectBooking( booking );
@@ -311,14 +311,14 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates();
 		if ( item.tmpl !== tmpl) {
 			item.tmpl = tmpl;
-			updateItem( item );
+			item.update();
 			(edit ? bookingEditRendered : bookingRendered)( item );
 		}
 	}
 
 	function updateBooking( item ) {
 		item.animate = false;
-		updateItem( item );
+		item.update();
 		(item.data === selectedBooking ? bookingEditRendered : bookingRendered)( item );
 		item.animate = true;
 	}
@@ -330,7 +330,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		}
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
-		updateItem( cartTmplItem );
+		cartTmplItem.update();
 		$( bookingTmplItems[booking.movie.Id].nodes ).remove();
 		delete bookingTmplItems[booking.movie.Id];
 		return false; 
@@ -345,17 +345,11 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
-		updateItem( cartTmplItem );
+		cartTmplItem.update();
 	}
 
 	function formatDate( date ) {
 		return date.toLocaleDateString();
-	}
-
-	function updateItem( item ) {
-		var coll = item.nodes;
-		$.tmpl( null, null, null, item ).insertBefore( coll[0] );
-		$( coll ).remove();
 	}
 
 	function removeContext( item ) {

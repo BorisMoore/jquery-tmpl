@@ -20,7 +20,8 @@
 			calls: tiCalls,
 			nest: tiNest,
 			wrap: tiWrap,
-			html: tiHtml
+			html: tiHtml,
+			update: tiUpdate
 		};
 		if ( options ) {
 			jQuery.extend( newItem, options, { nodes: [], parent: parentItem } );
@@ -386,8 +387,8 @@
 			}
 			processItemKey( elem );
 		}
-		// Remove temporary wrappedItem objects
-		wrappedItems = {};
+		// Cannot remove temporary wrappedItem objects, since needed during updating of nested items. //wrappedItems = {}; 
+		// TODO - ensure no memory leaks 
 
 		function processItemKey( el ) {
 			var pntKey, pntNode = el, pntItem, tmplItem, key;
@@ -475,5 +476,11 @@
 					e.innerText || e.textContent :
 					e.outerHTML || outerHtml(e);
 			});
+	}
+
+	function tiUpdate() {
+		var coll = this.nodes;
+		jQuery.tmpl( null, null, null, this).insertBefore( coll[0] );
+		jQuery( coll ).remove();
 	}
 })(jQuery);

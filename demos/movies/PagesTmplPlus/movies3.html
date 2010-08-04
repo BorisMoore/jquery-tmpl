@@ -204,7 +204,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 			booking.quantity++;
 		} else {
 			cart.count++;
-			$.tmplCmd( "update", cartTmplItem );
+			cartTmplItem.update();
 			booking = { movie: movie, date: new Date(), quantity: 1, movieTheater: "" };
 		}
 		selectBooking( booking );
@@ -249,7 +249,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		if ( item.rendered !== rendered) {
 			item.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates();
 			item.rendered = rendered;
-			$.tmplCmd( "update", item );
+			item.update();
 		}
 	}
 
@@ -299,7 +299,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 
 	function updateBooking( item ) {
 		item.animate = false;
-		$.tmplCmd( "update", item );
+		item.update();
 		item.animate = true;
 	}
 
@@ -310,7 +310,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		}
 		delete cart.bookings[booking.movie.Id];
 		cart.count--;
-		$.tmplCmd( "update", cartTmplItem );
+		cartTmplItem.update();
 		$.tmplCmd( "remove", booking, bookingTmplItems );
 		return false; 
 	}
@@ -321,7 +321,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		cart.count = 0;
 		cart.bookings = {};
 		selectedBooking = null;
-		$.tmplCmd( "update", cartTmplItem );
+		cartTmplItem.update();
 	}
 
 	function formatDate( date ) {
