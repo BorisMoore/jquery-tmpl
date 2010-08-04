@@ -1,4 +1,4 @@
-A jQuery templating plugin - created for demonstration purposes.
+A jQuery templating plugin.
 ____________________________________________________________________
 
 	// Render one LI, filled with data, then append it into the UL
@@ -41,5 +41,3 @@ ____________________________________________________________________
 
 ____________________________________________________________________
 
-A demo page using this plugin can be found here:
-http://infinity88.com/jquery-tmpl/movies/movies.htm

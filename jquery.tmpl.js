@@ -1,12 +1,11 @@
 	/*
  * jQuery Templating Plugin
- *   NOTE: Created for demonstration purposes.
  * Copyright 2010, John Resig
  * Dual licensed under the MIT or GPL Version 2 licenses.
  */
 (function( jQuery, undefined ){
 	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem", htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/,
-		newTmplItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0;
+		newTmplItems = {}, wrappedItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0, stack = [];
 
 	function newTmplItem( options, parentItem, fn, data ) {
 		// Returns a template item data structure for a new rendered instance of a template (a 'template item').
@@ -14,22 +13,25 @@
 		// removed and replaced by nodes field of dom elements, once inserted in DOM).
 		var newItem = {
 			data: data || (parentItem ? parentItem.data : {}),
+			_wrap: parentItem ? parentItem._wrap : null,
 			tmpl: null,
 			parent: parentItem || null,
 			nodes: [],
-			nest: nest
+			calls: tiCalls,
+			nest: tiNest,
+			wrap: tiWrap,
+			html: tiHtml
 		};
 		if ( options ) {
 			jQuery.extend( newItem, options, { nodes: [], parent: parentItem } );
-			fn = fn || (typeof options.tmpl === "function" ? options.tmpl : null);
 		}
 		if ( fn ) {
 			// Build the hierarchical content to be used during insertion into DOM
 			newItem.tmpl = fn;
-			newItem.content = newItem.tmpl( jQuery, newItem );
+			newItem._ctnt = newItem._ctnt || newItem.tmpl( jQuery, newItem );
 			newItem.key = ++itemKey;
 			// Keep track of new template item, until it is stored as jQuery Data on DOM element
-			newTmplItems[itemKey] = newItem;
+			(stack.length ? wrappedItems : newTmplItems)[itemKey] = newItem;
 		}
 		return newItem;
 	}
@@ -122,17 +124,26 @@
 			} else if ( !tmpl ) {
 				// The template item is already associated with DOM - this is a refresh.
 				// Re-evaluate rendered template for the parentItem
-				tmpl =  parentItem.tmpl;
+				tmpl = parentItem.tmpl;
 				newTmplItems[parentItem.key] = parentItem;
 				parentItem.nodes = [];
+				updateWrapped( parentItem );
 				// Rebuild, without creating a new template item
 				return jQuery( build( parentItem, null, parentItem.tmpl( jQuery, parentItem ) ));
-			} 
+			}
 			if ( !tmpl ) {
 				return []; // Could throw...
 			}
 			if ( typeof data === "function" ) {
 				data = data.call( parentItem || {} );
+			}
+			if ( options && options.wrapped ) {
+				// Create template item for wrapped content, without rendering template
+				parentItem = newTmplItem( options, parentItem, null, data );
+				parentItem.key = ++itemKey;
+				wrappedItems[itemKey] = parentItem;
+				parentItem.tmpl = tmpl;
+				updateWrapped( parentItem );
 			}
 			ret = jQuery.isArray( data ) ? 
 				jQuery.map( data, function( dataItem ) {
@@ -196,29 +207,34 @@
 		tags: {
 			"tmpl": {
 				_default: { $2: "null" },
-				prefix: "if($notnull_1){_=_.concat($item.nest($1,$2));}"
+				open: "if($notnull_1){_=_.concat($item.nest($1,$2));}"
 				// tmpl target parameter can be of type function, so use $1, not $1a (so not auto detection of functions)
 				// This means that {{tmpl foo}} treats foo as a template (which IS a function). 
 				// Explicit parens can be used if foo is a function that returns a template: {{tmpl foo()}}.
 			},
+			"wrap": {
+				_default: { $2: "null" },
+				open: "$item.calls(_,$1,$2);_=[];",
+				close: "call=$item.calls();_=call._.concat($item.wrap(call,_));"
+			},
 			"each": {
 				_default: { $2: "$index, $value" },
-				prefix: "if($notnull_1){$.each($1a,function($2){with(this){",
-				suffix: "}});}"
+				open: "if($notnull_1){$.each($1a,function($2){with(this){",
+				close: "}});}"
 			},
 			"if": {
-				prefix: "if(($notnull_1) && $1a){",
-				suffix: "}"
+				open: "if(($notnull_1) && $1a){",
+				close: "}"
 			},
 			"else": {
-				prefix: "}else{"
+				open: "}else{"
 			},
 			"html": {
-				prefix: "if($notnull_1){_.push($1a);}"
+				open: "if($notnull_1){_.push($1a);}"
 			},
 			"=": {
 				_default: { $1: "$data" },
-				prefix: "if($notnull_1){_.push($.encode($1a));}"
+				open: "if($notnull_1){_.push($.encode($1a));}"
 			}
 		},
 
@@ -252,9 +268,9 @@
 		var frag, ret = jQuery.map( content, function( item ) {
 			return (typeof item === "string") ? 
 				// Insert template item annotations, to be converted to jQuery.data( "tmplItem" ) when elems are inserted into DOM.
-				item.replace( /(<\w+)([^>]*)/g, "$1 " + tmplItmAtt + "=\"" + tmplItem.key + "\" $2" ) : 
+				item.replace( /(<\w+)(?=[\s>])(?![^>]*_tmplitem)([^>]*)/g, "$1 " + tmplItmAtt + "=\"" + tmplItem.key + "\" $2" ) :
 				// This is a child template item. Build nested template.
-				build( item, tmplItem, item.content );
+				build( item, tmplItem, item._ctnt );
 		});
 		if ( nested ) {
 			return ret;
@@ -321,7 +337,7 @@
 					}
 					fnargs = unescape( fnargs );
 					return "');" + 
-						cmd[ slash ? "suffix" : "prefix" ]
+						cmd[ slash ? "close" : "open" ]
 							.split( "$notnull_1" ).join( "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" )
 							.split( "$1a" ).join( exprAutoFnDetect )
 							.split( "$1" ).join( expr )
@@ -338,13 +354,23 @@
 		);
 	}
 
+	function updateWrapped( tmplItem ) {
+		if ( tmplItem.wrapped ) {
+			var wrapped = tmplItem.wrapped;
+			// Build the wrapped content
+			tmplItem._wrap = build( tmplItem, true, 
+				jQuery.isArray( wrapped ) ? wrapped : [htmlExpr.test( wrapped ) ? wrapped : jQuery( wrapped ).html()] 
+			).join("");
+		}
+	}
+	
 	function unescape( args ) {
 		return args ? args.replace( /\\'/g, "'").replace(/\\\\/g, "\\" ) : null;
 	}
-
-	function nest( tmpl, data, options ) {
-		// nested template, using {{tmpl}} tag
-		return jQuery.tmpl( jQuery.templates( tmpl ), data, options, this );
+	function outerHtml( elem ) {
+		var div = document.createElement("div");
+		div.appendChild( elem.cloneNode(true) );
+		return div.innerHTML;
 	}
 
 	// Store template items in jQuery.data(), ensuring a unique tmplItem data data structure for each rendered template instance.
@@ -360,42 +386,52 @@
 			}
 			processItemKey( elem );
 		}
+		// Remove temporary wrappedItem objects
+		wrappedItems = {};
 
 		function processItemKey( el ) {
-			var pntKey, pntNode = el, pntItem, pntNodeItem, tmplItem, key;
+			var pntKey, pntNode = el, pntItem, tmplItem, key;
 			// Ensure that each rendered template inserted into the DOM has its own template item,
 			if ( key = el.getAttribute( tmplItmAtt )) {
 				while ((pntNode = pntNode.parentNode).nodeType === 1 && !(pntKey = pntNode.getAttribute( tmplItmAtt ))) { }
 				if ( pntKey !== key ) {
 					// The next ancestor with a _tmplitem expando is on a different key than this one.
 					// So this is a top-level element within this template item
-					tmplItem = newTmplItems[key];
+					pntNode = pntNode.nodeType === 11 ? 0 : (pntNode.getAttribute( tmplItmAtt ) || 0);
+					if ( !(tmplItem = newTmplItems[key]) ) {
+						// The item is for wrapped content, and was copied from the temporary parent wrappedItem.
+						tmplItem = wrappedItems[key];
+						tmplItem = newTmplItem( tmplItem, newTmplItems[pntNode]||wrappedItems[pntNode], null, true );
+						tmplItem.key = ++itemKey;
+						// Note that there is a remaining issue on parenting of wrappedItems.
+						// ...Currently there may be additional newTmplItems items wrapped contexts, leading to duplicate rendered events.
+						newTmplItems[itemKey] = tmplItem;
+					}
 					if ( cloneIndex ) {
 						cloneTmplItem( key );
 					}
-					pntNodeItem = el.parentNode;
-					pntNodeItem = pntNodeItem.nodeType === 11 ? 0 : (pntNodeItem.getAttribute( tmplItmAtt ) || 0);
 				}
 				el.removeAttribute( tmplItmAtt );
 			} else if ( cloneIndex && (tmplItem = jQuery.data( el, "tmplItem" )) ) {
 				// This was a rendered element, cloned during append or appendTo etc.
-				// TmplItem stored in jQuery data has already been cloned in cloneCopyEvent. We must replace it with a fresh cloned tmplItem. 
+				// TmplItem stored in jQuery data has already been cloned in cloneCopyEvent. We must replace it with a fresh cloned tmplItem.
 				cloneTmplItem( tmplItem.key );
 				newTmplItems[tmplItem.key] = tmplItem;
-				pntNodeItem = jQuery.data( el.parentNode, "tmplItem" );
-				pntNodeItem = pntNodeItem ? pntNodeItem.key : 0;
+				pntNode = jQuery.data( el.parentNode, "tmplItem" );
+				pntNode = pntNode ? pntNode.key : 0;
 			}
 			if ( tmplItem ) {
 				pntItem = tmplItem;
 				// Find the template item of the parent element
-				while ( pntItem && pntItem.key != pntNodeItem ) {
+				while ( pntItem && pntItem.key != pntNode ) {
 					// Add this element as a top-level node for this rendered template item, as well as for any
 					// ancestor items between this item and the item of its parent element
 					pntItem.nodes.push( el );
 					pntItem = pntItem.parent;
 				}
 				// Delete content built during rendering - reduce API surface area and memory use, and avoid exposing of stale data after rendering...
-				delete tmplItem._content;
+				delete tmplItem._ctnt;
+				delete tmplItem._wrap;
 				// Store template item as jQuery data on the element
 				jQuery.data( el, "tmplItem", tmplItem );
 			}
@@ -405,5 +441,39 @@
 				= (newClonedItems[key] || newTmplItem( tmplItem, newTmplItems[tmplItem.parent.key + keySuffix] || tmplItem.parent, null, true ));
 			}
 		}
+	}
+
+	//---- Helper functions for template item ----
+
+	function tiCalls( content, tmpl, data, options ) {
+		if ( !content ) {
+			return stack.pop();
+		}
+		var l = stack.length;
+		stack.push({ _: content, tmpl: tmpl, parent: l ? stack[l - 1].item : this, item:this, data: data, options: options });
+	}
+
+	function tiNest( tmpl, data, options ) {
+		// nested template, using {{tmpl}} tag
+		return jQuery.tmpl( jQuery.templates( tmpl ), data, options, this );
+	}
+
+	function tiWrap( call, wrapped ) {
+		// nested template, using {{wrap}} tag
+		var options = call.options;
+		options.wrapped = wrapped;
+		// Apply the template, which may incorporate wrapped content, 
+		return jQuery.tmpl( jQuery.templates( call.tmpl ), call.data, options, call.parent );
+	}
+
+	function tiHtml( filter, textOnly ) {
+		var wrapped = this._wrap;
+		return jQuery.map(
+			jQuery( jQuery.isArray( wrapped ) ? wrapped.join("") : wrapped ).filter( filter || "*" ),
+			function(e) {
+				return textOnly ?
+					e.innerText || e.textContent :
+					e.outerHTML || outerHtml(e);
+			});
 	}
 })(jQuery);

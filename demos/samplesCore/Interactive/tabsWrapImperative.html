@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+A tabs control against HTML markup, using imperative API to provide wrapped HTML content
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>A tabs control against HTML markup, using imperative API to provide wrapped HTML content</title>
+	<link href="resources/tabs.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<h1>Tabs</h1>
+
+<div id="tabsView">..loading</div>
+
+<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+
+<div id="tabsContent" style="display:none">
+	<h3>Inline</h3>
+	<div>
+		Rendering a <span class='special'>template</span> declared in script block
+	</div>
+
+	<h3>String</h3>
+	<div>
+		Rendering a <span class='special'>template</span> passed as a string
+	</div>
+
+	<h3>Remote</h3>
+	<div>
+		Rendering remote data using <span class='special'>templates</span>
+	</div>
+</div>
+
+<script id="tabsWrap" type="text/html">
+	<table class="tabsView"><tbody>
+		<tr>
+			{{each $item.html("h3", true)}}
+				<th class="header_${$index === $item.state.activeIndex}">
+					${$value}
+				</th>
+			{{/each}}
+		</tr>
+		<tr><td colspan='${$item.html("h3").length}'>
+			<div class="body">
+				{{html $item.html("div")[$item.state.activeIndex]}}
+			</div>
+		</td></tr>
+	</tbody></table>
+</script>
+
+<script type="text/javascript">
+
+	var state = { activeIndex: 0 };
+
+	// ******************** Load UI ********************
+
+	function refresh() {
+		$( "#tabsView" ).empty();
+		$( "#tabsWrap" ).tmpl( null, {state: state, wrapped: "#tabsContent"} ).appendTo( "#tabsView" );
+	}
+	refresh();
+
+	// ******************** Events ********************
+
+	$( "#tabsView" )
+		.delegate( ".tabsView th", "click", function() {
+			$.tmplItem( this ).state.activeIndex = $(this).index();
+			refresh();
+		});
+
+</script>
+
+</body>
+</html>

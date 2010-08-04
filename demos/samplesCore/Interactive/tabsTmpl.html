@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+A tabs control against data, using {{tmpl}}
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>A tabs control against data, using {{tmpl}}</title>
+	<link href="resources/tabs.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<h1>Tabs</h1>
+<div id="tabsView">..loading</div>
+
+<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+
+<script id="tabsTmpl" type="text/html">
+	<table class="tabsView"><tbody>
+		<tr>{{tmpl(items) "#headerItemTmpl"}}</tr>
+		<tr><td colspan="${items.length}">
+			<div class="body">{{tmpl(activeDataItem) "#contentTmpl"}}</div>
+		</td></tr>
+	</tbody></table>
+</script>
+
+<script id="headerItemTmpl" type="text/html">
+	<th class="header_${$data === activeDataItem}">${name}</th>
+</script>
+
+<script id="contentTmpl" type="text/html">
+	<h3>${title}</h3>
+	<div>{{html description}}</div>
+</script>
+
+<script type="text/javascript">
+
+	// ******************** Data for categories and samples ********************
+
+	var samples = {
+			title: "Templating samples",
+			items: [
+				{ name: "Inline", title: "Template inline in a script block",
+					description:"Rendering a <span class='special'>template</span> declared in script block" },
+				{ name: "String", title: "Template as string", 
+					description:"Rendering a <span class='special'>template</span> passed as a string" },
+				{ name: "Remote", title: "Render remote data", 
+					description:"Rendering remote data using <span class='special'>templates</span>" },
+				{ name: "TreeView", title: "Building a Tree View", 
+					description:"A tree view using recursive nested <span class='special'>templates</span>" },
+				{ name: "Tabs", title: "A Tabs control", 
+					description:"Create a tabs control using <span class='special'>templates</span>" }
+			]
+		},
+
+		activeDataItem = samples.items[0];
+
+	// ******************** Load UI ********************
+
+	$( "#tabsView" ).empty();
+	$( "#tabsTmpl" ).tmpl( samples ).appendTo( "#tabsView" );
+
+	// ******************** Events ********************
+
+	$( "#tabsView" )
+		.delegate( ".tabsView th", "click", function() {
+			// Get the 'template item' for this tab
+			var activeHeaderTmplItem = $.tmplItem( this );
+			activeDataItem = activeHeaderTmplItem.data;
+
+			// Update the template item for the whole tabs control
+			update( activeHeaderTmplItem.parent ); // Alternatively use $.tmplCmd( "update", fldrTmplItem ); from tmplPlus.js
+		})
+
+	// ******************** Helper functions ********************
+
+	function update( tmplItem ) {
+		// This function is equivalent to $.tmplCmd( "update", fldrTmplItem ) available in the from tmplPlus.js
+		var coll = tmplItem.nodes;
+		$.tmpl( null, null, null, tmplItem ).insertBefore( coll[0] );
+		$( coll ).remove();
+	}
+
+</script>
+
+</body>
+</html>

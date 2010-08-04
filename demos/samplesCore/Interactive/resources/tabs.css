@@ -1,0 +1,74 @@
+﻿body 
+{
+	font-family: Arial;
+}
+
+.special
+{
+	color: Red;
+	font-family: Comic Sans MS;
+	font-size: 20px;
+	font-style: italic;
+}
+
+.tabsView .body
+{
+	height: 200px;
+}
+
+.tabsView .body div 
+{
+	padding: 15px;
+	height: 60px;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.tabsView .body h3
+{
+	text-align:center;
+}
+
+.tabsView td
+{
+	border: solid 1px #0000A6;
+	border-top: none;
+	border-right: solid 2px #1E1ED2;
+}
+
+.tabsView th
+{
+	cursor: pointer;
+	padding: 2px;
+	font-weight: normal;
+	font-style: italic;
+	color: #888;
+	border: solid 1px #bbb;
+	border-right: none;
+	background-color: #f8f8f8;
+	border-bottom: solid 1px #1E1ED2;
+}
+
+.tabsView
+{
+	width: 500px;
+	border-collapse: collapse;
+	border: none;
+	margin-top: 20px;
+}
+
+.tabsView tr
+{
+	border-right: solid 1px #bbb;
+}
+
+.tabsView th.header_true
+{
+	font-weight: bold;
+	border: solid 1px #0000A6;
+	border-right: solid 2px #1E1ED2;
+	border-bottom: solid 1px #eee;
+	color: #0000A6;
+	background-color: #fff;
+}
+
