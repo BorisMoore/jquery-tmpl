@@ -1,4 +1,4 @@
-	/*
+/*
  * jQuery Templating Plugin
  * Copyright 2010, John Resig
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -83,8 +83,8 @@
 		},
 
 		// Consider the first wrapped element as a template declaration, and get the compiled template or store it as a named template.
-		templates: function( name ) {
-			return jQuery.templates( name, this[0] );
+		template: function( name ) {
+			return jQuery.template( name, this[0] );
 		},
 
 		domManip: function( args, table, callback, options ) {
@@ -121,7 +121,7 @@
 			if ( topLevel ) {
 				// This is a top-level tmpl call (not from a nested template using {{tmpl}})
 				parentItem = topTmplItem;
-				tmpl = jQuery.templates[tmpl] || jQuery.templates( null, tmpl );
+				tmpl = jQuery.template[tmpl] || jQuery.template( null, tmpl );
 			} else if ( !tmpl ) {
 				// The template item is already associated with DOM - this is a refresh.
 				// Re-evaluate rendered template for the parentItem
@@ -166,17 +166,17 @@
 		},
 
 		// Set:
-		// Use $.templates( name, tmpl ) to cache a named template,
+		// Use $.template( name, tmpl ) to cache a named template,
 		// where tmpl is a template string, a script element or a jQuery instance wrapping a script element, etc.
-		// Use $( "selector" ).templates( name ) to provide access by name to a script block template declaration.
+		// Use $( "selector" ).template( name ) to provide access by name to a script block template declaration.
 
 		// Get:
-		// Use $.templates( name ) to access a cached template.
-		// Also $( selectorToScriptBlock ).templates(), or $.templates( null, templateString )
+		// Use $.template( name ) to access a cached template.
+		// Also $( selectorToScriptBlock ).template(), or $.template( null, templateString )
 		// will return the compiled template, without adding a name reference.
-		// If templateString includes at least one HTML tag, $.templates( templateString ) is equivalent
-		// to $.templates( null, templateString )
-		templates: function( name, tmpl ) {
+		// If templateString includes at least one HTML tag, $.template( templateString ) is equivalent
+		// to $.template( null, templateString )
+		template: function( name, tmpl ) {
 			if (tmpl) {
 				// Compile template and associate with name
 				if ( typeof tmpl === "string" ) {
@@ -189,13 +189,13 @@
 					// If this is a template block, use cached copy, or generate tmpl function and cache.
 					tmpl = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", buildTmplFn( tmpl.innerHTML ));
 				}
-				return typeof name === "string" ? (jQuery.templates[name] = tmpl) : tmpl;
+				return typeof name === "string" ? (jQuery.template[name] = tmpl) : tmpl;
 			}
 			// Return named compiled template
-			return typeof name !== "string" ? jQuery.templates( null, name ): 
-				(jQuery.templates[name] || 
+			return typeof name !== "string" ? jQuery.template( null, name ): 
+				(jQuery.template[name] || 
 					// If not in map, treat as a selector. (If integrated with core, use quickExpr.exec) 
-					jQuery.templates( null, htmlExpr.test( name ) ? name : jQuery( name ))); 
+					jQuery.template( null, htmlExpr.test( name ) ? name : jQuery( name ))); 
 		},
 
 		encode: function( text ) {
@@ -456,15 +456,15 @@
 
 	function tiNest( tmpl, data, options ) {
 		// nested template, using {{tmpl}} tag
-		return jQuery.tmpl( jQuery.templates( tmpl ), data, options, this );
+		return jQuery.tmpl( jQuery.template( tmpl ), data, options, this );
 	}
 
 	function tiWrap( call, wrapped ) {
 		// nested template, using {{wrap}} tag
-		var options = call.options;
+		var options = call.options || {};
 		options.wrapped = wrapped;
 		// Apply the template, which may incorporate wrapped content, 
-		return jQuery.tmpl( jQuery.templates( call.tmpl ), call.data, options, call.parent );
+		return jQuery.tmpl( jQuery.template( call.tmpl ), call.data, options, call.parent );
 	}
 
 	function tiHtml( filter, textOnly ) {

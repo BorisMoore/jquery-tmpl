@@ -308,7 +308,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			return;
 		}
 		var item = bookingTmplItems[booking.movie.Id],
-			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates();
+			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).template();
 		if ( item.tmpl !== tmpl) {
 			item.tmpl = tmpl;
 			item.update();

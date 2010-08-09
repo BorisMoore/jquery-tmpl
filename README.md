@@ -33,7 +33,7 @@ ____________________________________________________________________
 ____________________________________________________________________
 
 	// Store a string as a compiled template for later use
-	$.templates( "myTmpl", "<span>${firstName}</span>" );
+	$.template( "myTmpl", "<span>${firstName}</span>" );
 
 	// Render stored template and insert after target. 
 	$.tmpl( "myTmpl", dataObject )

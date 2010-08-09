@@ -7,34 +7,40 @@
 .treeView li
 {
 	list-style-type: none;
-	padding: 1px;
-	margin: 0;
+	padding: 2px;
 }
 
 .treeView li li
 {
-	margin-left: 22px;
+	margin-left: 18px;
 }
 
 .treeView img
 {
 	vertical-align: middle;
 	border: 0px;
+	margin-right:7px;
 }
 
-.folderItem
+img.folder 
+{
+	width:15px;
+	height:14px;
+}
+
+img.expand 
+{
+	width:8px;
+	width:9px;
+}
+
+.treeView li.folderItem
 {
 	cursor: pointer;
-	margin: 17px;
 	color:Blue;
 	text-decoration: underline;
 	font-style:italic;
-}
-
-.treeView .folderItem
-{
-	cursor: pointer;
-	padding: 0px 0 3px 16px;
+	margin-bottom: 4px;
 }
 
 .content_true
@@ -42,4 +48,3 @@
 	cursor: pointer;
 	font-weight: bold;
 }
-

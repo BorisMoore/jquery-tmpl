@@ -78,7 +78,7 @@
 				dmArgs = jQuery.makeArray( arguments );
 
 				// Eval template to obtain fragment to clone and insert
-				dmArgs[0] = [ jQuery.tmpl( jQuery.templates( tmpl ), data, args[2], args[3] ) ];
+				dmArgs[0] = [ jQuery.tmpl( jQuery.template( tmpl ), data, args[2], args[3] ) ];
 
 				dmArgs[2] = function( fragClone ) {
 					// Handler called by oldManip when rendered template has been inserted into DOM.
@@ -90,6 +90,3 @@
 		}
 	});
 })(jQuery);
-
-
-

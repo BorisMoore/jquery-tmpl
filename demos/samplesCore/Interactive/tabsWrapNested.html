@@ -61,9 +61,9 @@ Nested tabs controls against HTML markup, using {{wrap}}
 				</th>
 			{{/each}}
 		</tr>
-		<tr><td colspan="${tabCount}">
+		<tr><td colspan="${tabCount()}">
 			<div class="body">
-				{{html tabContent}}
+				{{html tabContent()}}
 			</div>
 		</td></tr>
 	</tbody></table>

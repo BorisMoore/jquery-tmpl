@@ -53,12 +53,12 @@ function cityNumber() {
 }
 
 function getTemplate( key ) {
-	return $( "#tmpl" + key ).templates();
+	return $( "#tmpl" + key ).template();
 }
 
 $(function(){
 	// Create named template, to be used in composition below
-	$.templates( "citySeparator", '<tr class="citySeparator"><td colspan="2"></td></tr>' );
+	$.template( "citySeparator", '<tr class="citySeparator"><td colspan="2"></td></tr>' );
 	
 	$( "#tmplPeople" )
 		.tmpl( people )

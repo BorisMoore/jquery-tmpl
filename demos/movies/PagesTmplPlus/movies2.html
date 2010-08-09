@@ -258,7 +258,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 		var item = bookingItem( booking ),
 			rendered = edit ? onBookingEditRendered  : onBookingRendered;
 		if ( item.rendered !== rendered) {
-			item.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).templates();
+			item.tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).template();
 			item.rendered = rendered;
 			item.update();
 		}

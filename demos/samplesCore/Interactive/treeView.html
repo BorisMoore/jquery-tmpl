@@ -18,8 +18,8 @@ A tree view control using recursive templates
 
 <script id="folderTmpl" type="text/html">
 	<li class="content_${hasContent($item)}">
-		<img src="resources/${expanderImage}.png" />
-		<img src="resources/folder.png" />
+		<img class="expand" src="resources/${expanderImage}.png" />
+		<img class="folder" src="resources/folder.png" />
 		<span>${name}</span>
 	</li>
 	{{if expanded}}

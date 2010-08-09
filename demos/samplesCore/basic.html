@@ -67,7 +67,7 @@ jQuery(function(){
 		.appendTo( "ul" );
 
 	// Store a string as a compiled template for later use
-	$.templates( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $item.showCities}}(${cityJoin()}){{/if}}</li>' );
+	$.template( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $item.showCities}}(${cityJoin()}){{/if}}</li>' );
 
 	// Render stored template and insert after target. 
 	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
@@ -81,7 +81,7 @@ jQuery(function(){
 		.appendTo( "ul" );
 
 	// Store a template declared in a script block as a named template for later use.
-	$( "#sometmpl" ).templates( "peopleList" );
+	$( "#sometmpl" ).template( "peopleList" );
 
 	// Use the named template
 	$.tmpl( "peopleList", arrayOfDataObjects )
