@@ -69,7 +69,7 @@ $(function(){
 });
 </script>
 
-<script id="tmplPeople" type="text/html">
+<script id="tmplPeople" type="text/x-jquery-tmpl">
 	{{tmpl "#tmplSeparator"}}
 	<tr class="${alternate(this.data, people)}"><td colspan="2"><a href="${url}">${getName}</a></td></tr>
 	{{if cities}}
@@ -77,11 +77,11 @@ $(function(){
 	{{/if}}
 </script>
 
-<script id="tmplSeparator" type="text/html">
+<script id="tmplSeparator" type="text/x-jquery-tmpl">
 	<tr class="separator"><td colspan="2"></td></tr>
 </script>
 
-<script id="tmplCity" type="text/html">
+<script id="tmplCity" type="text/x-jquery-tmpl">
 	{{tmpl "citySeparator"}}
 	<tr class="${alternate(this.parent.data, people)}"><td colspan="2"><b><i>City ${cityNumber}:</i></b></td></tr>
 	<tr class="${alternate(this.parent.data, people)}"><td><b>${name}</b></td><td>${state}</td></tr>

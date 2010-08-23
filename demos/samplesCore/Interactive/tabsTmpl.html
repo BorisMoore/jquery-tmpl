@@ -15,7 +15,7 @@ A tabs control against data, using {{tmpl}}
 <script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../../../jquery.tmpl.js" type="text/javascript"></script>
 
-<script id="tabsTmpl" type="text/html">
+<script id="tabsTmpl" type="text/x-jquery-tmpl">
 	<table class="tabsView"><tbody>
 		<tr>{{tmpl(items) "#headerItemTmpl"}}</tr>
 		<tr><td colspan="${items.length}">
@@ -24,11 +24,11 @@ A tabs control against data, using {{tmpl}}
 	</tbody></table>
 </script>
 
-<script id="headerItemTmpl" type="text/html">
+<script id="headerItemTmpl" type="text/x-jquery-tmpl">
 	<th class="header_${$data === activeDataItem}">${name}</th>
 </script>
 
-<script id="contentTmpl" type="text/html">
+<script id="contentTmpl" type="text/x-jquery-tmpl">
 	<h3>${title}</h3>
 	<div>{{html description}}</div>
 </script>

@@ -70,7 +70,7 @@ function alternate() {
 var startIndex = 1, endIndex = 3;
 </script>
 
-<script id="tmplPeople" type="text/html">
+<script id="tmplPeople" type="text/x-jquery-tmpl">
 	<tr class="${alternate}"><td colspan="3"><a href="${url}">${getName}</a></td></tr>
 	{{tmpl "#tmplSeparator"}}
 	{{if getCityCount(startIndex, endIndex)}}
@@ -88,7 +88,7 @@ var startIndex = 1, endIndex = 3;
 	{{/if}}
 </script>
 
-<script id="tmplSeparator" type="text/html">
+<script id="tmplSeparator" type="text/x-jquery-tmpl">
 	<tr class="${$item.type}separator"><td colspan="3"></td></tr>
 </script>
 

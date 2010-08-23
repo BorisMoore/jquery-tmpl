@@ -48,7 +48,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 <script src="../components/jquery.pager.js" type="text/javascript"></script>
 <script src="../components/jquery-ui-1.8.1.custom.js" type="text/javascript"></script>
 
-<script id="movieTmpl" type="text/html">
+<script id="movieTmpl" type="text/x-jquery-tmpl">
 	<div>
 		<div><img src="${BoxArt.LargeUrl}" /> </div>
 		<strong>${Name}</strong>
@@ -58,7 +58,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	</div>
 </script>
 
-<script id="cartTmpl" type="text/html">
+<script id="cartTmpl" type="text/x-jquery-tmpl">
 	<td class="cart-${!!count}" colspan="4">
 		<span class="text">${count} items in Cart...</span>
 		{{if count}} 
@@ -78,7 +78,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	</td>
 </script>
 
-<script id="bookingTitleTmpl" type="text/html">
+<script id="bookingTitleTmpl" type="text/x-jquery-tmpl">
 	<tr class="bookingTitle${$item.mode}">
 		<td>${movie.Name}</td><td>${movieTheater}</td>
 		<td>${formatDate(date)}</td>
@@ -89,7 +89,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	</tr>
 </script>
 
-<script id="bookingEditTmpl" type="text/html">
+<script id="bookingEditTmpl" type="text/x-jquery-tmpl">
 	{{tmpl($data, {mode: "Edit"}) "#bookingTitleTmpl"}}
 	<tr class="bookingEdit">
 		<td colspan="4">

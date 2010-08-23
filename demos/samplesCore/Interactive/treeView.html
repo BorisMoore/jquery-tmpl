@@ -16,7 +16,7 @@ A tree view control using recursive templates
 <script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../../../jquery.tmpl.js" type="text/javascript"></script>
 
-<script id="folderTmpl" type="text/html">
+<script id="folderTmpl" type="text/x-jquery-tmpl">
 	<li class="content_${hasContent($item)}">
 		<img class="expand" src="resources/${expanderImage}.png" />
 		<img class="folder" src="resources/folder.png" />
@@ -30,7 +30,7 @@ A tree view control using recursive templates
 	{{/if}}
 </script>
 
-<script id="itemTmpl" type="text/html">
+<script id="itemTmpl" type="text/x-jquery-tmpl">
 	<li class="folderItem">${name}</li>
 </script>
 

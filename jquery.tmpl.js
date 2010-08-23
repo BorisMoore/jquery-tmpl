@@ -90,7 +90,7 @@
 		domManip: function( args, table, callback, options ) {
 			// This appears to be a bug in the appendTo, etc. implementation
 			// it should be doing .call() instead of .apply(). See #6227
-			if ( args[0].nodeType ) {
+			if ( args[0] && args[0].nodeType ) {
 				var dmArgs = jQuery.makeArray( arguments ), argsLength = args.length, i = 0, tmplItem;
 				while ( i < argsLength && !(tmplItem = jQuery.data( args[i++], "tmplItem" ))) {};
 				if ( argsLength > 1 ) {
@@ -205,7 +205,7 @@
 	});
 
 	jQuery.extend( jQuery.tmpl, {
-		tags: {
+		tag: {
 			"tmpl": {
 				_default: { $2: "null" },
 				open: "if($notnull_1){_=_.concat($item.nest($1,$2));}"
@@ -317,11 +317,11 @@
 				.replace( /\${([^}]*)}/g, "{{= $1}}" )
 				.replace( /{{(\/?)(\w+|.)(?:\(((?:.(?!}}))*?)?\))?(?:\s+(.*?)?)?(\((.*?)\))?\s*}}/g,
 				function( all, slash, type, fnargs, target, parens, args ) {
-					var cmd = jQuery.tmpl.tags[ type ], def, expr, exprAutoFnDetect;
-					if ( !cmd ) {
+					var tag = jQuery.tmpl.tag[ type ], def, expr, exprAutoFnDetect;
+					if ( !tag ) {
 						throw "Template command not found: " + type;
 					}
-					def = cmd._default || [];
+					def = tag._default || [];
 					if ( target ) {
 						target = unescape( target ); 
 						args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
@@ -338,7 +338,7 @@
 					}
 					fnargs = unescape( fnargs );
 					return "');" + 
-						cmd[ slash ? "close" : "open" ]
+						tag[ slash ? "close" : "open" ]
 							.split( "$notnull_1" ).join( "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" )
 							.split( "$1a" ).join( exprAutoFnDetect )
 							.split( "$1" ).join( expr )

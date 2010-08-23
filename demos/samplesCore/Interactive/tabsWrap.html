@@ -16,7 +16,7 @@ A tabs control against HTML markup, using {{wrap}}
 <script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../../../jquery.tmpl.js" type="text/javascript"></script>
 
-<script id="tabsTmpl" type="text/html">
+<script id="tabsTmpl" type="text/x-jquery-tmpl">
 	{{wrap(null, {state: state}) "#tabsWrap"}}
 
 		<h3>Inline</h3>
@@ -37,7 +37,7 @@ A tabs control against HTML markup, using {{wrap}}
 	{{/wrap}}
 </script>
 
-<script id="tabsWrap" type="text/html">
+<script id="tabsWrap" type="text/x-jquery-tmpl">
 	<table class="tabsView"><tbody>
 		<tr>
 			{{each tabs}}

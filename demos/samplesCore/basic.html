@@ -110,7 +110,7 @@ jQuery(function(){
 });
 </script>
 
-<script id="sometmpl" type="text/html">
+<script id="sometmpl" type="text/x-jquery-tmpl">
 	<li>
 		{{if $item.array}}
 			${index($item.array)} of ${$item.array.length})
@@ -124,7 +124,7 @@ jQuery(function(){
 	</li>
 </script>
 
-<script id="leadingOrTrailingText" type="text/html">
+<script id="leadingOrTrailingText" type="text/x-jquery-tmpl">
 	${firstName} <strong>${lastName}</strong> <br/>
 </script>
 

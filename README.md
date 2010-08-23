@@ -7,9 +7,9 @@ ____________________________________________________________________
 		.appendTo( "ul" );
 ____________________________________________________________________
 
-	<!-- Declare a template as a script block of type "text/html" -->
+	<!-- Declare a template as a script block of type "text/x-jquery-tmpl" -->
 
-	<script id="sometmpl" type="text/html">
+	<script id="sometmpl" type="text/x-jquery-tmpl">
 		<li>${firstName}</li>
 	</script>
 ____________________________________________________________________
