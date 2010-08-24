@@ -65,7 +65,7 @@ function alternate( item, array ) {
 </script>
 
 <script id="tmplPeople" type="text/x-jquery-tmpl">
-	<tr class="${alternate($data, people)}"><td colspan="2"><a href="${url}">${getName}</a></td></tr>
+	<tr class="${alternate($data, people)}"><td colspan="2"><a href="${url}">${getName()}</a></td></tr>
 	{{each cities}}
 		<tr class="cityseparator"><td colspan="2"></td></tr>
 		<tr class="${alternate($data, people)}"><td colspan="2"><b><i>City ${index($value, cities)}:</i></b></td></tr>

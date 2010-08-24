@@ -40,15 +40,15 @@ A tabs control against HTML markup, using {{wrap}}
 <script id="tabsWrap" type="text/x-jquery-tmpl">
 	<table class="tabsView"><tbody>
 		<tr>
-			{{each tabs}}
+			{{each tabs()}}
 				<th class="${headerClass($index)}">
 					${$value}
 				</th>
 			{{/each}}
 		</tr>
-		<tr><td colspan="${tabCount}">
+		<tr><td colspan="${tabCount()}">
 			<div class="body">
-				{{html tabContent}}
+				{{html tabContent()}}
 			</div>
 		</td></tr>
 	</tbody></table>

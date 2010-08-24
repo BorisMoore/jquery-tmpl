@@ -18,7 +18,7 @@ A tree view control using recursive templates
 
 <script id="folderTmpl" type="text/x-jquery-tmpl">
 	<li class="content_${hasContent($item)}">
-		<img class="expand" src="resources/${expanderImage}.png" />
+		<img class="expand" src="resources/${expanderImage()}.png" />
 		<img class="folder" src="resources/folder.png" />
 		<span>${name}</span>
 	</li>

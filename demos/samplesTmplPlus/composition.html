@@ -67,7 +67,7 @@ $(function(){
 
 <script id="tmplPeople" type="text/x-jquery-tmpl">
 	{{tmpl "#tmplSeparator"}}
-	<tr class="${alternate($data, people)}"><td colspan="2"><a href="${url}">${getName}</a></td></tr>
+	<tr class="${alternate($data, people)}"><td colspan="2"><a href="${url}">${getName()}</a></td></tr>
 	{{if cities}}
 		{{tmpl(cities) getTemplate("City")}}
 	{{/if}}
@@ -83,7 +83,7 @@ $(function(){
 
 <script id="tmplCity" type="text/x-jquery-tmpl">
 	{{tmpl "#tmplCitySeparator"}}
-	<tr class="${alternate(this.parent.data, people)}"><td colspan="2"><b><i>City ${cityNumber}:</i></b></td></tr>
+	<tr class="${alternate(this.parent.data, people)}"><td colspan="2"><b><i>City ${cityNumber()}:</i></b></td></tr>
 	<tr class="${alternate(this.parent.data, people)}"><td><b>${name}</b></td><td>${state}</td></tr>
 </script>
 

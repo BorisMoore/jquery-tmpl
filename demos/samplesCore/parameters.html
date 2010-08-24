@@ -71,18 +71,18 @@ var startIndex = 1, endIndex = 3;
 </script>
 
 <script id="tmplPeople" type="text/x-jquery-tmpl">
-	<tr class="${alternate}"><td colspan="3"><a href="${url}">${getName}</a></td></tr>
+	<tr class="${alternate()}"><td colspan="3"><a href="${url}">${getName()}</a></td></tr>
 	{{tmpl "#tmplSeparator"}}
 	{{if getCityCount(startIndex, endIndex)}}
-		<tr class="${alternate}"><td colspan="3"><i>Favorite Cities</i></td></tr>
+		<tr class="${alternate()}"><td colspan="3"><i>Favorite Cities</i></td></tr>
 		{{each getCities(startIndex, endIndex)}}
 			{{tmpl(null, {type:"city"}) "#tmplSeparator"}}
-			<tr class="${alternate}">
+			<tr class="${alternate()}">
 				<td>${$index + 1}</td>
 				<td><b>${name}</b></td>
 				<td>${state}</td>
 			</tr>
-			<tr class="${alternate}"><td colspan="3"><i>${weather}...</i></td></tr>
+			<tr class="${alternate()}"><td colspan="3"><i>${weather}...</i></td></tr>
 		{{/each}}
 		{{tmpl "#tmplSeparator"}}
 	{{/if}}

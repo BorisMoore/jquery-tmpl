@@ -122,13 +122,16 @@
 				// This is a top-level tmpl call (not from a nested template using {{tmpl}})
 				parentItem = topTmplItem;
 				tmpl = jQuery.template[tmpl] || jQuery.template( null, tmpl );
+				wrappedItems = {}; // Any wrapped items will be rebuilt, since this is top level
 			} else if ( !tmpl ) {
 				// The template item is already associated with DOM - this is a refresh.
 				// Re-evaluate rendered template for the parentItem
 				tmpl = parentItem.tmpl;
 				newTmplItems[parentItem.key] = parentItem;
 				parentItem.nodes = [];
-				updateWrapped( parentItem );
+				if ( parentItem.wrapped ) {
+					updateWrapped( parentItem, parentItem.wrapped );
+				}
 				// Rebuild, without creating a new template item
 				return jQuery( build( parentItem, null, parentItem.tmpl( jQuery, parentItem ) ));
 			}
@@ -139,12 +142,7 @@
 				data = data.call( parentItem || {} );
 			}
 			if ( options && options.wrapped ) {
-				// Create template item for wrapped content, without rendering template
-				parentItem = newTmplItem( options, parentItem, null, data );
-				parentItem.key = ++itemKey;
-				wrappedItems[itemKey] = parentItem;
-				parentItem.tmpl = tmpl;
-				updateWrapped( parentItem );
+				updateWrapped( options, options.wrapped );
 			}
 			ret = jQuery.isArray( data ) ? 
 				jQuery.map( data, function( dataItem ) {
@@ -266,16 +264,19 @@
 	function build( tmplItem, nested, content ) {
 		// Convert hierarchical content into flat string array 
 		// and finally return array of fragments ready for DOM insertion
-		var frag, ret = jQuery.map( content, function( item ) {
+		var frag, ret = content ? jQuery.map( content, function( item ) {
 			return (typeof item === "string") ? 
 				// Insert template item annotations, to be converted to jQuery.data( "tmplItem" ) when elems are inserted into DOM.
-				item.replace( /(<\w+)(?=[\s>])(?![^>]*_tmplitem)([^>]*)/g, "$1 " + tmplItmAtt + "=\"" + tmplItem.key + "\" $2" ) :
+				(tmplItem.key ? item.replace( /(<\w+)(?=[\s>])(?![^>]*_tmplitem)([^>]*)/g, "$1 " + tmplItmAtt + "=\"" + tmplItem.key + "\" $2" ) : item) :
 				// This is a child template item. Build nested template.
 				build( item, tmplItem, item._ctnt );
-		});
+		}) : 
+		// If content is not defined, insert tmplItem directly. Not a template item. May be a string, or a string array, e.g. from {{html $item.html()}}. 
+		tmplItem;
 		if ( nested ) {
 			return ret;
 		}
+
 		// top-level template
 		ret = ret.join("");
 
@@ -305,7 +306,7 @@
 	// Generate a reusable function that will serve to render a template against data
 	function buildTmplFn( markup ) {
 		return new Function("jQuery","$item",
-			"var $=jQuery,_=[],$data=$item.data;" +
+			"var $=jQuery,call,_=[],$data=$item.data;" +
 
 			// Introduce the data as local variables using with(){}
 			"with($data){_.push('" +
@@ -355,16 +356,14 @@
 		);
 	}
 
-	function updateWrapped( tmplItem ) {
-		if ( tmplItem.wrapped ) {
-			var wrapped = tmplItem.wrapped;
-			// Build the wrapped content
-			tmplItem._wrap = build( tmplItem, true, 
-				jQuery.isArray( wrapped ) ? wrapped : [htmlExpr.test( wrapped ) ? wrapped : jQuery( wrapped ).html()] 
-			).join("");
-		}
+	function updateWrapped( options, wrapped ) {
+		// Build the wrapped content. 
+		options._wrap = build( options, true, 
+			// Suport imperative scenario in which options.wrapped can be set to a selector or an HTML string.
+			jQuery.isArray( wrapped ) ? wrapped : [htmlExpr.test( wrapped ) ? wrapped : jQuery( wrapped ).html()]
+		).join("");
 	}
-	
+
 	function unescape( args ) {
 		return args ? args.replace( /\\'/g, "'").replace(/\\\\/g, "\\" ) : null;
 	}
@@ -387,9 +386,6 @@
 			}
 			processItemKey( elem );
 		}
-		// Cannot remove temporary wrappedItem objects, since needed during updating of nested items. //wrappedItems = {}; 
-		// TODO - ensure no memory leaks 
-
 		function processItemKey( el ) {
 			var pntKey, pntNode = el, pntItem, tmplItem, key;
 			// Ensure that each rendered template inserted into the DOM has its own template item,
@@ -404,8 +400,6 @@
 						tmplItem = wrappedItems[key];
 						tmplItem = newTmplItem( tmplItem, newTmplItems[pntNode]||wrappedItems[pntNode], null, true );
 						tmplItem.key = ++itemKey;
-						// Note that there is a remaining issue on parenting of wrappedItems.
-						// ...Currently there may be additional newTmplItems items wrapped contexts, leading to duplicate rendered events.
 						newTmplItems[itemKey] = tmplItem;
 					}
 					if ( cloneIndex ) {
@@ -451,7 +445,7 @@
 			return stack.pop();
 		}
 		var l = stack.length;
-		stack.push({ _: content, tmpl: tmpl, parent: l ? stack[l - 1].item : this, item:this, data: data, options: options });
+		stack.push({ _: content, tmpl: tmpl, item:this, data: data, options: options });
 	}
 
 	function tiNest( tmpl, data, options ) {
@@ -464,7 +458,7 @@
 		var options = call.options || {};
 		options.wrapped = wrapped;
 		// Apply the template, which may incorporate wrapped content, 
-		return jQuery.tmpl( jQuery.template( call.tmpl ), call.data, options, call.parent );
+		return jQuery.tmpl( jQuery.template( call.tmpl ), call.data, options, call.item );
 	}
 
 	function tiHtml( filter, textOnly ) {
