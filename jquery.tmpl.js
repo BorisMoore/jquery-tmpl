@@ -157,7 +157,7 @@
 		tmplItem: function( elem ) {
 			var tmplItem;
 			if ( elem instanceof jQuery ) {
-				elem = tmpl[0];
+				elem = elem[0];
 			}
 			while ( elem && elem.nodeType === 1 && !(tmplItem = jQuery.data( elem, "tmplItem" )) && (elem = elem.parentNode) ) {}
 			return tmplItem || topTmplItem;
@@ -312,7 +312,7 @@
 			"with($data){_.push('" +
 
 			// Convert the template into pure JavaScript
-			$.trim(markup)
+			jQuery.trim(markup)
 				.replace( /([\\'])/g, "\\$1" )
 				.replace( /[\r\t\n]/g, " " )
 				.replace( /\${([^}]*)}/g, "{{= $1}}" )
