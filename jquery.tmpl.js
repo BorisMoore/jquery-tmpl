@@ -355,7 +355,6 @@
 			"');}return _;"
 		);
 	}
-
 	function updateWrapped( options, wrapped ) {
 		// Build the wrapped content. 
 		options._wrap = build( options, true, 
@@ -477,4 +476,4 @@
 		jQuery.tmpl( null, null, null, this).insertBefore( coll[0] );
 		jQuery( coll ).remove();
 	}
-})(jQuery);
+})( jQuery );

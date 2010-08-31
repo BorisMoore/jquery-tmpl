@@ -1,4 +1,5 @@
 A jQuery templating plugin.
+Note: this plugin requires jquery version 1.4.2.
 ____________________________________________________________________
 
 	// Render one LI, filled with data, then append it into the UL
