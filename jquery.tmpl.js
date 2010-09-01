@@ -326,14 +326,10 @@
 					if ( target ) {
 						target = unescape( target ); 
 						args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
-						if ( parens && target.indexOf(".") > -1 ) {
-							// Support for target being things like a.toLowerCase(); 
-							// In that case don't call with template item as 'this' pointer. Just evaluate...
-							target += parens;
-							args = "";
-						}
-						expr = args ? ("(" + target + ").call($item" + args) : target;
-						exprAutoFnDetect = args ? expr : "(typeof(" + target + ")==='function'?(" + target + ").call($item):(" + target + "))";
+						// Support for target being things like a.toLowerCase();
+						// In that case don't call with template item as 'this' pointer. Just evaluate...
+						expr = parens ? (target.indexOf(".") > -1 ? target + parens : ("(" + target + ").call($item" + args)) : target;
+						exprAutoFnDetect = parens ? expr : "(typeof(" + target + ")==='function'?(" + target + ").call($item):(" + target + "))";
 					} else {
 						expr = def["$1"] || "null";
 					}
