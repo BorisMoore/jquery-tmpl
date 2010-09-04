@@ -4,7 +4,7 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  */
 (function( jQuery, undefined ){
-	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem", htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$/,
+	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem", htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$|{{! /,
 		newTmplItems = {}, wrappedItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0, stack = [];
 
 	function newTmplItem( options, parentItem, fn, data ) {
@@ -226,14 +226,21 @@
 				close: "}"
 			},
 			"else": {
-				open: "}else{"
+				_default: { $1: "true" },
+				open: "}else if(($notnull_1) && $1a){"
 			},
 			"html": {
+				// Unecoded expression evaluation. 
 				open: "if($notnull_1){_.push($1a);}"
 			},
 			"=": {
+				// Encoded expression evaluation. Abbreviated form is ${}.
 				_default: { $1: "$data" },
 				open: "if($notnull_1){_.push($.encode($1a));}"
+			},
+			"!": {
+				// Comment tag. Skipped by parser
+				open: ""
 			}
 		},
 
@@ -331,12 +338,12 @@
 						expr = parens ? (target.indexOf(".") > -1 ? target + parens : ("(" + target + ").call($item" + args)) : target;
 						exprAutoFnDetect = parens ? expr : "(typeof(" + target + ")==='function'?(" + target + ").call($item):(" + target + "))";
 					} else {
-						expr = def["$1"] || "null";
+						exprAutoFnDetect = expr = def["$1"] || "null";
 					}
 					fnargs = unescape( fnargs );
 					return "');" + 
 						tag[ slash ? "close" : "open" ]
-							.split( "$notnull_1" ).join( "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" )
+							.split( "$notnull_1" ).join( target ? "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" : "true" )
 							.split( "$1a" ).join( exprAutoFnDetect )
 							.split( "$1" ).join( expr )
 							.split( "$2" ).join( fnargs ?

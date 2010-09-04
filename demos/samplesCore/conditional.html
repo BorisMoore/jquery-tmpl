@@ -1,0 +1,43 @@
+﻿<!--
+This sample illustrates use of conditional template tags {{if}} and {{else}}.
+The comment tag {{! }} is also shown.
+-->
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="../../jquery.tmpl.js" type="text/javascript"></script>
+<script>
+$(function(){
+	$( "#movieTemplate" )
+	.tmpl( movies )
+	.appendTo( "#movieList" );
+});
+
+var movies = [
+	{ Name: "Meet Joe Black", Languages: "French", Subtitles: "English" },
+	{ Name: "The Mighty", Subtitles: "French and Spanish" },
+	{ Name: "The Mighty" },
+	{ Name: "City Hunter", Languages: "Mandarin and Cantonese" }
+];
+</script>
+
+<script id="movieTemplate" type="text/x-jquery-tmpl"> 
+	<li>${Name}
+
+		{{if Languages}}
+
+			(Alternative languages: ${Languages}).
+
+		{{else Subtitles}} {{! Note that the 'else' tag with a parameter behaves as 'else if' }}
+
+			(Original language only. Subtitles in ${Subtitles}).
+
+		{{else}} {{! The 'else' tag with no parameter behaves as 'else' }}
+
+			(Original version only, without subtitles).
+
+		{{/if}}
+
+	</li>
+</script>
+
+<ul id="movieList"></ul>
