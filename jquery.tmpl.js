@@ -330,6 +330,10 @@
 						throw "Template command not found: " + type;
 					}
 					def = tag._default || [];
+					if ( parens && !/\w$/.test(target)) {
+						target += parens;
+						parens = "";
+					}
 					if ( target ) {
 						target = unescape( target ); 
 						args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
