@@ -22,11 +22,25 @@
 				tmplItem.rendered( tmplItem );
 			}
 		}
-	}
+	};
 
 	jQuery.extend({
 		tmplCmd: function( command, data, tmplItems ) {
 			var retTmplItems = [], before; 
+			function find( data, tmplItems ) {
+				var found = [], tmplItem, ti, tl = tmplItems.length, dataItem, di = 0, dl = data.length;
+				for ( ; di < dl; ) {
+					dataItem = data[di++]; 
+					for ( ti = 0; ti < tl; ) {
+						tmplItem = tmplItems[ti++];
+						if ( tmplItem.data === dataItem ) {
+							found.push( tmplItem );
+						}
+					}
+				}
+				return found;
+			}
+
 			data = jQuery.isArray( data ) ? data : [ data ];
 			switch ( command ) {
 				case "find":
@@ -54,19 +68,6 @@
 				}
 			});
 			return retTmplItems;
-			function find( data, tmplItems ) {
-				var found = [], tmplItem, ti, tl = tmplItems.length, dataItem, di = 0, dl = data.length;
-				for ( ; di < dl; ) {
-					dataItem = data[di++]; 
-					for ( ti = 0; ti < tl; ) {
-						tmplItem = tmplItems[ti++];
-						if ( tmplItem.data === dataItem ) {
-							found.push( tmplItem );
-						}
-					}
-				}
-				return found;
-			}
 		}
 	});
 
@@ -83,7 +84,7 @@
 				dmArgs[2] = function( fragClone ) {
 					// Handler called by oldManip when rendered template has been inserted into DOM.
 					jQuery.tmpl.afterManip( this, fragClone, callback );
-				}
+				};
 				return oldManip.apply( this, dmArgs );
 			}
 			return oldManip.apply( this, arguments );

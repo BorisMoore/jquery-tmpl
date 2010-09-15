@@ -21,23 +21,16 @@ var movies = [
 </script>
 
 <script id="movieTemplate" type="text/x-jquery-tmpl"> 
-	<li>${Name}
-
-		{{if Languages}}
-
-			(Alternative languages: ${Languages}).
-
-		{{else Subtitles}} {{! Note that the 'else' tag with a parameter behaves as 'else if' }}
-
-			(Original language only. Subtitles in ${Subtitles}).
-
-		{{else}} {{! The 'else' tag with no parameter behaves as 'else' }}
-
-			(Original version only, without subtitles).
-
-		{{/if}}
-
-	</li>
+<li>
+	Title: ${Name}.
+	{{if Languages}}
+		(Alternative languages: ${Languages}).
+	{{else Subtitles}} 
+		(Original language only. Subtitles in ${Subtitles}).
+	{{else}}
+		(Original version only, without subtitles).
+	{{/if}}
+</li>
 </script>
 
 <ul id="movieList"></ul>
