@@ -190,10 +190,10 @@
 				return typeof name === "string" ? (jQuery.template[name] = tmpl) : tmpl;
 			}
 			// Return named compiled template
-			return typeof name !== "string" ? jQuery.template( null, name ): 
+			return name ? (typeof name !== "string" ? jQuery.template( null, name ): 
 				(jQuery.template[name] || 
 					// If not in map, treat as a selector. (If integrated with core, use quickExpr.exec) 
-					jQuery.template( null, htmlExpr.test( name ) ? name : jQuery( name ))); 
+					jQuery.template( null, htmlExpr.test( name ) ? name : jQuery( name )))) : null; 
 		},
 
 		encode: function( text ) {
