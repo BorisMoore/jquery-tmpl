@@ -1,0 +1,7 @@
+The code contributions made by Microsoft to the jQuery-tmpl source code, 
+on http://github.com/nje/jquery-tmpl, are modifications to the original 
+code at http://github.com/jquery/jquery-tmpl written by the jQuery team.  
+
+Thus, Microsoft is contributing solely its modifications to the original 
+templating code, as we cannot claim to own the original templating code, 
+which belongs to the jQuery team. 
