@@ -149,7 +149,6 @@
 					return dataItem ? newTmplItem( options, parentItem, tmpl, dataItem ) : null;
 				}) :
 				[ newTmplItem( options, parentItem, tmpl, data ) ];
-
 			return topLevel ? jQuery( build( parentItem, null, ret ) ) : ret;
 		},
 
@@ -396,11 +395,12 @@
 			var pntKey, pntNode = el, pntItem, tmplItem, key;
 			// Ensure that each rendered template inserted into the DOM has its own template item,
 			if ( (key = el.getAttribute( tmplItmAtt ))) {
-				while ((pntNode = pntNode.parentNode).nodeType === 1 && !(pntKey = pntNode.getAttribute( tmplItmAtt ))) { }
+				while ( pntNode.parentNode && (pntNode = pntNode.parentNode).nodeType === 1 && !(pntKey = pntNode.getAttribute( tmplItmAtt ))) { }
 				if ( pntKey !== key ) {
 					// The next ancestor with a _tmplitem expando is on a different key than this one.
 					// So this is a top-level element within this template item
-					pntNode = pntNode.nodeType === 11 ? 0 : (pntNode.getAttribute( tmplItmAtt ) || 0);
+					// Set pntNode to the key of the parentNode, or to 0 if pntNode.parentNode is null, or pntNode is a fragment.
+					pntNode = pntNode.parentNode ? (pntNode.nodeType === 11 ? 0 : (pntNode.getAttribute( tmplItmAtt ) || 0)) : 0;
 					if ( !(tmplItem = newTmplItems[key]) ) {
 						// The item is for wrapped content, and was copied from the temporary parent wrappedItem.
 						tmplItem = wrappedItems[key];
