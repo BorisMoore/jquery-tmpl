@@ -1,44 +1,11 @@
-A jQuery templating plugin.
-Note: this plugin requires jquery version 1.4.2.
-____________________________________________________________________
+A jQuery Templates plugin.
 
-	// Render one LI, filled with data, then append it into the UL
+_Note: this plugin requires jquery version 1.4.2._
+ 
+jQuery templates contain markup with binding expressions. Templates are applied to data objects or arrays, and rendered into the HTML DOM
 
-	$.tmpl( "<li>${firstName}</li>", dataObject )
-		.appendTo( "ul" );
-____________________________________________________________________
+Documentation for the _jQuery Templates_ plugin can be found on the jQuery documentation site:
+<a href="http://api.jquery.com/category/plugins/templates/">http://api.jquery.com/category/plugins/templates</a>
 
-	<!-- Declare a template as a script block of type "text/x-jquery-tmpl" -->
-
-	<script id="sometmpl" type="text/x-jquery-tmpl">
-		<li>${firstName}</li>
-	</script>
-____________________________________________________________________
-
-	// Render the declared template as one LI appended to the target UL
-
-	$( "#sometmpl" )
-		.tmpl( dataObject )
-		.appendTo( "ul" );
-____________________________________________________________________
-
-	// Render the declared template as multiple LIs appended to the target UL
-	// Provide a click event accessing the data
-
-	$( "#sometmpl" )
-		.tmpl( arrayOfDataObjects )
-		.appendTo( "ul" )
-		.click( function() {
-			alert( $.tmpl(this).data.firstName );
-		});
-____________________________________________________________________
-
-	// Store a string as a compiled template for later use
-	$.template( "myTmpl", "<span>${firstName}</span>" );
-
-	// Render stored template and insert after target. 
-	$.tmpl( "myTmpl", dataObject )
-		.insertAfter( "#target" );
-
-____________________________________________________________________
+See also <a href="http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html">http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html</a> for more background.
 
