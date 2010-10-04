@@ -1,4 +1,4 @@
-A jQuery Templates plugin.
+# jQuery Templates plugin
 
 _Note: this plugin requires jquery version 1.4.2._
  
