@@ -1,7 +1,12 @@
-/*
-* Additional templating features or support for more advanced/less common scenarios.
-* Requires jquery.tmpl.js 
-*/
+/*!
+ * Additional templating features or support for more advanced/less common scenarios.
+ * Requires jquery.tmpl.js 
+ * http://github.com/jquery/jquery-tmpl
+ *
+ * Copyright Software Freedom Conservancy, Inc.
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ */
 (function (jQuery) {
 	var oldComplete = jQuery.tmpl.complete, oldManip = jQuery.fn.domManip;
 
