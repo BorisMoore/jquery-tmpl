@@ -27,7 +27,7 @@
 			update: tiUpdate
 		};
 		if ( options ) {
-			jQuery.extend( newItem, options, { nodes: [], parent: parentItem } );
+			jQuery.extend( true, newItem, options, { nodes: [], parent: parentItem } );
 		}
 		if ( fn ) {
 			// Build the hierarchical content to be used during insertion into DOM
