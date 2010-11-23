@@ -1,4 +1,5 @@
 /*!
+ * preBeta1.0.1
  * Additional templating features or support for more advanced/less common scenarios.
  * Requires jquery.tmpl.js 
  * http://github.com/jquery/jquery-tmpl
