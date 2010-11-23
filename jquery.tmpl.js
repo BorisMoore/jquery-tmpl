@@ -1,5 +1,5 @@
 /*!
- * jQuery Templates Plugin
+ * jQuery Templates Plugin preBeta1.0.1
  * http://github.com/jquery/jquery-tmpl
  *
  * Copyright Software Freedom Conservancy, Inc.
@@ -27,7 +27,7 @@
 			update: tiUpdate
 		};
 		if ( options ) {
-			jQuery.extend( newItem, options, { nodes: [], parent: parentItem } );
+			jQuery.extend( newItem, options, { nodes: [], parent: parentItem, data: newItem.data });
 		}
 		if ( fn ) {
 			// Build the hierarchical content to be used during insertion into DOM
@@ -407,7 +407,7 @@
 					if ( !(tmplItem = newTmplItems[key]) ) {
 						// The item is for wrapped content, and was copied from the temporary parent wrappedItem.
 						tmplItem = wrappedItems[key];
-						tmplItem = newTmplItem( tmplItem, newTmplItems[pntNode]||wrappedItems[pntNode], null, true );
+						tmplItem = newTmplItem( tmplItem, newTmplItems[pntNode]||wrappedItems[pntNode] );
 						tmplItem.key = ++itemKey;
 						newTmplItems[itemKey] = tmplItem;
 					}
@@ -443,7 +443,7 @@
 			function cloneTmplItem( key ) {
 				key = key + keySuffix;
 				tmplItem = newClonedItems[key] = 
-					(newClonedItems[key] || newTmplItem( tmplItem, newTmplItems[tmplItem.parent.key + keySuffix] || tmplItem.parent, null, true ));
+					(newClonedItems[key] || newTmplItem( tmplItem, newTmplItems[tmplItem.parent.key + keySuffix] || tmplItem.parent ));
 			}
 		}
 	}
