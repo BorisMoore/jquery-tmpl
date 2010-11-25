@@ -1,6 +1,7 @@
 /*!
  * jQuery Templates Plugin preBeta1.0.1
  * http://github.com/jquery/jquery-tmpl
+ * Requires jQuery 1.4.2
  *
  * Copyright Software Freedom Conservancy, Inc.
  * Dual licensed under the MIT or GPL Version 2 licenses.
@@ -27,7 +28,7 @@
 			update: tiUpdate
 		};
 		if ( options ) {
-			jQuery.extend( newItem, options, { nodes: [], parent: parentItem, data: newItem.data });
+			jQuery.extend( newItem, options, { nodes: [], parent: parentItem });
 		}
 		if ( fn ) {
 			// Build the hierarchical content to be used during insertion into DOM
@@ -60,7 +61,7 @@
 				for ( i = 0, l = insert.length; i < l; i++ ) {
 					cloneIndex = i;
 					elems = (i > 0 ? this.clone(true) : this).get();
-					jQuery.fn[ original ].apply( jQuery(insert[i]), elems );
+					jQuery( insert[i] )[ original ]( elems );
 					ret = ret.concat( elems );
 				}
 				cloneIndex = 0;
@@ -91,14 +92,9 @@
 		},
 
 		domManip: function( args, table, callback, options ) {
-			// This appears to be a bug in the appendTo, etc. implementation
-			// it should be doing .call() instead of .apply(). See #6227
-			if ( args[0] && args[0].nodeType ) {
-				var dmArgs = jQuery.makeArray( arguments ), argsLength = args.length, i = 0, tmplItem;
-				while ( i < argsLength && !(tmplItem = jQuery.data( args[i++], "tmplItem" ))) {}
-				if ( argsLength > 1 ) {
-					dmArgs[0] = [jQuery.makeArray( args )];
-				}
+			if ( args[0] && jQuery.isArray( args[0] )) {
+				var dmArgs = jQuery.makeArray( arguments ), elems = args[0], elemsLength = elems.length, i = 0, tmplItem;
+				while ( i < elemsLength && !(tmplItem = jQuery.data( elems[i++], "tmplItem" ))) {}
 				if ( tmplItem && cloneIndex ) {
 					dmArgs[2] = function( fragClone ) {
 						// Handler called by oldManip when rendered template has been inserted into DOM.
