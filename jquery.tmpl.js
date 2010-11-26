@@ -1,5 +1,5 @@
 /*!
- * jQuery Templates Plugin preBeta1.0.1
+ * jQuery Templates Plugin v1.0pre
  * http://github.com/jquery/jquery-tmpl
  * Requires jQuery 1.4.2
  *

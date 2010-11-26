@@ -1,5 +1,5 @@
 /*!
- * preBeta1.0.1
+ * tmplPlus.js: for jQuery Templates Plugin v1.0pre 
  * Additional templating features or support for more advanced/less common scenarios.
  * Requires jquery.tmpl.js 
  * http://github.com/jquery/jquery-tmpl
