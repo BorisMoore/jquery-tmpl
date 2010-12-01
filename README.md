@@ -1,8 +1,8 @@
-# jQuery Templates plugin
+# jQuery Templates plugin v1.0.0pre. 
 
-_Note: this plugin requires jquery version 1.4.2._
- 
-jQuery templates contain markup with binding expressions. Templates are applied to data objects or arrays, and rendered into the HTML DOM
+_Note: This plugin is currently in beta form and may change significantly before version 1.0 is released. See tagged versions for stable Beta releases. Requires jquery version 1.4.2._
+
+jQuery templates contain markup with binding expressions ('Template tags'). Templates are applied to data objects or arrays, and rendered into the HTML DOM
 
 Documentation for the _jQuery Templates_ plugin can be found on the jQuery documentation site:
 <a href="http://api.jquery.com/category/plugins/templates/">http://api.jquery.com/category/plugins/templates</a>

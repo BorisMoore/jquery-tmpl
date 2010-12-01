@@ -1,5 +1,5 @@
 /*!
- * jQuery Templates Plugin v1.0pre
+ * jQuery Templates Plugin 1.0.0pre
  * http://github.com/jquery/jquery-tmpl
  * Requires jQuery 1.4.2
  *
@@ -183,7 +183,10 @@
 				}
 				if ( tmpl.nodeType ) {
 					// If this is a template block, use cached copy, or generate tmpl function and cache.
-					tmpl = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", buildTmplFn( tmpl.innerHTML ));
+					tmpl = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", buildTmplFn( tmpl.innerHTML )); 
+					// Issue: In IE, if the container element is not a script block, the innerHTML will remove quotes from attribute values whenever the value does not include white space. 
+					// This means that foo="${x}" will not work if the value of x includes white space: foo="${x}" -> foo=value of x. 
+					// To correct this, include space in tag: foo="${ x }" -> foo="value of x"
 				}
 				return typeof name === "string" ? (jQuery.template[name] = tmpl) : tmpl;
 			}
