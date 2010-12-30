@@ -34,7 +34,6 @@ function test_handler( test_name, res, exp ) {
 }
 
 // these are used throughout to test if tag blocks suppress them
-// TODO fixme
 jQuery.tmpl.tag.syntax_error = { open: "throw SyntaxError('test syntax error');" };
 jQuery.tmpl.tag.reference_error = { open: "throw ReferenceError('test reference error');" };
 jQuery.tmpl.tag.type_error = { open: "throw TypeError('test type error');" };
@@ -81,10 +80,9 @@ module("Basics");
 	});
 
 	test("Incorrect Nesting", function() {
-		// TODO fixme
-		//test_handler( 'default', R("{{ if 1 }}{{ if 1 }}{{ /if }}", testData), SyntaxError );
-		//test_handler( 'extra /if', R("{{ if 1 }}{{ /if }}{{ /if }}", testData), SyntaxError );
-		//test_handler( 'but terminated', R("{{ if 1 }}{{ each arr }}{{ /if }}{{ /each }}", testData), SyntaxError );
+		test_handler( 'default', R("{{if 1}}{{if 1}}{{/if}}", testData), SyntaxError );
+		test_handler( 'extra /if', R("{{if 1}}{{/if}}{{/if}}", testData), SyntaxError );
+		test_handler( 'but terminated', R("{{if 1}}{{each arr}}{{/if}}{{/each}}", testData), SyntaxError );
 	});
 
 	test("Ignore Malformed Tags", function() {
