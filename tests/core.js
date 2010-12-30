@@ -86,9 +86,9 @@ module("Basics");
 	});
 
 	test("Ignore Malformed Tags", function() {
-		test_handler( 'a {{ one } b', R("a {{ one } b", testData), 'a {{ one } b' );
-		test_handler( 'first} {{ second }', R("${ one }} {{ two }", testData), 'first} {{ two }' );
-		test_handler( '{{ one }', R('{{ one }', testData), '{{ one }' );
+		test_handler( 'a {{one } b', R("a {{one } b", testData), 'a {{one } b' );
+		test_handler( 'first} {{second }', R("${ one }} {{two }", testData), 'first} {{two }' );
+		test_handler( '{{one }', R('{{one }', testData), '{{one }' );
 	});
 
 	// reserved words 
