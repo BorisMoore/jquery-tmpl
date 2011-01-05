@@ -351,13 +351,7 @@
 							.split( "$notnull_1" ).join( target ? "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" : "true" )
 							.split( "$1a" ).join( exprAutoFnDetect )
 							.split( "$1" ).join( expr )
-							.split( "$2" ).join( fnargs ?
-								fnargs.replace( /\s*([^\(]+)\s*(\((.*?)\))?/g, function( all, name, parens, params ) {
-									params = params ? ("," + params + ")") : (parens ? ")" : "");
-									return params ? ("(" + name + ").call($item" + params) : all;
-								})
-								: (def.$2||"")
-							) +
+							.split( "$2" ).join( fnargs || def.$2 || "" ) +
 						"_.push('";
 				}) +
 			"');}return _;"
