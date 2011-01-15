@@ -11,7 +11,7 @@
 	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem", htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$|\{\{\! /,
 		newTmplItems = {}, wrappedItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0, stack = [];
 
-	function newTmplItem( options, parentItem, fn, data ) {
+	function newTmplItem( options, parentItem, fn, data, _index ) {
 		// Returns a template item data structure for a new rendered instance of a template (a 'template item').
 		// The content field is a hierarchical array of strings and nested items (to be
 		// removed and replaced by nodes field of dom elements, once inserted in DOM).
@@ -25,7 +25,7 @@
 			nest: tiNest,
 			wrap: tiWrap,
 			html: tiHtml,
-			update: tiUpdate
+			update: tiUpdate, "$index" : _index
 		};
 		if ( options ) {
 			jQuery.extend( newItem, options, { nodes: [], parent: parentItem });
@@ -144,10 +144,10 @@
 				updateWrapped( options, options.wrapped );
 			}
 			ret = jQuery.isArray( data ) ? 
-				jQuery.map( data, function( dataItem ) {
-					return dataItem ? newTmplItem( options, parentItem, tmpl, dataItem ) : null;
+				jQuery.map( data, function( dataItem, _index ) {
+					return dataItem ? newTmplItem( options, parentItem, tmpl, dataItem, _index ) : null;
 				}) :
-				[ newTmplItem( options, parentItem, tmpl, data ) ];
+				[ newTmplItem( options, parentItem, tmpl, data, 0 ) ];
 			return topLevel ? jQuery( build( parentItem, null, ret ) ) : ret;
 		},
 
@@ -314,7 +314,7 @@
 	// Generate a reusable function that will serve to render a template against data
 	function buildTmplFn( markup ) {
 		return new Function("jQuery","$item",
-			"var $=jQuery,call,_=[],$data=$item.data;" +
+			"var $=jQuery,call,_=[],$data=$item.data,$index=$item['$index'];" +
 
 			// Introduce the data as local variables using with(){}
 			"with($data){_.push('" +
