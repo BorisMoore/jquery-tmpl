@@ -1,0 +1,11 @@
+<script src="http://code.jquery.com/jquery-git.js"></script>
+<script src="../../jquery.tmpl.js" type="text/javascript"></script>
+
+<script>
+jQuery.getTemplate('http://localhost/template.jqtpl', 'hello', function(template) {
+	jQuery.tmpl(template, {name: 'Daniel'}).appendTo('div');
+});
+</script>
+
+<div>
+</div>
