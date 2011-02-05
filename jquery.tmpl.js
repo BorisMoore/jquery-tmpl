@@ -16,7 +16,7 @@
 		// The content field is a hierarchical array of strings and nested items (to be
 		// removed and replaced by nodes field of dom elements, once inserted in DOM).
 		var newItem = {
-			data: data || (parentItem ? parentItem.data : {}),
+			data: data || (data === 0 || data === false) ? data : (parentItem ? parentItem.data : {}),
 			_wrap: parentItem ? parentItem._wrap : null,
 			tmpl: null,
 			parent: parentItem || null,
