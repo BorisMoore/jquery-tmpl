@@ -329,7 +329,7 @@
 				function( all, slash, type, fnargs, target, parens, args ) {
 					var tag = jQuery.tmpl.tag[ type ], def, expr, exprAutoFnDetect;
 					if ( !tag ) {
-						throw "Template command not found: " + type;
+						throw "Unknown template tag: " + type;
 					}
 					def = tag._default || [];
 					if ( parens && !/\w$/.test(target)) {
