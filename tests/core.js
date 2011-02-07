@@ -23,7 +23,6 @@ var R = function ( tmpl, data ) {
 };
 
 function test_handler( test_name, res, exp ) {
-	console.log(arguments)
 	var is_err = ($.isFunction(exp) && exp.prototype instanceof Error);
 	if ( is_err && res instanceof exp ) {
 		ok( res instanceof exp, test_name );
