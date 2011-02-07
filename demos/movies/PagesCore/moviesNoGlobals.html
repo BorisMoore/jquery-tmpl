@@ -8,6 +8,14 @@ It uses the NetFlix OData JSONP services as a source of data.
 This version of the movies sample demo uses the
 	$( templateSelector ).tmpl( data ).appendTo( targetSelector )
 pattern, and does not use the tmplCmd plugin or the rendered event.
+
+Notice that in the example there are no global variables:
+	Code is wrapped in  a function closure: (function($) {...})(jQuery);
+	The formatDate function within the closure is called from within the
+	template by passing it in with options: 
+		$( "#bookingEditTmpl" ).tmpl( booking, { formatDate: formatDate } ) 
+	and accessing it on the template item, $item: 
+		${$item.formatDate()}.
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -76,7 +84,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 <script id="bookingTitleTmpl" type="text/x-jquery-tmpl">
 	<tr class="bookingTitle${$item.mode}">
 		<td>${movie.Name}</td><td>${movieTheater}</td>
-		<td>${formatDate(date)}</td>
+		<td>${$item.formatDate()}</td>
 		<td>
 			${quantity}
 			<span class="ui-icon close"></span>
@@ -85,12 +93,12 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 </script>
 
 <script id="bookingEditTmpl" type="text/x-jquery-tmpl">
-	{{tmpl($data, {mode: "Edit"}) "#bookingTitleTmpl"}}
+	{{tmpl($data, { mode: "Edit", formatDate: $item.formatDate }) "#bookingTitleTmpl"}}
 	<tr class="bookingEdit">
 		<td colspan="4">
 			<div class="fields">
 				<span>Movie Theater: </span><input class="theater" type="text" value="${movieTheater}" /><br/>
-				<span>Date: </span><input class="date" type="text" value="${formatDate(date)}" /><br/>
+				<span>Date: </span><input class="date" type="text" value="${$item.formatDate()}" /><br/>
 				<span>Quantity: </span><input class="quantity" type="text" value="${quantity}" />
 			</div>
 			<div><img src="${movie.BoxArt.LargeUrl}" /></div>
@@ -99,6 +107,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 </script>
 
 <script type="text/javascript">
+(function($) {
 	var genre="Cartoons", pageIndex = 1, pageSize = 3, pageCount = 0,
 		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = {}, selectedBooking;
 
@@ -245,7 +254,7 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 			var bookingNode = $( "#bookingEditTmpl" )
 
 				// Render the booking for the chosen movie using the bookingEditTemplate
-				.tmpl( booking, { animate: true } ) 
+				.tmpl( booking, { animate: true, formatDate: formatDate } ) 
 
 				// Append the rendered booking to the bookings list
 				.appendTo( "#bookingsList" )
@@ -344,9 +353,10 @@ pattern, and does not use the tmplCmd plugin or the rendered event.
 		cartTmplItem.update();
 	}
 
-	function formatDate( date ) {
-		return date.toLocaleDateString();
+	function formatDate() {
+		return this.data.date.toLocaleDateString();
 	}
+})(jQuery);
 </script>
 
 </body>
