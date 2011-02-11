@@ -219,8 +219,8 @@
 			},
 			"each": {
 				_default: { $2: "$index, $value" },
-				open: "if($notnull_1){$.each($1a,function($2){with(this){",
-				close: "}});}"
+				open: "if($notnull_1){$.each($1a,function($2){var $dataSaved=$data;$data=this;",
+				close: "$data=$dataSaved;});}"
 			},
 			"if": {
 				open: "if(($notnull_1) && $1a){",
