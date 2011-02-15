@@ -194,7 +194,7 @@
 			return name ? (typeof name !== "string" ? jQuery.template( null, name ): 
 				(jQuery.template[name] || 
 					// If not in map, treat as a selector. (If integrated with core, use quickExpr.exec) 
-					jQuery.template( null, htmlExpr.test( name ) ? name : jQuery( name )))) : null; 
+					jQuery.template( null, jQuery( name )[0] ? jQuery( name ) : name))) : null; 
 		},
 
 		encode: function( text ) {
