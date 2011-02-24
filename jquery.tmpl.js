@@ -33,7 +33,7 @@
 		if ( fn ) {
 			// Build the hierarchical content to be used during insertion into DOM
 			newItem.tmpl = fn;
-			newItem._ctnt = newItem._ctnt || newItem.tmpl( jQuery, newItem );
+			newItem._ctnt = newItem._ctnt || jQuery.isFunction(newItem.tmpl) && newItem.tmpl( jQuery, newItem ) || fn;
 			newItem.key = ++itemKey;
 			// Keep track of new template item, until it is stored as jQuery Data on DOM element
 			(stack.length ? wrappedItems : newTmplItems)[itemKey] = newItem;
