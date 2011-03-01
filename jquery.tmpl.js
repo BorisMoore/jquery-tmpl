@@ -422,7 +422,7 @@
 				pntItem = tmplItem;
 				// Find the template item of the parent element. 
 				// (Using !=, not !==, since pntItem.key is number, and pntNode may be a string)
-				while ( pntItem && pntItem.key != pntNode ) { 
+				while ( pntItem && pntItem.nodes && pntItem.key != pntNode ) { 
 					// Add this element as a top-level node for this rendered template item, as well as for any
 					// ancestor items between this item and the item of its parent element
 					pntItem.nodes.push( el );
