@@ -193,7 +193,8 @@
 			// Return named compiled template
 			return name ? (typeof name !== "string" ? jQuery.template( null, name ): 
 				(jQuery.template[name] || 
-					// If not in map, treat as a selector. (If integrated with core, use quickExpr.exec) 
+					// If not in map, and not containing at least on HTML tag, treat as a selector. 
+					// (If integrated with core, use quickExpr.exec) 
 					jQuery.template( null, htmlExpr.test( name ) ? name : jQuery( name )))) : null; 
 		},
 

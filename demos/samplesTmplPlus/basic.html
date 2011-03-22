@@ -1,10 +1,18 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
-This sample illustrates some basic templating features and scenarios.
+This sample is equivalent to the samplesCore/basic.html sample, 
+except that it uses jquery.tmplPlus.js in order to take advantage 
+of the alternative API: 
+    $( targetContainer ).append( template, data, options );
+rather than 
+	$( template ).tmpl( data, options ).appendTo( targetContainer );
 -->
-<script src="http://code.jquery.com/jquery.js"></script>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body>
+<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../../jquery.tmpl.js" type="text/javascript" ></script>
 <script src="../../jquery.tmplPlus.js" type="text/javascript"></script>
-<script>
+<script type="text/javascript">
 
 var dataObject = {
 	firstName: "John",
@@ -93,3 +101,5 @@ jQuery(function(){
 
 <div id="target">Target</div>
 
+</body>
+</html>

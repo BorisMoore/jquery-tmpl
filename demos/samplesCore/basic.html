@@ -1,15 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
 This sample illustrates some basic templating features and scenarios.
 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
 <style type="text/css">
 	.clickable 	{
 		cursor:pointer;
 		color: Blue;
 	}
 </style>
-<script src="http://code.jquery.com/jquery.js"></script>
+</head>
+<body>
+<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../../jquery.tmpl.js" type="text/javascript"></script>
-<script>
+<script type="text/javascript">
 
 var dataObject = {
 	firstName: "John",
@@ -131,3 +136,6 @@ jQuery(function(){
 <ul><li class="multiple">first</li><li class="multiple">last</li></ul>
 
 <div class="target"></div>
+
+</body>
+</html>

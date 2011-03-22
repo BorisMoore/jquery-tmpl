@@ -3,11 +3,11 @@
 This sample illustrates using templates for a more complete and
 realistic scenario.
 
-It uses the NetFlix OData JSONP services as a source of data.
-
-This version of the movies sample demo uses the
-	$( targetSelector ).append( templateSelector, data )
-pattern, and also uses the tmplCmd plugin and the rendered event.
+It is similar to the movies/PagesCore/movies.html sample,
+except that it uses jquery.tmplPlus.js in order to take advantage
+of the
+$( targetSelector ).append( templateSelector, data )
+pattern, as well as the .tmplCmd() features and the rendered event.
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -38,7 +38,7 @@ pattern, and also uses the tmplCmd plugin and the rendered event.
 	</table>
 	<br/>
 </div>
-<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../../../jquery.tmpl.js" type="text/javascript"></script>
 <script src="../../../jquery.tmplPlus.js" type="text/javascript"></script>
 <script src="../components/jquery.pager.js" type="text/javascript"></script>

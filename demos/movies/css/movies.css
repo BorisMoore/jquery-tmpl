@@ -110,6 +110,7 @@
 	margin-bottom: 10px;
 	padding: 8px;
 	background-color: #fff;
+	height: 180px;
 }
 
 #movieList div div
@@ -118,6 +119,8 @@
 	float: left;
 	width: 120px;
 	height: 150px;
+	float: left;
+	clear: both;
 }
 
 #movieList div img
@@ -132,7 +135,10 @@
 
 .buyButton
 {
-	/* 	background: url(buyButton.png) no-repeat 0px -20px) */
+	float: left;
+	clear: both;
+	margin-left: 6px;
+	margin-top: 6px;
 }
 
 #bookingsList

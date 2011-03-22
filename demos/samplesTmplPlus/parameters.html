@@ -1,6 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
-This sample illustrates using the {{if}}, {{each}} and {{tmpl}} template tags, with parameters.
+This sample is equivalent to the samplesCore/parameters.html sample,
+except that it uses jquery.tmplPlus.js in order to take advantage
+of the alternative API: 
+    $( targetContainer ).append( template, data, options );
+rather than 
+	$( template ).tmpl( data, options ).appendTo( targetContainer );
 -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
 <style type="text/css">
 	.peopleTable td { border:2px solid #555; text-align:center; }
 	.person{ background-color:#AFA; }
@@ -9,11 +17,13 @@ This sample illustrates using the {{if}}, {{each}} and {{tmpl}} template tags, w
 	.cityseparator { background-color:#CCC; height:4px;}
 	.peopleTable { border-collapse:collapse; border:2px solid #555; }
 </style>
+</head>
+<body>
 
-<script src="http://code.jquery.com/jquery.js"></script>
+<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
 <script src="../../jquery.tmpl.js" type="text/javascript"></script>
 <script src="../../jquery.tmplPlus.js" type="text/javascript"></script>
-<script>
+<script type="text/javascript">
 $(function(){
 	$(".peopleTable")
 		.append("#tmplPeople", people, {allCities: allCities} );
@@ -96,3 +106,5 @@ var startIndex = 1, endIndex = 3;
 	<tr class="separator"><td colspan="3"></td></tr>
 </tbody></table>
 
+</body>
+</html>
