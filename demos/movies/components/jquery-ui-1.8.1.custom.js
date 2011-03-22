@@ -114,7 +114,7 @@ $.fn.extend({
 			})
 			: this._focus.apply(this, arguments);
 	},
-	
+
 	enableSelection: function() {
 		return this
 			.attr('unselectable', 'off')
@@ -146,7 +146,7 @@ $.fn.extend({
 		if (zIndex !== undefined) {
 			return this.css('zIndex', zIndex);
 		}
-		
+
 		if (this.length) {
 			var elem = $(this[0]), position, value;
 			while (elem.length && elem[0] !== document) {
@@ -322,7 +322,7 @@ $.extend(Datepicker.prototype, {
 		if (this.debug)
 			console.log.apply('', arguments);
 	},
-	
+
 	// TODO rename to "widget" when switching to widget factory
 	_widgetDatepicker: function() {
 		return this.dpDiv;
@@ -1703,7 +1703,7 @@ $.extend(Datepicker.prototype, {
 					drawMonth = 0;
 					drawYear++;
 				}
-				calender += '</tbody></table>' + (isMultiMonth ? '</div>' + 
+				calender += '</tbody></table>' + (isMultiMonth ? '</div>' +
 							((numMonths[0] > 0 && col == numMonths[1]-1) ? '<div class="ui-datepicker-row-break"></div>' : '') : '');
 				group += calender;
 			}

@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
-This sample is equivalent to the samplesCore/composition.html sample, 
-except that it uses jquery.tmplPlus.js in order to take advantage 
-of the alternative API: 
+This sample is equivalent to the samplesCore/composition.html sample,
+except that it uses jquery.tmplPlus.js in order to take advantage
+of the alternative API:
     $( targetContainer ).append( template, data, options );
-rather than 
+rather than
 	$( template ).tmpl( data, options ).appendTo( targetContainer );
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -54,7 +54,7 @@ var people = [
 function getName() {
 	return this.data.firstName + " " + this.data.lastName;
 }
-		 
+
 function alternate( item, array ) {
 	return ($.inArray( item, array ) % 2) ? "personAlt" : "person";
 }

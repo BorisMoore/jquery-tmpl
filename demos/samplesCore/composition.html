@@ -48,7 +48,7 @@ var people = [
 function getName() {
 	return this.data.firstName + " " + this.data.lastName;
 }
-		 
+
 function alternate( item, array ) {
 	return ($.inArray( item, array ) % 2) ? "personAlt" : "person";
 }
@@ -64,7 +64,7 @@ function getTemplate( key ) {
 $(function(){
 	// Create named template, to be used in composition below
 	$.template( "citySeparator", '<tr class="citySeparator"><td colspan="2"></td></tr>' );
-	
+
 	$( "#tmplPeople" )
 		.tmpl( people )
 		.appendTo( ".peopleTable" );

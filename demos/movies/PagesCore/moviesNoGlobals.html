@@ -12,9 +12,9 @@ pattern, and does not use the tmplPlus features (.tmplCmd, or the rendered event
 Notice that in the example there are no global variables:
 	Code is wrapped in  a function closure: (function($) {...})(jQuery);
 	The formatDate function within the closure is called from within the
-	template by passing it in with options: 
-		$( "#bookingEditTmpl" ).tmpl( booking, { formatDate: formatDate } ) 
-	and accessing it on the template item, $item: 
+	template by passing it in with options:
+		$( "#bookingEditTmpl" ).tmpl( booking, { formatDate: formatDate } )
+	and accessing it on the template item, $item:
 		${$item.formatDate()}.
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -152,7 +152,7 @@ Notice that in the example there are no global variables:
 			case "2":
 				compare = compareDate;
 				break;
-		} 
+		}
 
 		for ( var item in cart.bookings ) {
 			data.push( cart.bookings[item] );
@@ -162,7 +162,7 @@ Notice that in the example there are no global variables:
 		for ( var i = 0, l = data.length; i < l; i++ ) {
 			$( bookingTmplItems[data[i].movie.Id].nodes ).appendTo( "#bookingsList" );
 		}
-	
+
 		function compareName( a, b ) {
 			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
 		}
@@ -201,7 +201,7 @@ Notice that in the example there are no global variables:
 
 		$( "#movieTmpl" )
 			// Render movies using the movieTemplate
-			.tmpl( movies ) 
+			.tmpl( movies )
 
 			// Display rendered movies in the movieList container
 			.appendTo( "#movieList" )
@@ -237,7 +237,7 @@ Notice that in the example there are no global variables:
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
-			var oldSelected = selectedBooking; 
+			var oldSelected = selectedBooking;
 			$( "div", bookingTmplItems[oldSelected.movie.Id].nodes ).animate( { height: 0 }, 500, function() {
 				switchView( oldSelected );
 			});
@@ -254,7 +254,7 @@ Notice that in the example there are no global variables:
 			var bookingNode = $( "#bookingEditTmpl" )
 
 				// Render the booking for the chosen movie using the bookingEditTemplate
-				.tmpl( booking, { animate: true, formatDate: formatDate } ) 
+				.tmpl( booking, { animate: true, formatDate: formatDate } )
 
 				// Append the rendered booking to the bookings list
 				.appendTo( "#bookingsList" )
@@ -267,7 +267,7 @@ Notice that in the example there are no global variables:
 			bookingTmplItems[booking.movie.Id] = newItem;
 
 			// Attach handlers etc. on the rendered template.
-			bookingEditRendered( newItem ); 
+			bookingEditRendered( newItem );
 		}
 	}
 
@@ -302,7 +302,7 @@ Notice that in the example there are no global variables:
 	}
 
 	function bookingRendered( item ) {
-		$( item.nodes ).click( function() { 
+		$( item.nodes ).click( function() {
 			selectBooking( item.data );
 		});
 		$( ".close", item.nodes ).click( removeBooking );
@@ -338,7 +338,7 @@ Notice that in the example there are no global variables:
 		cartTmplItem.update();
 		$( bookingTmplItems[booking.movie.Id].nodes ).remove();
 		delete bookingTmplItems[booking.movie.Id];
-		return false; 
+		return false;
 	}
 
 	function removeBookings() {

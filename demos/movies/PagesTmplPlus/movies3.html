@@ -57,7 +57,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 <script id="cartTmpl" type="text/x-jquery-tmpl">
 	<td class="cart-${!!count}" colspan="4">
 		<span class="text">${count} items in Cart...</span>
-		{{if count}} 
+		{{if count}}
 			<span id="submit">Checkout</span>
 			<span id="cancel">Remove All</span>
 			{{if count>1}}
@@ -102,7 +102,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex = 1, pageSize = 3, pageCount = 0,
 		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = [], selectedBooking;
-		
+
 	getMovies( pageIndex );
 
 	$( "#genres li" ).click( selectGenre );
@@ -141,7 +141,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 			case "2":
 				compare = compareDate;
 				break;
-		} 
+		}
 
 		for ( var item in cart.bookings ) {
 			data.push( cart.bookings[item] );
@@ -149,7 +149,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 		data = data.sort( compare );
 
 		bookingTmplItems = $.tmplCmd( "replace", data, bookingTmplItems );
-	
+
 		function compareName( a, b ) {
 			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
 		}
@@ -157,7 +157,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 			return a.date - b.date;
 		}
 	}
-		
+
 	function getMovies( index ) {
 		var query = "http://odata.netflix.com/Catalog/Genres('" + genre + "')/Titles" +
 			"?$format=json" +
@@ -183,7 +183,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 			movies = data.d.results;
 
 		$( "#pager" ).pager({ pagenumber: pageIndex, pagecount: pageCount, buttonClickCallback: getMovies });
-		
+
 		$( "#movieList" )
 			.empty()
 
@@ -213,7 +213,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
-			var oldSelected = selectedBooking; 
+			var oldSelected = selectedBooking;
 			$( "div", bookingItem( oldSelected ).nodes ).animate( { height: 0 }, 500, function() {
 				switchView( oldSelected );
 			});
@@ -229,7 +229,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 
 			// Render the booking for the chosen movie using the bookingEditTemplate, and append the rendered booking to the bookings list
 			$( "#bookingsList" ).append( "#bookingEditTmpl", booking, {
-				animate: true, 
+				animate: true,
 				rendered: onBookingEditRendered,
 				addedTmplItems: bookingTmplItems
 			});
@@ -265,7 +265,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 
 	function onBookingEditRendered( item ) {
 		var data = item.data, nodes = item.nodes;
-		
+
 		$( nodes[0] ).click( function() {
 			selectBooking();
 		});
@@ -308,7 +308,7 @@ pattern, as well as the .tmplCmd() features and the rendered event.
 		cart.count--;
 		cartTmplItem.update();
 		$.tmplCmd( "remove", booking, bookingTmplItems );
-		return false; 
+		return false;
 	}
 
 	function removeBookings() {

@@ -1,4 +1,4 @@
-# jQuery Templates plugin v1.0.0pre. 
+# jQuery Templates plugin v1.0.0pre.
 
 _Note: This plugin is currently in beta form and may change significantly before version 1.0 is released. See tagged versions for stable Beta releases. Requires jquery version 1.4.2._
 

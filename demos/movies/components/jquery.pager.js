@@ -9,7 +9,7 @@
 * Dual licensed under the MIT and GPL licenses:
 * http://www.opensource.org/licenses/mit-license.php
 * http://www.gnu.org/licenses/gpl.html
-* 
+*
 * Read the related blog post and contact the author at http://www.j-dee.com/2008/12/22/jquery-pager-plugin/
 *
 * This version is far from perfect and doesn't manage it's own state, therefore contributions are more than welcome!
@@ -20,7 +20,7 @@
 *       pagecount is the total number of pages to display
 *       buttonClickCallback is the method to fire when a pager button is clicked.
 *
-* buttonClickCallback signiture is PagerClickTest = function(pageclickednumber) 
+* buttonClickCallback signiture is PagerClickTest = function(pageclickednumber)
 * Where pageclickednumber is the number of the page clicked in the control.
 *
 * The included Pager.CSS file is a dependancy but can obviously tweaked to your wishes
@@ -36,7 +36,7 @@
 
         // empty out the destination element and then render out the pager with the supplied options
             $(this).empty().append(renderpager(parseInt(options.pagenumber), parseInt(options.pagecount), options.buttonClickCallback));
-            
+
             // specify correct cursor activity
             $('.pages li').mouseover(function() { document.body.style.cursor = "pointer"; }).mouseout(function() { document.body.style.cursor = "auto"; });
         });

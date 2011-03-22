@@ -100,7 +100,7 @@ of the .tmplCmd() features and the rendered event.
 <script type="text/javascript">
 	var genre="Cartoons", pageIndex = 1, pageSize = 3, pageCount = 0,
 		cart = { bookings: {}, count: 0, sortBy:0 }, bookingTmplItems = [], selectedBooking;
-		
+
 	getMovies( pageIndex );
 
 	$( "#genres li" ).click( selectGenre );
@@ -141,7 +141,7 @@ of the .tmplCmd() features and the rendered event.
 			case "2":
 				compare = compareDate;
 				break;
-		} 
+		}
 
 		for ( var item in cart.bookings ) {
 			data.push( cart.bookings[item] );
@@ -149,7 +149,7 @@ of the .tmplCmd() features and the rendered event.
 		data = data.sort( compare );
 
 		bookingTmplItems = $.tmplCmd( "replace", data, bookingTmplItems );
-	
+
 		function compareName( a, b ) {
 			return a == b ? 0 : (((a.movie.Name > b.movie.Name) !== reverse) ? 1 : -1);
 		}
@@ -157,7 +157,7 @@ of the .tmplCmd() features and the rendered event.
 			return a.date - b.date;
 		}
 	}
-		
+
 	function getMovies( index ) {
 		var query = "http://odata.netflix.com/Catalog/Genres('" + genre + "')/Titles" +
 			"?$format=json" +
@@ -177,7 +177,7 @@ of the .tmplCmd() features and the rendered event.
 				});
 			});
 	}
-	
+
 	function showMovies( data ) {
 		pageCount = Math.ceil( data.d.__count/pageSize ),
 			movies = data.d.results;
@@ -217,7 +217,7 @@ of the .tmplCmd() features and the rendered event.
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
-			var oldSelected = selectedBooking; 
+			var oldSelected = selectedBooking;
 			$( "div", bookingItem( oldSelected ).nodes ).animate( { height: 0 }, 500, function() {
 				switchView( oldSelected );
 			});
@@ -234,8 +234,8 @@ of the .tmplCmd() features and the rendered event.
 			$( "#bookingEditTmpl" )
 
 				// Render the booking for the chosen movie using the bookingEditTemplate
-				.tmpl( booking, { 
-					animate: true, 
+				.tmpl( booking, {
+					animate: true,
 					rendered: onBookingEditRendered,
 					addedTmplItems: bookingTmplItems
 				})
@@ -280,7 +280,7 @@ of the .tmplCmd() features and the rendered event.
 		});
 
 		$( ".close", nodes ).click( removeBooking );
-		
+
 		$( ".date", nodes ).change( function() {
 			data.date = $(this).datepicker( "getDate" );
 			updateBooking( item );
@@ -317,7 +317,7 @@ of the .tmplCmd() features and the rendered event.
 		cart.count--;
 		cartTmplItem.update();
 		$.tmplCmd( "remove", booking, bookingTmplItems );
-		return false; 
+		return false;
 	}
 
 	function removeBookings() {

@@ -22,12 +22,12 @@ var movies = [
 ];
 </script>
 
-<script id="movieTemplate" type="text/x-jquery-tmpl"> 
+<script id="movieTemplate" type="text/x-jquery-tmpl">
 <li>
 	Title: ${Name}.
 	{{if Languages}}
 		(Alternative languages: ${Languages}).
-	{{else Subtitles}} 
+	{{else Subtitles}}
 		(Original language only. Subtitles in ${Subtitles}).
 	{{else}}
 		(Original version only, without subtitles).

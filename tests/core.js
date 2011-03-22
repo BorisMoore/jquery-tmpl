@@ -50,7 +50,7 @@ module("Basics");
 		test_handler( 'multi word variable tag', R("${ a b c }}"), SyntaxError );
 		test_handler( "_ (underscore) cannot by used by data", R('${ _ }', {'_':'foo'}), TypeError );
 		test_handler( "$ cannot be used by data", R('${ $ }', {'$':'foo'}), TypeError );
-	
+
 	});
 
 	// test errors are passed back correctly
@@ -60,7 +60,7 @@ module("Basics");
 		test_handler( 'type', R("{{type_error }}", testData), TypeError );
 	});
 
-	// newlines should work because: ${ foo + "\n" } and they have whitespace management benefits 
+	// newlines should work because: ${ foo + "\n" } and they have whitespace management benefits
 	test("Newlines / Escaping", function(){
 		test_handler( "newlines do not kill tags", R('${\n \none\n }', testData), 'first');
 		// TODO fixme
@@ -75,7 +75,7 @@ module("Basics");
 		// TODO fixme
 		//test_handler( 'default', R("{{}}", testData), '{{}}' );
 		//test_handler( 'with whitespace', R("{{ }}"), '{{ }}' );
-		//test_handler( 'with tabs whitespace', R("{{\t\t}}"), '{{\t\t}}' );	
+		//test_handler( 'with tabs whitespace', R("{{\t\t}}"), '{{\t\t}}' );
 	});
 
 	test("Incorrect Nesting", function() {
@@ -90,7 +90,7 @@ module("Basics");
 		test_handler( '{{one }', R('{{one }', testData), '{{one }' );
 	});
 
-	// reserved words 
+	// reserved words
 	test("Reserved Words", function(){
 		// TODO fixme
 		//test_handler( "Disallow new operator", R('${ new Object() }',{}), SyntaxError );
@@ -115,12 +115,12 @@ module("Basics");
 		$elm.template('nametmpl2');
 		test_handler( "using a named template created from a node", $.tmpl('nametmpl2', testData).text(), 'name: test' );
 	});
-	
+
 	test("Bracketed Accessors", function(){
 		test_handler( "foo[\"bar\"]", R('${ foo["bar"] }',{foo:{bar:'baz'}}), 'baz' );
 		test_handler( "foo['bar']", R("${ foo['bar'] }",{foo:{bar:'baz'}}), 'baz' );
 	});
-	
+
 	test("Escaping", function(){
 		// TODO fixme
 		//test_handler( 'echoing escapes html', R("${ 'foo<div>bar</div>baz' }"), 'foo&lt;div&gt;bar&lt;/div&gt;baz' );
@@ -147,7 +147,7 @@ module("Basics");
 		test_handler( "comments may contain invalid content (stray else)", R('1{{! {{else}} }}2', testData), '12' );
 		test_handler( "comments may contain invalid content (invalid javascript)", R('1{{! {{if ...}} }}2', testData), '12' );
 
-	});	
+	});
 
 	test("Variables", function() {
 
@@ -255,7 +255,7 @@ module("Basics");
 		test_handler( "Logical AND", R('${ zero && "TRUEY" }',{ zero: 1 }), "TRUEY" );
 		test_handler( "Conditional Operator", R('${ zero ? "zero" : "other" }',{ zero: 1 }), "zero" );
 		test_handler( "Unary logical NOT", R('${ !zero }',{ zero: 1 }), "false" );
-		
+
 		test_handler( "Single-Quoted Strings", R("${ 'test' }",{}), "test" );
 		test_handler( "Single-Quoted Comparison", R("${ 'test' == testvar }",{ testvar: 'test' }), "true" );
 	});
@@ -289,12 +289,12 @@ module("Commands");
 		$.tmpl.tag.trans = { open: "_.push($.getText($1));" };
 		test_handler( "creating new command works", R('{{trans "translate" }}'), 'TRANSLATE' );
 		$.tmpl.tag._ = $.tmpl.tag.trans;
-		test_handler( "_ can by assigned a command", R('{{_ "translate" }}', {}), 'TRANSLATE' );	
+		test_handler( "_ can by assigned a command", R('{{_ "translate" }}', {}), 'TRANSLATE' );
 		delete $.getText;
 		delete $.tmpl.tag.trans;
 		delete $.tmpl.tag._;
 	});
-	
+
 	test("Each {{ each }}", function() {
 
 		test_handler( "loop", R('{{each arr}}${ $index }:${ this }/{{/each}}', testData), '0:AA/1:BB/2:CC/' );
@@ -337,7 +337,7 @@ module("Commands");
 		test_handler( 'errors are passed back correctly (type)', R("{{if true}}{{type_error}}{{/if}}", testData), TypeError );
 
 	});
-	
+
 	test("{{tmpl() template}}", function() {
 
 		jQuery.template('test', '${ "test text" }');
@@ -352,18 +352,18 @@ module("Commands");
 		jQuery.template('nested0', '${ foo }');
 
 		test_handler( "nested - 1 level", R('{{tmpl "nested"}}', nestedData), 'bar' );
-		
+
 		jQuery.template('nested0', '{{tmpl "nested1"}}');
 		jQuery.template('nested1', '{{tmpl "nested2"}}');
 		jQuery.template('nested2', '${ foo }');
-		
+
 		test_handler( "nested - 2 levels", R('{{tmpl "nested" }}', nestedData), 'bar' );
-		
+
 		nestedData = {foo: {bar: {sweet: 1} } };
 		jQuery.template('nested2', '${ foo.bar.sweet }');
-		
+
 		test_handler( "nested - 2 levels - complex data", R('{{tmpl "nested" }}', nestedData), '1' );
-		
+
 		// TODO fixme
 		jQuery.template('test', '${ $index }');
 		//test_handler( "{{each}} index variable", R('{{each arr}}{{tmpl "test" }}{{/each}}', testData), '012' );
@@ -374,7 +374,7 @@ module("Commands");
 		jQuery.template('test', '${ item }');
 		//test_handler( "{{each}} item variable", R('{{each(n, item) arr}}{{tmpl "test" }}{{/each}}', testData), 'AABBCC' );
 	});
-		
+
 	test("Html Output Unecoded {{html }}", function(){
 		// TODO fixme
 		//test_handler("encoded", R('{{= html}}', testData), '&lt;a&gt;');
@@ -386,11 +386,10 @@ module("Script Tag Caching");
 	test("Template Reuse", function(){
 		var template = $('#reuse'),
 			data = {data: 'pass1'};
-			
+
 		var pass1 = template.tmpl(data).html();
 		data = {data: 'pass2'};
 		var pass2 = template.tmpl(data).html();
 
 		ok( "simple reuse test", pass1 == 'pass1' && pass2 == 'pass2' );
 	});
-	

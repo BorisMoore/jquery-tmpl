@@ -26,9 +26,9 @@ var dataObject = {
 	]
 };
 
-var arrayOfDataObjects = [ 
+var arrayOfDataObjects = [
 	dataObject
-	, 
+	,
 	{
 		firstName: "Dave",
 		lastName: "Reed",
@@ -74,7 +74,7 @@ jQuery(function(){
 	// Store a string as a compiled template for later use
 	$.template( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $item.showCities}}(${cityJoin()}){{/if}}</li>' );
 
-	// Render stored template and insert after target. 
+	// Render stored template and insert after target.
 	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
 	$.tmpl( "myTmpl", dataObject )
 		.insertAfter( ".multiple" );
@@ -104,7 +104,7 @@ jQuery(function(){
 		.find( "span" )
 		.addClass( "clickable" )
 		.click( function() {
-			var item = $.tmplItem(this); 
+			var item = $.tmplItem(this);
 			alert( item.data.firstName + " at " + item.data.url );
 		});
 

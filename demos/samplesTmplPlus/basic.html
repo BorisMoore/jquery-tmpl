@@ -1,10 +1,10 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!--
-This sample is equivalent to the samplesCore/basic.html sample, 
-except that it uses jquery.tmplPlus.js in order to take advantage 
-of the alternative API: 
+This sample is equivalent to the samplesCore/basic.html sample,
+except that it uses jquery.tmplPlus.js in order to take advantage
+of the alternative API:
     $( targetContainer ).append( template, data, options );
-rather than 
+rather than
 	$( template ).tmpl( data, options ).appendTo( targetContainer );
 -->
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -24,9 +24,9 @@ var dataObject = {
 	]
 };
 
-var arrayOfDataObjects = [ 
+var arrayOfDataObjects = [
 	dataObject
-	, 
+	,
 	{
 		firstName: "Dave",
 		lastName: "Reed",
@@ -64,14 +64,14 @@ function index( array ) {
 jQuery(function(){
 	// A template string
 	var tmpl = '<li><a href="${url}">${getName()}</a> {{if $item.showCities}}(${cityJoin()}){{/if}}</li>';
-		
+
 	// Renders one LI, filled with data, then appends it into the UL
 	$("ul").append( tmpl, dataObject, null );
 
 	// Store a string as a compiled template for later use
 	$.template( "myTmpl", '<li>My template: <a href="${url}">${getName()}</a> {{if $item.showCities}}(${cityJoin()}){{/if}}</li>' );
-	
-	// Render stored template and insert after target. 
+
+	// Render stored template and insert after target.
 	// Target wrapped set has more than one element, so rendered template cloned into two places in DOM
 	$(".multiple").after( "myTmpl", dataObject );
 

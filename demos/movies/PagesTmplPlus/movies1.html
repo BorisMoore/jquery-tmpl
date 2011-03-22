@@ -142,7 +142,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 			case "2":
 				compare = compareDate;
 				break;
-		} 
+		}
 
 		for ( var item in cart.bookings ) {
 			data.push( cart.bookings[item] );
@@ -158,7 +158,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 			return a.date - b.date;
 		}
 	}
-		
+
 	function getMovies( index ) {
 		var query = "http://odata.netflix.com/Catalog/Genres('" + genre + "')/Titles" +
 			"?$format=json" +
@@ -182,7 +182,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 	function showMovies( data ) {
 		pageCount = Math.ceil( data.d.__count/pageSize ),
 			movies = data.d.results;
-		
+
 		$( "#pager" ).pager({ pagenumber: pageIndex, pagecount: pageCount, buttonClickCallback: getMovies });
 
 		// show movies in template
@@ -190,7 +190,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 
 		$( "#movieTmpl" )
 			// Render movies using the movieTemplate
-			.tmpl( movies ) 
+			.tmpl( movies )
 
 			// Display rendered movies in the movieList container
 			.appendTo( "#movieList" )
@@ -226,7 +226,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 				return;
 			}
 			// Collapse previously selected booking, and switch to non-edit view
-			var oldSelected = selectedBooking; 
+			var oldSelected = selectedBooking;
 			$( "div", bookingItem( oldSelected ).nodes ).animate( { height: 0 }, 500, function() {
 				switchView( oldSelected );
 			});
@@ -239,11 +239,11 @@ of the .tmplCmd() features. It does not use the rendered event.
 			switchView( booking, true );
 		} else {
 			cart.bookings[booking.movie.Id] = booking;
-		
+
 			var bookingNode = $( "#bookingEditTmpl" )
-		
+
 				// Render the booking for the chosen movie using the bookingEditTemplate
-				.tmpl( booking, { animate: true } ) 
+				.tmpl( booking, { animate: true } )
 
 				// Append the rendered booking to the bookings list
 				.appendTo( "#bookingsList" )
@@ -289,7 +289,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 			$( "div", nodes ).css( "height", 0 ).animate( { height: 116 }, 500 );
 		}
 	}
-	
+
 	function bookingRendered( item ) {
 		$( item.nodes ).click( function() {
 			selectBooking( item.data );
@@ -304,7 +304,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 		var item = bookingItem( booking ),
 			tmpl = $( edit ? "#bookingEditTmpl" : "#bookingTitleTmpl" ).template();
 		if ( item.tmpl !== tmpl) {
-			item.tmpl = tmpl; 
+			item.tmpl = tmpl;
 			item.update();
 			(edit ? bookingEditRendered : bookingRendered)( item );
 		}
@@ -326,7 +326,7 @@ of the .tmplCmd() features. It does not use the rendered event.
 		cart.count--;
 		cartTmplItem.update();
 		$.tmplCmd( "remove", booking, bookingTmplItems );
-		return false; 
+		return false;
 	}
 
 	function removeBookings() {

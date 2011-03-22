@@ -35,7 +35,7 @@ A tree view control using recursive templates
 </script>
 
 <script type="text/javascript">
-	
+
 	// ******************** Data for folders hierarchy, and samples ********************
 
 	var folders = {
@@ -56,17 +56,17 @@ A tree view control using recursive templates
 	};
 
 	var samples = [
-		{ name: "Template in script block", 
-			folders: [ ".tmpl" ], 
+		{ name: "Template in script block",
+			folders: [ ".tmpl" ],
 			description: "Rendering a template declared in script block" },
-		{ name: "Template as string", 
-			folders: [ ".tmpl" ], 
+		{ name: "Template as string",
+			folders: [ ".tmpl" ],
 			description:"Rendering a template passed as a string" },
-		{ name: "Render remote data", 
-			folders: [ "API" ], 
+		{ name: "Render remote data",
+			folders: [ "API" ],
 			description: "Rendering remote data using templates" },
-		{ name: "Tree View", 
-			folders: [ "tmpl", ".tmpl" ], 
+		{ name: "Tree View",
+			folders: [ "tmpl", ".tmpl" ],
 			description: "A tree view using recursive nested templates" }
 	];
 
@@ -74,7 +74,7 @@ A tree view control using recursive templates
 
 	$( "#samplesList" ).empty();
 	$( "#folderTmpl" ).tmpl( folders ).appendTo( "#samplesList" );
-	
+
 	// ******************** Events ********************
 
 	$( "#samplesList" )
@@ -95,16 +95,16 @@ A tree view control using recursive templates
 		});
 
 	// ******************** Helper functions ********************
-	
+
 	function getSamples( folderTmplItem ) {
 		return $.map( samples, function( sample ) {
 			return $.inArray( folderTmplItem.data.name, sample.folders ) > -1 ? sample : null;
 		});
-	} 
+	}
 
 	function getFolders( folderTmplItem ) {
 		return folderTmplItem.data.folders || [];
-	} 
+	}
 
 	function expanderImage() {
 		if ( hasContent( this ) ) {
