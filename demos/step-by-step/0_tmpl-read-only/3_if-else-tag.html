@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/movielist.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="3_if-else-tag-source.html">Source</a>
+
+<h3>Demo: Using {{if}} and {{else}} to render conditional sections.</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl">
+	<tr>
+		<td>${Title}</td>
+		<td>
+			{{if Languages}}
+				Alternative languages: <em>${Languages}</em>.
+			{{else Subtitles}}
+				Original language only... <br/>Subtitles in <em>${Subtitles}</em>.
+			{{else}}
+				Original version only, without subtitles.
+			{{/if}}
+		</td>
+	</tr>
+</li>
+</script>
+
+<table><tbody class="header"><tr><th>Synopsis</th><th>Title</th></tr></tbody>
+	<tbody id="movieList"></tbody>
+</table>
+
+<script type="text/javascript">
+
+	var movies = [
+		{
+			Title: "Meet Joe Black",
+			Languages: "English and French",
+			Subtitles: "English"
+		},
+		{
+			Title: "Eyes Wide Shut",
+			Subtitles: "French and Spanish"
+		},
+		{
+			Title: "The Mighty"
+		},
+		{
+			Title: "City Hunter",
+			Languages: "Mandarin and Chinese"
+		}
+	];
+
+	$( "#movieTemplate" ).tmpl( movies )
+		.appendTo( "#movieList" );
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+</body>
+</html>

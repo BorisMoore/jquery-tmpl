@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/syntaxhighlighter.css" rel="stylesheet" type="text/css" />
+	<script src="../../resources/syntaxhighlighter.min.js" type="text/javascript"></script>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="1_remote-data.html">Run</a>
+
+<h3>Demo: Render template against remote data</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl"><li>
+	<b>${Name}</b> (${ReleaseYear})
+</li></script>
+
+<button id="cartoonsBtn">Cartoons</button>
+<button id="dramaBtn">Drama</button><br /><br />
+
+<div class="height">
+<div class="plusViewer edit">
+	<ul id="movieList"></ul>
+</div>
+</div>
+
+<script type="text/javascript">
+
+function getMovies( genre, skip, top ) {
+	$.ajax({
+
+		dataType: "jsonp",
+
+		url: "http://odata.netflix.com/Catalog/Genres('" + genre
+			+ "')/Titles?$format=json&$skip="
+			+ skip + "&$top=" + top,
+
+		jsonp: "$callback",
+
+		success: function( data ) {
+			var movies = data.d;				 // Get movies array from the data
+
+			$( "#movieList" ).empty();			 // Remove current set of movie template items
+
+			$( "#movieTemplate" ).tmpl( movies ) // Render template with movies data
+				.appendTo( "#movieList" );		 // and insert rendered HTML under "movieList" element
+		}
+	});
+}
+
+$( "#cartoonsBtn" ).click( function() {
+	getMovies( "Cartoons", 0, 6 );
+});
+
+$( "#dramaBtn" ).click( function() {
+	getMovies( "Drama", 0, 6 );
+});
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+<h4>HTML:</h4>
+
+<pre class="brush: xml;">&lt;script id="movieTemplate" type="text/x-jquery-tmpl">
+	&lt;li>
+		&lt;b>${Name}&lt;/b> (${ReleaseYear})
+	&lt;/li>
+&lt;/script>
+
+&lt;ul id="movieList">&lt;/ul></pre>
+
+<h4>Script:</h4>
+<pre class="brush: js;">$.ajax({
+
+	dataType: "jsonp",
+
+	url: "http://odata.netflix.com/Catalog/Genres('" + genre
+		+ "')/Titles?$format=json&$skip="
+		+ skip + "&$top=" + top,
+
+	jsonp: "$callback",
+
+	success: function( data ) {
+			var movies = data.d;				 // Get the movies array from the data
+
+			$( "#movieList" ).empty();			 // Remove current set of movie template items
+
+			$( "#movieTemplate" ).tmpl( movies ) // Render the template with the movies data
+				.appendTo( "#movieList" );		 // and insert the rendered HTML under the "movieList" element
+	}
+});
+</pre>
+</body>
+</html>
+

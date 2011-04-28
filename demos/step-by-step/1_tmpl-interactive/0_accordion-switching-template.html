@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<style type="text/css">
+		table { cursor:pointer; border-collapse:collapse; border:2px solid blue; width:300px; margin:8px; }
+		table tr { border:1px solid blue; color:blue; background-color:#f8f8f8; } table td { padding:3px; } table tr:hover { color:red; }
+		.movieDetail { background-color:yellow; } .movieDetail.row1 { border-bottom:none; } .movieDetail.row2 { border-top:none; }
+	</style>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="0_accordion-switching-template-source.html">Source</a>
+
+<h3>Accordion: Using dynamic switching of templates</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="summaryTemplate" type="text/x-jquery-tmpl">
+	<tr class='movieSummary'><td>
+		${Title}
+	</td></tr>
+</script>
+
+<script id="detailTemplate" type="text/x-jquery-tmpl">
+	<tr class='movieDetail row1'><td>
+		${Title}
+	</td></tr>
+	<tr class='movieDetail row2'><td><b>Languages:</b>
+		{{tmpl(Languages) "#languageTemplate"}}
+	</td></tr>
+</script>
+
+<script id="languageTemplate" type="text/x-jquery-tmpl">
+	<div>
+		<em>${Name}</em>
+	</div>
+</script>
+
+Click for details:
+<div class="height">
+	<table><tbody id="movieList"></tbody></table>
+</div>
+
+<script type="text/javascript">
+
+	var selectedItem = null,
+
+		movies = [
+			{
+				Title: "The Red Violin",
+				Languages: [
+					{ Name: "English" },
+					{ Name: "French" }
+				]
+			},
+			{
+				Title: "Eyes Wide Shut",
+				Languages: [
+					{ Name: "French" },
+					{ Name: "German" },
+					{ Name: "Spanish" }
+				]
+			},
+			{
+				Title: "The Inheritance",
+				ReleaseYear: "1976",
+				Languages: [
+					{ Name: "English" },
+					{ Name: "Dutch" }
+				]
+			}
+		],
+
+		detailTemplate = $( "#detailTemplate" ).template(),
+
+		summaryTemplate = $( "#summaryTemplate" ).template();
+
+	function unselect( tmplItem ) {
+		/* Set the template of the selected item
+		   back to the summary template */
+		if ( selectedItem ) {
+			selectedItem.tmpl = summaryTemplate;
+			selectedItem.update();
+			selectedItem = null;
+		}
+	}
+
+	/* Render the summaryTemplate with the "movies" data */
+	$( "#summaryTemplate" )
+		.tmpl( movies )
+		.appendTo( "#movieList" );
+
+	/* Add onclick handlers for movie template items
+	   using the summary or details template */
+	$("#movieList")
+		.delegate( ".movieSummary", "click", function () {
+			/* Unselect the currently selected item */
+			unselect( selectedItem );
+
+			/* Get the template item data structure
+			   which this clicked element belongs to,
+			   and make it the selected item */
+			selectedItem = $.tmplItem(this);
+
+			/* Set the template on this item to the detail template */
+			selectedItem.tmpl = detailTemplate;
+			selectedItem.update();
+		})
+		.delegate( ".movieDetail", "click", function () {
+			/* Unselect the currently selected item */
+			unselect();
+		});
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+</body>
+</html>

@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="0_local-data-source.html">Source</a>
+
+<h3>Demo: Render template against local data</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl">
+	<li>
+		<b>${Name}</b> (${ReleaseYear})
+	</li>
+</script>
+
+<ul id="movieList"></ul>
+
+<script type="text/javascript">
+
+	var movies = [
+		{ Name: "The Red Violin", ReleaseYear: "1998" },
+		{ Name: "Eyes Wide Shut", ReleaseYear: "1999" },
+		{ Name: "The Inheritance", ReleaseYear: "1976" }
+	];
+
+	$( "#movieTemplate" ).tmpl( movies )
+		.appendTo( "#movieList" );
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+</body>
+</html>

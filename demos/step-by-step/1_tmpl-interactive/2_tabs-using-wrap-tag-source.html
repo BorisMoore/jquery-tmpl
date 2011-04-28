@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/syntaxhighlighter.css" rel="stylesheet" type="text/css" />
+	<script src="../../resources/syntaxhighlighter.min.js" type="text/javascript"></script>
+	<style type="text/css">
+		.body { height: 175px; background-color: #fff; }
+		.body div { height: 60px; padding: 12px; font-weight: bold; color: #222; }
+		.body div span { margin: 7px 0 10px 0; font-style:italic; font-weight: normal; padding: 3px;}
+		.body div img { float: left; margin-right: 30px; }
+		.body h3 { text-align: center; }
+		.tabsView td { border: solid 1px #0000A6; border-top: none; border-right: solid 2px #1E1ED2; }
+		.tabsView th { cursor: pointer; padding: 2px; font-weight: normal; font-style: italic; color: #888; border: solid 1px #bbb; border-right: none; background-color: #f8f8f8; border-bottom: solid 1px #1E1ED2; }
+		#tabsView > .tabsView { width: 465px; }
+		.tabsView { width: 450px; border-collapse: collapse; border: none; margin: 5px; }
+		.tabsView tr { border-right: solid 1px #bbb; }
+		th.header_true { font-weight: bold; border: solid 1px #0000A6; border-right: solid 2px #1E1ED2; border-bottom: solid 1px #eee; color: #0000A6; background-color: #fff; }
+	</style>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="2_tabs-using-wrap-tag.html">Run</a>
+
+<h3>Tab View: Using {{wrap}} for template composition incorporating wrapped HTML</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl">
+	<h2>${Title}</h2>
+
+	{{wrap "#tabsTemplate"}}
+		<h3>Details</h3>
+		<div>
+
+			Title: <span>${Title}</span><br/>
+			<h4>Languages:</h4>
+			{{each Languages}}<span>${$value.Name}</span><br/>{{/each}}
+
+		</div>
+
+		<h3>Description</h3>
+		<div>
+
+			<img src='http://cdn-4.nflximg.com/US/boxshots/large/5670434.jpg'/><br/><br/>
+			Director Stanley Kubrick's<br/> final film.
+
+		</div>
+
+		<h3>Comments</h3>
+		<div>
+
+			<ul>
+				<li>Great film...</li>
+				<li>The best</li>
+				<li>So boring, I couldn't keep my eyes open</li>
+			</ul>
+
+		</div>
+	{{/wrap}}
+</script>
+
+<script id="tabsTemplate" type="text/x-jquery-tmpl">
+	<table class="tabsView"><tbody>
+		<tr>
+			{{each $item.html("h3", true)}}
+				<th class="header_${$index === selectedTab}">
+					${$value}
+				</th>
+			{{/each}}
+		</tr>
+		<tr><td colspan='${$item.html("h3").length}'>
+			<div class="body">
+				{{html $item.html("div")[selectedTab]}}
+			</div>
+		</td></tr>
+	</tbody></table>
+</script>
+
+<br />
+<div id="tabsView">..loading</div>
+
+<script type="text/javascript">
+
+	/* Track the selected tab index for inner and outer tab views */
+	var movie = {
+			Title: "Meet Joe Black",
+			Languages: [
+				{ Name: "English" },
+				{ Name: "French" }
+			],
+			selectedTab: 0
+		};
+
+
+	function refresh() {
+		$( "#tabsView" ).empty();
+
+		$( "#movieTemplate" ).tmpl( movie )
+			.appendTo( "#tabsView" );
+	}
+
+	/* Render tabs view */
+	refresh();
+
+	$( "#tabsView" )
+		.delegate( ".tabsView th", "click", function() {
+			/* Set the selected tab index to this tab */
+			$.tmplItem( this ).data.selectedTab = $(this).index();
+
+			/* update the rendering */
+			refresh();
+		});
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+<h4>HTML:</h4>
+<pre class="brush: xml;">&lt;script id="movieTemplate" type="text/x-jquery-tmpl">
+	&lt;h2>${Title}&lt;/h2>
+
+	{{wrap "#tabsTemplate"}}
+		&lt;h3>Details&lt;/h3>
+		&lt;div>
+			Title: &lt;input value="${Title}" >
+			Languages:
+			{{each Languages}}&lt;span>${$value.Name}&lt;/span>{{/each}}
+		&lt;/div>
+
+		&lt;h3>Description&lt;/h3>
+		&lt;div>
+			... content of tab 2
+		&lt;/div>
+
+		&lt;h3>Comments&lt;/h3>
+		&lt;div>
+			... content of tab 3
+		&lt;/div>
+	{{/wrap}}
+&lt;/script>
+
+&lt;script id="tabsTemplate" type="text/x-jquery-tmpl">
+	&lt;table>&lt;tbody>
+		&lt;tr>
+			{{each $item.html("h3", true)}}
+				&lt;th class="header_${$index === selectedTab}">
+					${$value}
+				&lt;/th>
+			{{/each}}
+		&lt;/tr>
+		&lt;tr>&lt;td colspan='${$item.html("h3").length}'>
+			&lt;div>
+				{{html $item.html("div")[selectedTab]}}
+			&lt;/div>
+		&lt;/td>&lt;/tr>
+	&lt;/tbody>&lt;/table>
+&lt;/script>
+</pre>
+
+<h4>Script:</h4>
+<pre class="brush: js;">	function refresh() {
+		$( "#tabsView" ).empty();
+
+		$( "#movieTemplate" ).tmpl( movie )
+			.appendTo( "#tabsView" );
+	}
+
+	$( "#tabsView" )
+		.delegate( ".tabsView th", "click", function() {
+			/* Set the selected tab index to this tab */
+			$.tmplItem( this ).data.selectedTab = $(this).index();
+
+			/* update the rendering */
+			refresh();
+		});</pre>
+</body>
+</html>

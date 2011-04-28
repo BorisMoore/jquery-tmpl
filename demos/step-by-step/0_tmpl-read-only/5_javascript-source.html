@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/movielist.css" rel="stylesheet" type="text/css" />
+	<link href="../../resources/syntaxhighlighter.css" rel="stylesheet" type="text/css" />
+	<script src="../../resources/syntaxhighlighter.min.js" type="text/javascript"></script>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="5_javascript.html">Run</a>
+
+<h3>Demo: Using JavaScript expressions and functions calls within templates.</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl">
+	<tr>
+		<td>${Title}</td>
+		<td><b>Languages:</b>
+			<em>
+				{{each Languages}}
+					${$value.Name}{{if $index < Languages.length - 2}}, {{else $index === Languages.length - 2}} and {{/if}}
+				{{/each}}
+			</em><br/><br/>
+			<b>Subtitles:</b>
+			<em>
+				{{each( i, lang ) Subtitles}}
+					${namePlusSeparator( lang.Name, i, Subtitles.length )}
+				{{/each}}
+			</em>
+		</td>
+	</tr>
+</li>
+</script>
+
+<table><tbody class="header"><tr><th>Synopsis</th><th>Title</th></tr></tbody>
+	<tbody id="movieList"></tbody>
+</table>
+
+<script type="text/javascript">
+
+	function namePlusSeparator( name, index, length ){
+		var ret = name.toUpperCase();
+		if ( index < length - 1 ) {
+			if ( index === length - 2 ) {
+				ret += " and";
+			} else {
+				ret += ",";
+			}
+		}
+		return ret;
+	}
+
+	var movies = [
+		{
+			Title: "Meet Joe Black",
+			Languages: [
+				{ Name: "English" },
+				{ Name: "French" }
+			],
+			Subtitles: [
+				{ Name: "English" },
+				{ Name: "French" },
+				{ Name: "Chinese" }
+			]
+		},
+		{
+			Title: "Eyes Wide Shut",
+			Languages: [
+				{ Name: "French" },
+				{ Name: "German" },
+				{ Name: "Spanish" }
+			],
+			Subtitles: [
+				{ Name: "English" }
+			]
+		}
+	];
+
+	$( "#movieTemplate" ).tmpl( movies )
+		.appendTo( "#movieList" );
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+<h4>HTML:</h4>
+
+<pre class="brush: xml;">&lt;script id="movieTemplate" type="text/x-jquery-tmpl">
+	&lt;td>${Title}&lt;/td>
+	&lt;td>&lt;b>Languages:&lt;/b>
+		&lt;em>
+			{{each Languages}}
+				${$value.Name}{{if $index &lt; Languages.length - 2}}, {{else $index === Languages.length - 2}} and {{/if}}
+			{{/each}}
+		&lt;/em>&lt;br/>&lt;br/>
+		&lt;b>Subtitles:&lt;/b>
+		&lt;em>
+			{{each( i, lang ) Subtitles}}
+				${namePlusSeparator( lang.Name, i, Subtitles.length )}
+			{{/each}}
+		&lt;/em>
+	&lt;/td>
+&lt;/script></pre>
+
+<h4>Script:</h4>
+<pre class="brush: js;">function namePlusSeparator( name, index, length ){
+	var ret = name.toUpperCase();
+	if ( index < length - 1 ) {
+		if ( index === length - 2 ) {
+			ret += " and";
+		} else {
+			ret += ",";
+		}
+	}
+	return ret;
+}</pre>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/movielist.css" rel="stylesheet" type="text/css" />
+	<link href="../../resources/syntaxhighlighter.css" rel="stylesheet" type="text/css" />
+	<script src="../../resources/syntaxhighlighter.min.js" type="text/javascript"></script>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="3_if-else-tag.html">Run</a>
+
+<h3>Demo: Using {{if}} and {{else}} to render conditional sections.</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl">
+	<tr>
+		<td>${Title}</td>
+		<td>
+			{{if Languages}}
+				Alternative languages: <em>${Languages}</em>.
+			{{else Subtitles}}
+				Original language only... <br/>Subtitles in <em>${Subtitles}</em>.
+			{{else}}
+				Original version only, without subtitles.
+			{{/if}}
+		</td>
+	</tr>
+</li>
+</script>
+
+<table><tbody class="header"><tr><th>Synopsis</th><th>Title</th></tr></tbody>
+	<tbody id="movieList"></tbody>
+</table>
+
+<script type="text/javascript">
+
+	var movies = [
+		{
+			Title: "Meet Joe Black",
+			Languages: "English and French",
+			Subtitles: "English"
+		},
+		{
+			Title: "Eyes Wide Shut",
+			Subtitles: "French and Spanish"
+		},
+		{
+			Title: "The Mighty"
+		},
+		{
+			Title: "City Hunter",
+			Languages: "Mandarin and Chinese"
+		}
+	];
+
+	$( "#movieTemplate" ).tmpl( movies )
+		.appendTo( "#movieList" );
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+<h4>Data:</h4>
+
+<pre class="brush: js;">var movies = [
+	{
+		Title: "Meet Joe Black",
+		Languages: "English and French",
+		Subtitles: "English"
+	},
+	{
+		Title: "Eyes Wide Shut",
+		Subtitles: "French and Spanish"
+	},
+	{
+		Title: "The Mighty"
+	}
+];</pre>
+
+<h4>HTML:</h4>
+
+<pre class="brush: xml;">&lt;script id="movieTemplate" type="text/x-jquery-tmpl">
+	&lt;tr>
+		&lt;td>${Title}&lt;/td>
+		&lt;td>
+			{{if Languages}}
+				Alternative languages: &lt;em>${Languages}&lt;/em>.
+			{{else Subtitles}}
+				Original language only... &lt;br/>Subtitles in &lt;em>${Subtitles}&lt;/em>.
+			{{else}}
+				Original version only, without subtitles.
+			{{/if}}
+		&lt;/td>
+	&lt;/tr>
+&lt;/script></pre>
+
+</body>
+</html>

@@ -17,8 +17,8 @@
 * Usage: .pager({ pagenumber: 1, pagecount: 15, buttonClickCallback: PagerClickTest });
 *
 * Where pagenumber is the visible page number
-*       pagecount is the total number of pages to display
-*       buttonClickCallback is the method to fire when a pager button is clicked.
+*	   pagecount is the total number of pages to display
+*	   buttonClickCallback is the method to fire when a pager button is clicked.
 *
 * buttonClickCallback signiture is PagerClickTest = function(pageclickednumber)
 * Where pageclickednumber is the number of the page clicked in the control.
@@ -28,101 +28,101 @@
 */
 (function($) {
 
-    $.fn.pager = function(options) {
+	$.fn.pager = function(options) {
 
-        var opts = $.extend({}, $.fn.pager.defaults, options);
+		var opts = $.extend({}, $.fn.pager.defaults, options);
 
-        return this.each(function() {
+		return this.each(function() {
 
-        // empty out the destination element and then render out the pager with the supplied options
-            $(this).empty().append(renderpager(parseInt(options.pagenumber), parseInt(options.pagecount), options.buttonClickCallback));
+		// empty out the destination element and then render out the pager with the supplied options
+			$(this).empty().append(renderpager(parseInt(options.pagenumber), parseInt(options.pagecount), options.buttonClickCallback));
 
-            // specify correct cursor activity
-            $('.pages li').mouseover(function() { document.body.style.cursor = "pointer"; }).mouseout(function() { document.body.style.cursor = "auto"; });
-        });
-    };
+			// specify correct cursor activity
+			$('.pages li').mouseover(function() { document.body.style.cursor = "pointer"; }).mouseout(function() { document.body.style.cursor = "auto"; });
+		});
+	};
 
-    // render and return the pager with the supplied options
-    function renderpager(pagenumber, pagecount, buttonClickCallback) {
+	// render and return the pager with the supplied options
+	function renderpager(pagenumber, pagecount, buttonClickCallback) {
 
-        // setup $pager to hold render
-        var $pager = $('<ul class="pages"></ul>');
+		// setup $pager to hold render
+		var $pager = $('<ul class="pages"></ul>');
 
-        // add in the previous and next buttons
-        $pager.append(renderButton('first', pagenumber, pagecount, buttonClickCallback)).append(renderButton('prev', pagenumber, pagecount, buttonClickCallback));
+		// add in the previous and next buttons
+		$pager.append(renderButton('first', pagenumber, pagecount, buttonClickCallback)).append(renderButton('prev', pagenumber, pagecount, buttonClickCallback));
 
-        // pager currently only handles 10 viewable pages ( could be easily parameterized, maybe in next version ) so handle edge cases
-        var startPoint = 1;
-        var endPoint = 9;
+		// pager currently only handles 10 viewable pages ( could be easily parameterized, maybe in next version ) so handle edge cases
+		var startPoint = 1;
+		var endPoint = 9;
 
-        if (pagenumber > 4) {
-            startPoint = pagenumber - 4;
-            endPoint = pagenumber + 4;
-        }
+		if (pagenumber > 4) {
+			startPoint = pagenumber - 4;
+			endPoint = pagenumber + 4;
+		}
 
-        if (endPoint > pagecount) {
-            startPoint = pagecount - 8;
-            endPoint = pagecount;
-        }
+		if (endPoint > pagecount) {
+			startPoint = pagecount - 8;
+			endPoint = pagecount;
+		}
 
-        if (startPoint < 1) {
-            startPoint = 1;
-        }
+		if (startPoint < 1) {
+			startPoint = 1;
+		}
 
-        // loop thru visible pages and render buttons
-        for (var page = startPoint; page <= endPoint; page++) {
+		// loop thru visible pages and render buttons
+		for (var page = startPoint; page <= endPoint; page++) {
 
-            var currentButton = $('<li class="page-number">' + (page) + '</li>');
+			var currentButton = $('<li class="page-number">' + (page) + '</li>');
 
-            page == pagenumber ? currentButton.addClass('pgCurrent') : currentButton.click(function() { buttonClickCallback(this.firstChild.data); });
-            currentButton.appendTo($pager);
-        }
+			page == pagenumber ? currentButton.addClass('pgCurrent') : currentButton.click(function() { buttonClickCallback(this.firstChild.data); });
+			currentButton.appendTo($pager);
+		}
 
-        // render in the next and last buttons before returning the whole rendered control back.
-        $pager.append(renderButton('next', pagenumber, pagecount, buttonClickCallback)).append(renderButton('last', pagenumber, pagecount, buttonClickCallback));
+		// render in the next and last buttons before returning the whole rendered control back.
+		$pager.append(renderButton('next', pagenumber, pagecount, buttonClickCallback)).append(renderButton('last', pagenumber, pagecount, buttonClickCallback));
 
-        return $pager;
-    }
+		return $pager;
+	}
 
-    // renders and returns a 'specialized' button, ie 'next', 'previous' etc. rather than a page number button
-    function renderButton(buttonLabel, pagenumber, pagecount, buttonClickCallback) {
+	// renders and returns a 'specialized' button, ie 'next', 'previous' etc. rather than a page number button
+	function renderButton(buttonLabel, pagenumber, pagecount, buttonClickCallback) {
 
-        var $Button = $('<li class="pgNext">' + buttonLabel + '</li>');
+		var $Button = $('<li class="pgNext">' + buttonLabel + '</li>');
 
-        var destPage = 1;
+		var destPage = 1;
 
-        // work out destination page for required button type
-        switch (buttonLabel) {
-            case "first":
-                destPage = 1;
-                break;
-            case "prev":
-                destPage = pagenumber - 1;
-                break;
-            case "next":
-                destPage = pagenumber + 1;
-                break;
-            case "last":
-                destPage = pagecount;
-                break;
-        }
+		// work out destination page for required button type
+		switch (buttonLabel) {
+			case "first":
+				destPage = 1;
+				break;
+			case "prev":
+				destPage = pagenumber - 1;
+				break;
+			case "next":
+				destPage = pagenumber + 1;
+				break;
+			case "last":
+				destPage = pagecount;
+				break;
+		}
 
-        // disable and 'grey' out buttons if not needed.
-        if (buttonLabel == "first" || buttonLabel == "prev") {
-            pagenumber <= 1 ? $Button.addClass('pgEmpty') : $Button.click(function() { buttonClickCallback(destPage); });
-        }
-        else {
-            pagenumber >= pagecount ? $Button.addClass('pgEmpty') : $Button.click(function() { buttonClickCallback(destPage); });
-        }
+		// disable and 'grey' out buttons if not needed.
+		if (buttonLabel == "first" || buttonLabel == "prev") {
+			pagenumber <= 1 ? $Button.addClass('pgEmpty') : $Button.click(function() { buttonClickCallback(destPage); });
+		}
+		else {
+			pagenumber >= pagecount ? $Button.addClass('pgEmpty') : $Button.click(function() { buttonClickCallback(destPage); });
+		}
 
-        return $Button;
-    }
+		return $Button;
+	}
 
-    // pager defaults. hardly worth bothering with in this case but used as placeholder for expansion in the next version
-    $.fn.pager.defaults = {
-        pagenumber: 1,
-        pagecount: 1
-    };
+	// pager defaults. hardly worth bothering with in this case but used as placeholder for expansion in the next version
+	$.fn.pager.defaults = {
+		pagenumber: 1,
+		pagecount: 1
+	};
 
 })(jQuery);
 

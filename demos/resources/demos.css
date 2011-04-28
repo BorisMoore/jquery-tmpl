@@ -1,0 +1,7 @@
+﻿body { padding: 10px; font-family: Verdana; font-size: small }
+h4 { font-size: inherit`; font-variant: small-caps; }
+.height { width: 100%; margin-bottom:10px; float: left; clear: both; }
+.bottom { height:400px; width: 100%; margin-bottom:10px; float: left; clear: both; }
+body > button { float: left; clear: right; margin: 3px }
+.subhead { margin: 15px 0 4px 0; font-weight:bolder; color:#116; font-family:Arial; font-size:10pt }
+a { color: #55b}

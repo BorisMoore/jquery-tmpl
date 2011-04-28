@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/movielist.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		.role { font-weight: bold; font-style: italic; background-color: Yellow; }
+		.synopsis { background-color: white; padding: 15px; }
+		.director { font-weight: bold; font-style: italic; color: red;  }
+	</style>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="2_html-tag-source.html">Source</a>
+
+<h3>Demo: Using ${} or {{html}} to render data values or expressions</h3>
+
+<ul>
+<li>${} is equivalent to {{= }}. It HTML encodes. (Better security, but slight perf cost)</li>
+<li>{{html}} does not encode. Used to render values that include html markup</li>
+</ul><br />
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl">
+	<tr>
+		<td>${Title}</td>
+		<td class="synopsis">{{html Synopsis}}</td>
+	</tr>
+</script>
+
+<table><tbody class="header"><tr><th>Title</th><th>Synopsis</th></tr></tbody>
+	<tbody id="movieList"></tbody>
+</table>
+
+<script type="text/javascript">
+
+	var movies = [
+		{
+			Title: "Meet Joe Black",
+			Synopsis: "The <span class='role'>grim reaper</span> (<a href='http://www.netflix.com/RoleDisplay/Brad_Pitt/73919'>Brad Pitt</a>) visits <span class='role'>Bill Parrish</span> (<a href='http://www.netflix.com/RoleDisplay/Anthony_Hopkins/43014'>Anthony Hopkins</a>)..."
+		},
+		{
+			Title: "Eyes Wide Shut",
+			Synopsis: "Director <span class='director'>Stanley Kubrick's</span> final film: <br/><br/><img src='http://cdn-4.nflximg.com/US/boxshots/large/5670434.jpg'/>"
+		}
+	];
+
+	$( "#movieTemplate" ).tmpl( movies )
+		.appendTo( "#movieList" );
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+</body>
+</html>

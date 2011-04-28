@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/movielist.css" rel="stylesheet" type="text/css" />
+	<link href="../../resources/syntaxhighlighter.css" rel="stylesheet" type="text/css" />
+	<script src="../../resources/syntaxhighlighter.min.js" type="text/javascript"></script>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="6_hierarchical-data.html">Run</a>
+
+<h3>Demo: Using {{tmpl}} to render hierarchical data.</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl">
+	<tr>
+		<td>${Title}</td>
+		<td>
+			{{tmpl(Languages) "#languageTemplate"}}
+		</td>
+	</tr>
+</script>
+
+<script id="languageTemplate" type="text/x-jquery-tmpl">
+	<div>${Name}</div>
+</script>
+
+<div class="height">
+<table><tbody class="header"><tr><th>Title</th><th>Languages</th></tr></tbody>
+	<tbody id="movieList"></tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+
+	var movies = [
+		{
+			Title: "Meet Joe Black",
+			Languages: [
+				{ Name: "English" },
+				{ Name: "French" }
+			]
+		},
+		{
+			Title: "Eyes Wide Shut",
+			Languages: [
+				{ Name: "French" },
+				{ Name: "German" },
+				{ Name: "Spanish" }
+			]
+		}
+	];
+
+	$( "#movieTemplate" ).tmpl( movies )
+		.appendTo( "#movieList" );
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+<h4>Data:</h4>
+<pre class="brush: js;">var movies = [
+	{ Name: "Meet Joe Black",
+		Languages:[
+			{ Name: "English" },
+			{ Name: "French" }
+		]
+	},
+	{ Name: "Eyes Wide Shut",
+		Languages:[
+			{ Name: "French" },
+			{ Name: "German" } ,
+			{ Name: "Spanish" }
+		]
+	}
+];</pre>
+
+<h4>HTML:</h4>
+<pre class="brush: xml;">&lt;script id="movieTemplate" type="text/x-jquery-tmpl">
+	&lt;tr>
+		&lt;td>${Name}&lt;/td>
+		&lt;td>{{tmpl(Languages) "#languageTemplate"}}&lt;/td>
+	&lt;/tr>
+&lt;/script>
+
+&lt;script id="languageTemplate" type="text/x-jquery-tmpl">
+	&lt;div>${Name}&lt;/div>
+&lt;/script></pre>
+
+</body>
+</html>

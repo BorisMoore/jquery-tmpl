@@ -1,0 +1,7 @@
+﻿table { border-collapse: collapse; }
+table tr { color: blue; height: 25px; }
+.header { color: #009; border-bottom: solid #77c 2px; background-color: #E8E8F7; }
+.header th { padding:5px; border: 1px solid #77c; }
+#movieList tr td:first-child { width: 100px; }
+table { border: 2px solid blue; width: 480px; margin: 4px 0 4px 4px; padding: 2px; background-color: #f8f8f8; }
+table td { padding: 3px; margin: 3px; border: solid #77c 1px; }

@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/syntaxhighlighter.css" rel="stylesheet" type="text/css" />
+	<script src="../../resources/syntaxhighlighter.min.js" type="text/javascript"></script>
+	<style type="text/css">
+		.treeView li li {margin-left:24px;}
+		.toggle {cursor:pointer;vertical-align:middle;margin-right:7px;display:inline-block;border:1px solid #555;text-align:center;height:12px;width:12px;line-height:11px;background-color:#f8f8f8;color:Blue;}
+		.treeView, .treeView ul {padding:0;margin:0;} .treeView li {margin-left:8px;list-style-type:none;padding:2px;}
+		.treeView li.folderItem {color:Blue;text-decoration:underline;font-style:italic;margin-bottom:4px;}
+	</style>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="1_tree-view-using-tmpl-tag.html">Run</a>
+
+<h3>Tree view: using recursive nested {{tmpl}} tags.</h3>
+
+<!--=================== Demo Section ===================-->
+
+<ul id="movieList" class="treeView"></ul>
+
+<script id="folderTemplate" type="text/x-jquery-tmpl">
+	<li>
+		{{if hasContent($data)}}
+			<span class="toggle">${$data.expanded ? "-" : "+"}</span>
+		{{/if}}
+		<span>${name}</span>
+	</li>
+	{{if expanded}}
+		<li>
+			<ul>{{tmpl(getFolderItems(name)) "#itemTemplate"}}</ul>
+			<ul>{{tmpl($data.folders || []) "#folderTemplate"}}</ul>
+		</li>
+	{{/if}}
+</script>
+
+<script id="itemTemplate" type="text/x-jquery-tmpl">
+	<li class="folderItem">${name}</li>
+</script>
+
+<script type="text/javascript">
+
+ /* Hierarchy of named folders */
+var rootFolder = {
+	name: "Categories",
+	folders: [
+		{ name: "Drama", folders: [
+			{ name: "Courtroom" },
+			{ name: "Political" }
+		]},
+		{ name: "Classic", folders: [
+			{ name: "Musicals", folders: [
+				{ name: "Jazz"},
+				{ name: "R&B/Soul"}
+			]},
+		]}
+	]
+};
+
+/* Array for the folder items. Each item can show up in one or more folders */
+var movies = [
+	{ name: "12 Angry Men",
+		folders: [ "Courtroom" ],
+		description: "A jury of 12 men must decide the fate of an 18-year-old boy."
+	},
+	{ name: "Word of Honor",
+		folders: [ "Courtroom", "Classic" ],
+		description: "One man's word against the U.S. military."
+	}
+];
+
+/* Declare the functions for getting the items and subfolders, etc. */
+function getFolderItems( name ) {
+	return $.map( movies, function( movie ) {
+		return $.inArray( name, movie.folders ) > -1 ? movie : null;
+	});
+}
+
+function hasContent( folder ) {
+	return folder.expanded || folder.folders && folder.folders.length || getFolderItems(folder.name).length;
+}
+
+/* Render the folderTemplate with the "movies" data */
+$( "#folderTemplate" ).tmpl( rootFolder ).appendTo( "#movieList" );
+
+$( "#movieList" )
+	.delegate( ".toggle", "click", function() {
+		/* Toggle expanded property on data, then update rendering */
+		var tmplItem = $.tmplItem( this );
+		tmplItem.data.expanded = !tmplItem.data.expanded;
+		tmplItem.update();
+	})
+	.delegate( ".folderItem", "click", function() {
+		alert( $.tmplItem( this ).data.description );
+	});
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+<h4>Data:</h4>
+<pre class="brush: js;">var rootFolder = {
+	name: "Categories",
+	folders: [
+		{ name: "Drama", folders: [
+			{ name: "Courtroom" },
+			{ name: "Political" }
+		]},
+		{ name: "Classic", folders: [
+			{ name: "Musicals", folders: [
+				{ name: "Jazz"},
+				{ name: "R&B/Soul"}
+			]},
+		]}
+	]
+};
+
+/* Array for the folder items. Each item can show up in one or more folders */
+var movies = [
+	{ name: "12 Angry Men",
+		folders: [ "Courtroom" ],
+		description: "A jury of 12 men must decide the fate of an 18-year-old boy."
+	},
+	{ name: "Word of Honor",
+		folders: [ "Courtroom", "Classic" ],
+		description: "One man's word against the U.S. military."
+	}
+];</pre>
+
+<h4>HTML:</h4>
+<pre class="brush: xml;">&lt;script id="folderTemplate" type="text/x-jquery-tmpl">
+	&lt;li>
+		{{if hasContent($data)}}
+			&lt;span class="toggle">${$data.expanded ? "-" : "+"}&lt;/span>
+		{{/if}}
+		&lt;span>${name}&lt;/span>
+	&lt;/li>
+	{{if expanded}}
+		&lt;li>
+			&lt;ul>{{tmpl(getFolderItems(name)) "#itemTemplate"}}&lt;/ul>
+			&lt;ul>{{tmpl($data.folders || []) "#folderTemplate"}}&lt;/ul>
+		&lt;/li>
+	{{/if}}
+&lt;/script>
+
+&lt;script id="itemTemplate" type="text/x-jquery-tmpl">
+	&lt;li class="folderItem">${name}&lt;/li>
+&lt;/script>
+</pre>
+
+<h4>Script:</h4>
+<pre class="brush: js;">$( "#folderTmpl" ).tmpl( folders ).appendTo( "#movieList" );
+
+$( "#movieList" )
+	.delegate( ".toggle", "click", function() {
+		/* Toggle expanded property on data, then update rendering */
+		var tmplItem = $.tmplItem( this );
+		tmplItem.data.expanded = !tmplItem.data.expanded;
+		tmplItem.update();
+	})
+	.delegate( ".folderItem", "click", function() {
+		alert( $.tmplItem( this ).data.description );
+	});</pre>
+
+</body>
+</html>
+<script>
+

@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<script src="http://code.jquery.com/jquery.js" type="text/javascript"></script>
+	<script src="../../../jquery.tmpl.js" type="text/javascript"></script>
+	<link href="../../resources/demos.css" rel="stylesheet" type="text/css" />
+
+	<link href="../../resources/syntaxhighlighter.css" rel="stylesheet" type="text/css" />
+	<script src="../../resources/syntaxhighlighter.min.js" type="text/javascript"></script>
+</head>
+<body>
+<a href="../../step-by-step.html">Home</a><br />
+<a href="0_local-data.html">Run</a>
+
+<h3>Demo: Render template against local data</h3>
+
+<!--=================== Demo Section ===================-->
+
+<script id="movieTemplate" type="text/x-jquery-tmpl"><li>
+	<b>${Name}</b> (${ReleaseYear})
+</li></script>
+
+<ul id="movieList"></ul>
+
+<script type="text/javascript">
+
+	var movies = [
+		{ Name: "The Red Violin", ReleaseYear: "1998" },
+		{ Name: "Eyes Wide Shut", ReleaseYear: "1999" },
+		{ Name: "The Inheritance", ReleaseYear: "1976" }
+	];
+
+	// Render the template with the movies data and insert
+	// the rendered HTML under the "movieList" element
+	$("#movieTemplate").tmpl(movies)
+	.appendTo("#movieList");
+
+</script>
+
+<!--================ End of Demo Section ================-->
+
+<h4>Data:</h4>
+<pre class="brush: js;">var movies = [
+	{ Name: "The Red Violin", ReleaseYear: "1998" },
+	{ Name: "Eyes Wide Shut", ReleaseYear: "1999" },
+	{ Name: "The Inheritance", ReleaseYear: "1976" }
+];</pre>
+
+<h4>HTML:</h4>
+<pre class="brush: xml;">&lt;script id="movieTemplate" type="text/x-jquery-tmpl">
+	&lt;li>
+		&lt;b>${Name}&lt;/b> (${ReleaseYear})
+	&lt;/li>
+&lt;/script>
+
+&lt;ul id="movieList">&lt;/ul></pre>
+
+<h4>Script:</h4>
+<pre class="brush: js;">$( "#movieTemplate" ).tmpl( movies )
+	.appendTo( "#movieList" );</pre>
+
+</body>
+</html>
