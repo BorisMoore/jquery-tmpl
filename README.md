@@ -5,9 +5,9 @@ _Note: This plugin is currently in beta form and may change significantly before
 jQuery templates contain markup with binding expressions ('Template tags'). Templates are applied to data objects or arrays, and rendered into the HTML DOM
 
 Documentation for the _jQuery Templates_ plugin can be found on the jQuery documentation site:
-<a href="http://api.jquery.com/category/plugins/templates/">http://api.jquery.com/category/plugins/templates</a>
+[http://api.jquery.com/category/plugins/templates/] (http://api.jquery.com/category/plugins/templates)
 
-See also <a href="http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html">http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html</a> for more background.
+See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html] (http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html) for more background.
 
 <p>The beta1 version of jQuery Templates is available on CDN at:
 <ul>
