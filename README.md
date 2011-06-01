@@ -11,7 +11,7 @@ See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jqu
 
 <p>The beta1 version of jQuery Templates is available on CDN at:
 <ul>
-<li>[http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js] (http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js)</li>
-<li>[http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js] (http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js)</li>
+<li><a href="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js">http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js</a></li>
+<li><a href="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js</a></li>
 </ul></p>
 
