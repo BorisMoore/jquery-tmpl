@@ -177,7 +177,7 @@
 				// Compile template and associate with name
 				if ( typeof tmpl === "string" ) {
 					// This is an HTML string being passed directly in.
-					tmpl = buildTmplFn( tmpl )
+					tmpl = buildTmplFn( tmpl );
 				} else if ( tmpl instanceof jQuery ) {
 					tmpl = tmpl[0] || {};
 				}
