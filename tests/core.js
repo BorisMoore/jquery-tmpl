@@ -286,7 +286,7 @@ module("Commands");
 
 	test("Create New Command", function(){
 		$.getText = function ( str ) { return str.toUpperCase(); };
-		$.tmpl.tag.trans = { open: "_.push($.getText($1));" };
+		$.tmpl.tag.trans = { open: "__.push($.getText($1));" };
 		test_handler( "creating new command works", R('{{trans "translate" }}'), 'TRANSLATE' );
 		$.tmpl.tag._ = $.tmpl.tag.trans;
 		test_handler( "_ can by assigned a command", R('{{_ "translate" }}', {}), 'TRANSLATE' );
