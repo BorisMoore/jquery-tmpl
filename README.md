@@ -1,6 +1,6 @@
-# jQuery Templates plugin v1.0.0pre.
+# jQuery Templates plugin DEPRECATED (beta1)
 
-_Note: This plugin never made it past beta and is no longer being actively developed or maintained. See tagged versions for specific beta releases. Requires jquery version 1.4.2._
+_Note: This plugin never made it past beta and is no longer being actively developed or maintained. See vBeta1.0.0 tag for released beta version. Requires jQuery version 1.4.2._
 
 _Note: A template plugin fully supported by the jQuery Team is now being developed as part of jQuery UI. More details on the history of this can be found at http://blog.jquery.com/2011/04/16/official-plugins-a-change-in-the-roadmap/ . Track progress and participate in the design at http://wiki.jqueryui.com/Template_
 
