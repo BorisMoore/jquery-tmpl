@@ -3,7 +3,7 @@
  * http://github.com/jquery/jquery-tmpl
  * Requires jQuery 1.4.2
  *
- * Copyright Software Freedom Conservancy, Inc.
+ * Copyright 2011, Software Freedom Conservancy, Inc.
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  */

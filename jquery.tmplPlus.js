@@ -4,7 +4,7 @@
  * Requires jquery.tmpl.js
  * http://github.com/jquery/jquery-tmpl
  *
- * Copyright Software Freedom Conservancy, Inc.
+ * Copyright 2011, Software Freedom Conservancy, Inc.
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  */
