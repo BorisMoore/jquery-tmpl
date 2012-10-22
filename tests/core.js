@@ -48,7 +48,7 @@ module("Basics");
 
 		// throw errors with incomplete syntax
 		test_handler( 'multi word variable tag', R("${ a b c }}"), SyntaxError );
-		test_handler( "_ (underscore) cannot by used by data", R('${ _ }', {'_':'foo'}), TypeError );
+		test_handler( "__ (underscore underscore) cannot by used by data", R('${ __ }', {'__':'foo'}), TypeError );
 		test_handler( "$ cannot be used by data", R('${ $ }', {'$':'foo'}), TypeError );
 
 	});
@@ -286,7 +286,7 @@ module("Commands");
 
 	test("Create New Command", function(){
 		$.getText = function ( str ) { return str.toUpperCase(); };
-		$.tmpl.tag.trans = { open: "_.push($.getText($1));" };
+		$.tmpl.tag.trans = { open: "__.push($.getText($1));" };
 		test_handler( "creating new command works", R('{{trans "translate" }}'), 'TRANSLATE' );
 		$.tmpl.tag._ = $.tmpl.tag.trans;
 		test_handler( "_ can by assigned a command", R('{{_ "translate" }}', {}), 'TRANSLATE' );
