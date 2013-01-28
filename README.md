@@ -43,8 +43,9 @@ This documentation topic concerns the *jQuery Templates* plugin (jquery-tmpl), w
 The `jQuery.tmpl()` method is designed for chaining with `.appendTo`, `.prependTo`, `.insertAfter` or `.insertBefore` as in the following example.
 
 ### Example:
+```JavaScript
     $.tmpl( "<li>${Name}</li>", { "Name" : "John Doe" }).appendTo( "#target" );
-
+```
 The `template` parameter can be any of the following: 
 
 *   A string containing markup.
@@ -57,14 +58,14 @@ If `data` is an array, the template is rendered once for each data item in the a
 The return value is a jQuery collection of elements made up of the rendered template items (one for each data item in the array). If the template contains only one top-level element, then there will be one element for each data item in the array. 
 
 To insert the rendered template items into the HTML DOM, the returned jQuery collection should not be inserted directly into the DOM, but should be chained with `.appendTo`, `.prependTo`, `.insertAfter` or `.insertBefore`, as in following example: 
-
+```JavaScript
     $.tmpl( myTemplate, myData ).appendTo( "#target" );
-
+```
 See also .tmpl().
 
 ### Example 
 The following example shows how to use `jQuery.tmpl()` to render local data, using a template provided as a string: 
-
+```JavaScript
       var movies = [
 		  { Name: "The Red Violin", ReleaseYear: "1998" },
 		  { Name: "Eyes Wide Shut", ReleaseYear: "1999" },
@@ -80,10 +81,10 @@ The following example shows how to use `jQuery.tmpl()` to render local data, usi
 	  // the rendered HTML under the "movieList" element
 	  $.tmpl( "movieTemplate", movies )
 		  .appendTo( "#movieList" );
-    
+```
 ## Using Remote Data 
 Typically the data is not local and is instead obtained using an Ajax request to a remote service or page, as in the following example: 
-
+```JavaScript
     var markup = "<li><b>${Name}</b> (${ReleaseYear})</li>";
 
 	// Compile the markup as a named template
@@ -103,7 +104,7 @@ Typically the data is not local and is instead obtained using an Ajax request to
 	  $.tmpl( "movieTemplate", data )
 		.appendTo( "#movieList" );
 	}
-
+```
 ## The Markup for the Template  
 You can get the markup for the template from inline markup in the page, or from a string (possibly computed, or obtained remotely). For an example of how to use inline markup, see .tmpl().
 
@@ -115,7 +116,7 @@ Template tags such as the `${}` tag can used within jQuery templates in addition
 
 ## The `options` Parameter, and Template Items 
 Each template item (the result of rendering a data item with the template) is associated with a `tmplItem` data structure, which can be accessed using jQuery.tmplItem() and .tmplItem(), or the `$item` template variable. Any fields or anonomyous methods passed in with the `options` parameter of `jQuery.tmpl()` will extend the `tmplItem` data structure, and so be available to the template as in the following example: 
-
+```JavaScript
     var markup = "<li>Some content: ${$item.myMethod()}.<br/>" 
            + " More content: ${$item.myValue}.</li>";
 
@@ -131,3 +132,95 @@ Each template item (the result of rendering a data item with the template) is as
 		  } 
 	  } 
 	).appendTo( "#movieList" );
+```
+## Examples:
+
+### Example: Render local data using jQuery.tmpl().
+```html
+	<!DOCTYPE html>
+	<html>
+	<head>
+	  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	  <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+	</head>
+	<body>
+	  
+	<ul id="movieList"></ul>
+
+	<script>
+	  var movies = [
+	  { Name: "The Red Violin", ReleaseYear: "1998" },
+	  { Name: "Eyes Wide Shut", ReleaseYear: "1999" },
+	  { Name: "The Inheritance", ReleaseYear: "1976" }
+	  ];
+
+	var markup = "<li><b>${Name}</b> (${ReleaseYear})</li>";
+
+	/* Compile the markup as a named template */
+	$.template( "movieTemplate", markup );
+
+	/* Render the template with the movies data and insert
+	   the rendered HTML under the "movieList" element */
+	$.tmpl( "movieTemplate", movies )
+	  .appendTo( "#movieList" );
+	</script>
+
+	</body>
+	</html>
+```
+### Example: Render data from a remote service, using jQuery.tmpl().
+```html
+	<!DOCTYPE html>
+	<html>
+	<head>
+	  <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	  <script src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+	</head>
+	<body>
+	  
+	<button id="cartoonsBtn">Cartoons</button>
+	<button id="dramaBtn">Drama</button>
+
+	<ul id="movieList"></ul>
+
+	<script>
+	var markup = "<li><b>${Name}</b> (${ReleaseYear})</li>";
+
+	/* Compile the markup as a named template */
+	$.template( "movieTemplate", markup );
+
+	function getMovies( genre, skip, top ) {
+	  $.ajax({
+		dataType: "jsonp",
+		url: "http://odata.netflix.com/Catalog/Genres('" + genre
+		+ "')/Titles?$format=json&$skip="
+		+ skip + "&$top=" + top,
+		jsonp: "$callback",
+		success: function( data ) {
+		  /* Get the movies array from the data */
+		  var movies = data.d;
+
+		  /* Remove current set of movie template items */
+		  $( "#movieList" ).empty();
+
+		  /* Render the template items for each movie
+		  and insert the template items into the "movieList" */
+		  $.tmpl( "movieTemplate", movies )
+		  .appendTo( "#movieList" );
+		}
+	  });
+	}
+
+	$( "#cartoonsBtn" ).click( function() {
+	  getMovies( "Cartoons", 0, 6 );
+	});
+
+	$( "#dramaBtn" ).click( function() {
+	  getMovies( "Drama", 0, 6 );
+	});
+
+	</script>
+
+	</body>
+	</html>
+```
