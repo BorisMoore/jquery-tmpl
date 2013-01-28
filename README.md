@@ -43,7 +43,7 @@ This documentation topic concerns the *jQuery Templates* plugin (jquery-tmpl), w
 The `jQuery.tmpl()` method is designed for chaining with `.appendTo`, `.prependTo`, `.insertAfter` or `.insertBefore` as in the following example.
 
 ### Example:
-    $.tmpl( "http://jquery.com${Name}"http://jquery.com, { "http://jquery.comName"http://jquery.com : "http://jquery.comJohn Doe"http://jquery.com }).appendTo( "http://jquery.com#target"http://jquery.com );
+    $.tmpl( "<li>${Name}</li>", { "Name" : "John Doe" }).appendTo( "#target" );
 
 The `template` parameter can be any of the following: 
 
@@ -58,7 +58,7 @@ The return value is a jQuery collection of elements made up of the rendered temp
 
 To insert the rendered template items into the HTML DOM, the returned jQuery collection should not be inserted directly into the DOM, but should be chained with `.appendTo`, `.prependTo`, `.insertAfter` or `.insertBefore`, as in following example: 
 
-    $.tmpl( myTemplate, myData ).appendTo( "http://jquery.com#target"http://jquery.com );
+    $.tmpl( myTemplate, myData ).appendTo( "#target" );
 
 See also .tmpl().
 
@@ -66,49 +66,49 @@ See also .tmpl().
 The following example shows how to use `jQuery.tmpl()` to render local data, using a template provided as a string: 
 
       var movies = [
-          { Name: "http://jquery.comThe Red Violin"http://jquery.com, ReleaseYear: "http://jquery.com1998"http://jquery.com },
-          { Name: "http://jquery.comEyes Wide Shut"http://jquery.com, ReleaseYear: "http://jquery.com1999"http://jquery.com },
-          { Name: "http://jquery.comThe Inheritance"http://jquery.com, ReleaseYear: "http://jquery.com1976"http://jquery.com }
-      ];
+		  { Name: "The Red Violin", ReleaseYear: "1998" },
+		  { Name: "Eyes Wide Shut", ReleaseYear: "1999" },
+		  { Name: "The Inheritance", ReleaseYear: "1976" }
+		];
     
-      var markup = "http://jquery.com${Name} (${ReleaseYear})"http://jquery.com;
-    
-      // Compile the markup as a named template
-      $.template( "http://jquery.commovieTemplate"http://jquery.com, markup );
-    
-      // Render the template with the movies data and insert
-      // the rendered HTML under the "http://jquery.commovieList"http://jquery.com element
-      $.tmpl( "http://jquery.commovieTemplate"http://jquery.com, movies )
-          .appendTo( "http://jquery.com#movieList"http://jquery.com );
+      var markup = "<li><b>${Name}</b> (${ReleaseYear})</li>";
+
+	  // Compile the markup as a named template
+	  $.template( "movieTemplate", markup );
+
+	  // Render the template with the movies data and insert
+	  // the rendered HTML under the "movieList" element
+	  $.tmpl( "movieTemplate", movies )
+		  .appendTo( "#movieList" );
     
 ## Using Remote Data 
 Typically the data is not local and is instead obtained using an Ajax request to a remote service or page, as in the following example: 
 
-    var markup = "http://jquery.com${Name} (${ReleaseYear})"http://jquery.com;
-    
-    // Compile the markup as a named template
-    $.template( "http://jquery.commovieTemplate"http://jquery.com, markup );
-    
-    $.ajax({
-      dataType: "http://jquery.comjsonp"http://jquery.com,
-      url: moviesServiceUrl,
-      jsonp: "http://jquery.com$callback"http://jquery.com,
-      success: showMovies
-    });
-    
-    // Within the callback, use .tmpl() to render the data.
-    function showMovies( data ) {
-      // Render the template with the "http://jquery.commovies"http://jquery.com data and insert
-      // the rendered HTML under the 'http://jquery.commovieList'http://jquery.com element
-      $.tmpl( "http://jquery.commovieTemplate"http://jquery.com, data )
-        .appendTo( "http://jquery.com#movieList"http://jquery.com );
-    }
+    var markup = "<li><b>${Name}</b> (${ReleaseYear})</li>";
+
+	// Compile the markup as a named template
+	$.template( "movieTemplate", markup );
+
+	$.ajax({
+	  dataType: "jsonp",
+	  url: moviesServiceUrl,
+	  jsonp: "$callback",
+	  success: showMovies
+	});
+
+	// Within the callback, use .tmpl() to render the data.
+	function showMovies( data ) {
+	  // Render the template with the "movies" data and insert
+	  // the rendered HTML under the 'movieList' element
+	  $.tmpl( "movieTemplate", data )
+		.appendTo( "#movieList" );
+	}
 
 ## The Markup for the Template  
 You can get the markup for the template from inline markup in the page, or from a string (possibly computed, or obtained remotely). For an example of how to use inline markup, see .tmpl().
 
 ## Caching the Template 
-When a template is rendered, the markup is first converted into a compiled-template function. Every time `$.tmpl( markup , myData ).appendTo( "http://jquery.com#target"http://jquery.com )` is called, the template is recompiled. If the same template is to be used more than once for rendering data, you should ensure that the compiled template is cached. To cache the template when using markup that is obtained from a string (rather than from inline markup in the page), use `$.template( name, markup )` to create a named template for reuse. See jQuery.template().
+When a template is rendered, the markup is first converted into a compiled-template function. Every time `$.tmpl( markup , myData ).appendTo( "#target" )` is called, the template is recompiled. If the same template is to be used more than once for rendering data, you should ensure that the compiled template is cached. To cache the template when using markup that is obtained from a string (rather than from inline markup in the page), use `$.template( name, markup )` to create a named template for reuse. See jQuery.template().
 
 ## Template Tags, Expressions, and Template Variables 
 Template tags such as the `${}` tag can used within jQuery templates in addition to text and HTML markup to enable a number of scenarios such as composition of templates, iteration over hierarchical data, parameterization of template rendering, etc. Template tags can render content based on the values of data item fields or template variables such as `$item` (corresponding to the template item), as well as expressions and function calls. See the documentation topics for each template tag: ${}, {{each}}, {{if}}, {{else}}, {{html}}, {{tmpl}} and {{wrap}}.
@@ -116,18 +116,18 @@ Template tags such as the `${}` tag can used within jQuery templates in addition
 ## The `options` Parameter, and Template Items 
 Each template item (the result of rendering a data item with the template) is associated with a `tmplItem` data structure, which can be accessed using jQuery.tmplItem() and .tmplItem(), or the `$item` template variable. Any fields or anonomyous methods passed in with the `options` parameter of `jQuery.tmpl()` will extend the `tmplItem` data structure, and so be available to the template as in the following example: 
 
-    var markup = "http://jquery.comSome content: ${$item.myMethod()}."http://jquery.com 
-               %2B "http://jquery.com More content: ${$item.myValue}."http://jquery.com;
-    
-    // Compile the markup as a named template
-    $.template( "http://jquery.commovieTemplate"http://jquery.com, markup );
-    
-    // Render the template with the movies data
-    $.tmpl( "http://jquery.commovieTemplate"http://jquery.com, movies,
-      { 
-          myValue: "http://jquery.comsomevalue"http://jquery.com, 
-          myMethod: function() { 
-              return "http://jquery.comsomething"http://jquery.com;
-          } 
-      } 
-    ).appendTo( "http://jquery.com#movieList"http://jquery.com );
+    var markup = "<li>Some content: ${$item.myMethod()}.<br/>" 
+           + " More content: ${$item.myValue}.</li>";
+
+	// Compile the markup as a named template
+	$.template( "movieTemplate", markup );
+
+	// Render the template with the movies data
+	$.tmpl( "movieTemplate", movies,
+	  { 
+		  myValue: "somevalue", 
+		  myMethod: function() { 
+			  return "something";
+		  } 
+	  } 
+	).appendTo( "#movieList" );
