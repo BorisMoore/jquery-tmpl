@@ -6,8 +6,9 @@ _Note: The jQuery team has decided not to take this plugin past beta. It is no l
 
 jQuery templates contain markup with binding expressions ('Template tags'). Templates are applied to data objects or arrays, and rendered into the HTML DOM
 
-Documentation for the _jQuery Templates_ plugin can be found on the jQuery documentation site:
-[http://api.jquery.com/category/plugins/templates/] (http://api.jquery.com/category/plugins/templates)
+Note that documentation for the _jQuery Templates_ plugin is **no longer maintained on the jQuery documentation site**. 
+An archive copy of the original documenation can be found here: 
+[archive for previous http://api.jquery.com/category/plugins/templates/] (http://web.archive.org/web/20120920065217/http://api.jquery.com/category/plugins/templates/)
 
 See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html] (http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html) for more background.
 
@@ -24,7 +25,7 @@ Live versions of demos from this repository can be found at [http://jquery.githu
 _The following is a restoration of jQuery's official documentation on tmpl() as it was on 12/28/2012. jQuery is Copyright 2012, John Resig_
 
 
-[Source](http://web.archive.org/web/20121014080309/http://api.jquery.com/jquery.tmpl/ "Permalink to jQuery.tmpl() – jQuery API")
+[Source](http://web.archive.org/web/20121014080309/http://api.jquery.com/jquery.tmpl/ "Permalink to jQuery.tmpl() ï¿½ jQuery API")
 
 # jQuery.tmpl( template \[, data\] \[, options\] ) Returns: jQuery   
 
