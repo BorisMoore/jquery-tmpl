@@ -12,7 +12,7 @@ An archive copy of the original documentation (previously at api.jquery.com/cate
 
 See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html] (http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html) for more background.
 
-Live versions of demos from this repository can be found at [http://jquery.github.com/jquery-tmpl/demos/step-by-step.html] (http://jquery.github.com/jquery-tmpl/demos/step-by-step.html).
+Live versions of demos from this repository can be found at [http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html] (http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html).
 
 <p>The beta1 version of jQuery Templates is available on CDN at:
 <ul>
