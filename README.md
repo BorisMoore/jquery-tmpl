@@ -1,6 +1,6 @@
 # jQuery Templates plugin vBeta1.0.0
 
-_Note: The jQuery team has decided not to take this plugin past beta. It is no longer being actively developed or maintained. See vBeta1.0.0 tag for released beta version. Requires jQuery version 1.4.2._
+_Note: This is the original official jQuery Templates plugin. The project was maintained by the jQuery team as an official jQuery plugin. Since the jQuery team has decided not to take this plugin past beta, it has been returned to the principal developer's GitHub account (Boris Moore). It is no longer in active development, and will be superseded by JsRender. See vBeta1.0.0 tag for released beta version. Requires jQuery version 1.4.2._
 
 ----
 
