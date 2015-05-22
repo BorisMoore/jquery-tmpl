@@ -7,18 +7,15 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  */
-(function (factory) {
-	if (typeof define === 'function' && define.amd) {
-		// AMD
-		define(['jquery'], factory);
-	} else if (typeof exports === 'object') {
-		// CommonJS
-		factory(require('jquery'));
-	} else {
-		// Browser globals
-		factory(jQuery);
-	}
-}(function( jQuery, undefined ){
+(function( factory ) {
+    if (typeof define === 'function' && define.amd) {
+        // Loading from AMD script loader. Register as an anonymous module.
+        define( ['jquery'], factory );
+    } else {
+        // Browser using plain <script> tag
+        factory( jQuery );
+    }
+}(function( jQuery ){
 	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem", htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$|\{\{\! /,
 		newTmplItems = {}, wrappedItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0, stack = [];
 

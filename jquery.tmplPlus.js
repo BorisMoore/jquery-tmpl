@@ -8,18 +8,15 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  */
- (function (factory) {
-	if (typeof define === 'function' && define.amd) {
-		// AMD
-		define(['jquery'], factory);
-	} else if (typeof exports === 'object') {
-		// CommonJS
-		factory(require('jquery'));
-	} else {
-		// Browser globals
-		factory(jQuery);
-	}
-}(function (jQuery) {
+(function( factory ) {
+    if (typeof define === 'function' && define.amd) {
+        // Loading from AMD script loader. Register as an anonymous module.
+        define( ['jquery'], factory );
+    } else {
+        // Browser using plain <script> tag
+        factory( jQuery );
+    }
+}(function( jQuery ){
 	var oldComplete = jQuery.tmpl.complete, oldManip = jQuery.fn.domManip;
 
 	// Override jQuery.tmpl.complete in order to provide rendered event.
