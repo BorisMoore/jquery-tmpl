@@ -8,13 +8,13 @@
  * http://jquery.org/license
  */
 (function( factory ) {
-    if (typeof define === 'function' && define.amd) {
-        // Loading from AMD script loader. Register as an anonymous module.
-        define( ['jquery'], factory );
-    } else {
-        // Browser using plain <script> tag
-        factory( jQuery );
-    }
+	if (typeof define === 'function' && define.amd) {
+		// Loading from AMD script loader. Register as an anonymous module.
+		define( ['jquery'], factory );
+	} else {
+		// Browser using plain <script> tag
+		factory( jQuery );
+	}
 }(function( jQuery ){
 	var oldManip = jQuery.fn.domManip, tmplItmAtt = "_tmplitem", htmlExpr = /^[^<]*(<[\w\W]+>)[^>]*$|\{\{\! /,
 		newTmplItems = {}, wrappedItems = {}, appendToTmplItems, topTmplItem = { key: 0, data: {} }, itemKey = 0, cloneIndex = 0, stack = [];
