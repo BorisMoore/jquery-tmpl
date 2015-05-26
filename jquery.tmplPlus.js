@@ -8,7 +8,15 @@
  * Dual licensed under the MIT or GPL Version 2 licenses.
  * http://jquery.org/license
  */
-(function (jQuery) {
+(function( factory ) {
+    if (typeof define === 'function' && define.amd) {
+        // Loading from AMD script loader. Register as an anonymous module.
+        define( ['jquery'], factory );
+    } else {
+        // Browser using plain <script> tag
+        factory( jQuery );
+    }
+}(function( jQuery ){
 	var oldComplete = jQuery.tmpl.complete, oldManip = jQuery.fn.domManip;
 
 	// Override jQuery.tmpl.complete in order to provide rendered event.
@@ -96,4 +104,4 @@
 			return oldManip.apply( this, arguments );
 		}
 	});
-})(jQuery);
+}));
