@@ -244,6 +244,10 @@
 				// Comment tag. Skipped by parser
 				open: ""
 			}
+			"for": {
+        			open: "for(var $i = 0; $i < $1; $i++) {",
+        			close: "}"
+    			}
 		},
 
 		// This stub can be overridden, e.g. in jquery.tmplPlus for providing rendered events
