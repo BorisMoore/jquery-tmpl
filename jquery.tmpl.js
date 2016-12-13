@@ -162,28 +162,30 @@
 		},
 
 		// Set:
-		// Use $.template( name, tmpl ) to cache a named template,
+		// Use $.template( name, tmpl, tmplType ) to cache a named template,
 		// where tmpl is a template string, a script element or a jQuery instance wrapping a script element, etc.
+		// tmplType is the mime type of the script language if tmpl is a string, and overrides the type attribute
+		// of the element if tmpl is an element.
 		// Use $( "selector" ).template( name ) to provide access by name to a script block template declaration.
 
 		// Get:
 		// Use $.template( name ) to access a cached template.
-		// Also $( selectorToScriptBlock ).template(), or $.template( null, templateString )
+		// Also $( selectorToScriptBlock ).template(), or $.template( null, templateString, tmplType )
 		// will return the compiled template, without adding a name reference.
 		// If templateString includes at least one HTML tag, $.template( templateString ) is equivalent
 		// to $.template( null, templateString )
-		template: function( name, tmpl ) {
+		template: function( name, tmpl, tmplType ) {
 			if (tmpl) {
 				// Compile template and associate with name
 				if ( typeof tmpl === "string" ) {
 					// This is an HTML string being passed directly in.
-					tmpl = buildTmplFn( tmpl );
+					tmpl = jQuery.compileTemplate( tmpl, tmplType );
 				} else if ( tmpl instanceof jQuery ) {
 					tmpl = tmpl[0] || {};
 				}
 				if ( tmpl.nodeType ) {
 					// If this is a template block, use cached copy, or generate tmpl function and cache.
-					tmpl = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", buildTmplFn( tmpl.innerHTML ));
+					tmpl = jQuery.data( tmpl, "tmpl" ) || jQuery.data( tmpl, "tmpl", jQuery.compileTemplate( tmpl.innerHTML, tmplType || tmpl.getAttribute('type') ));
 					// Issue: In IE, if the container element is not a script block, the innerHTML will remove quotes from attribute values whenever the value does not include white space.
 					// This means that foo="${x}" will not work if the value of x includes white space: foo="${x}" -> foo=value of x.
 					// To correct this, include space in tag: foo="${ x }" -> foo="value of x"
@@ -191,11 +193,15 @@
 				return typeof name === "string" ? (jQuery.template[name] = tmpl) : tmpl;
 			}
 			// Return named compiled template
-			return name ? (typeof name !== "string" ? jQuery.template( null, name ):
+			return name ? (typeof name !== "string" ? jQuery.template( null, name, tmplType ):
 				(jQuery.template[name] ||
 					// If not in map, and not containing at least on HTML tag, treat as a selector.
 					// (If integrated with core, use quickExpr.exec)
-					jQuery.template( null, htmlExpr.test( name ) ? name : jQuery( name )))) : null;
+					jQuery.template( null, !tmplType && htmlExpr.test( name ) ? name : jQuery( name ), tmplType ))) : null;
+		},
+		
+		compileTemplate: function( sourceText, tmplType ) {
+		  return buildTmplFn( sourceText );
 		},
 
 		encode: function( text ) {
