@@ -218,6 +218,10 @@
 				open: "$item.calls(__,$1,$2);__=[];",
 				close: "call=$item.calls();__=call._.concat($item.wrap(call,__));"
 			},
+			"set": {
+				_default: { $2: "$data" },
+				open: "$2=$1a;"
+			},
 			"each": {
 				_default: { $2: "$index, $value" },
 				open: "if($notnull_1){$.each($1a,function($2){with(this){",
