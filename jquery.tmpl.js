@@ -326,7 +326,7 @@
 				.replace( /([\\'])/g, "\\$1" )
 				.replace( /[\r\t\n]/g, " " )
 				.replace( /\$\{([^\}]*)\}/g, "{{= $1}}" )
-				.replace( /\{\{(\/?)(\w+|.)(?:\(((?:[^\}]|\}(?!\}))*?)?\))?(?:\s+(.*?)?)?(\(((?:[^\}]|\}(?!\}))*?)\))?\s*\}\}/g,
+				.replace( /\{\{(\/?)(\w+|.)(?:\(((?:[^\}]|\}(?!\}))*?)?\))?(?:\s+(.*?)?)?(\(((?:[^\}]|\}(?!\}))*?)\))?\s*\}\}\s*/g,
 				function( all, slash, type, fnargs, target, parens, args ) {
 					var tag = jQuery.tmpl.tag[ type ], def, expr, exprAutoFnDetect;
 					if ( !tag ) {
@@ -355,7 +355,9 @@
 							.split( "$1" ).join( expr )
 							.split( "$2" ).join( fnargs || def.$2 || "" ) +
 						"__.push('";
-				}) +
+				})
+				.replace( /\r/g, "\\r" )
+                                .replace( /\n/g, "\\n" ) +
 			"');}return __;"
 		);
 	}
