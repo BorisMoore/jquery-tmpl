@@ -220,8 +220,8 @@
 			},
 			"each": {
 				_default: { $2: "$index, $value" },
-				open: "if($notnull_1){$.each($1a,function($2){with(this){",
-				close: "}});}"
+				open: "if($notnull_1){$.each($1a,function($2){var $dataSaved=$data;$data=this;",
+				close: "$data=$dataSaved;});}"
 			},
 			"if": {
 				open: "if(($notnull_1) && $1a){",
@@ -319,7 +319,7 @@
 			"var $=jQuery,call,__=[],$data=$item.data;" +
 
 			// Introduce the data as local variables using with(){}
-			"with($data){__.push('" +
+			"__.push('" +
 
 			// Convert the template into pure JavaScript
 			jQuery.trim(markup)
@@ -342,21 +342,21 @@
 						args = args ? ("," + unescape( args ) + ")") : (parens ? ")" : "");
 						// Support for target being things like a.toLowerCase();
 						// In that case don't call with template item as 'this' pointer. Just evaluate...
-						expr = parens ? (target.indexOf(".") > -1 ? target + unescape( parens ) : ("(" + target + ").call($item" + args)) : target;
-						exprAutoFnDetect = parens ? expr : "(typeof(" + target + ")==='function'?(" + target + ").call($item):(" + target + "))";
+						expr = parens ? (target.indexOf(".") > -1 ? target + unescape( parens ) : ("($data." + target + ").call($item" + args)) : target;
+						exprAutoFnDetect = parens ? expr : "(typeof($data." + target + ")==='function'?($data." + target + ").call($item):($data." + target + "))";
 					} else {
 						exprAutoFnDetect = expr = def.$1 || "null";
 					}
 					fnargs = unescape( fnargs );
 					return "');" +
 						tag[ slash ? "close" : "open" ]
-							.split( "$notnull_1" ).join( target ? "typeof(" + target + ")!=='undefined' && (" + target + ")!=null" : "true" )
+							.split( "$notnull_1" ).join( target ? "typeof($data." + target + ")!=='undefined' && ($data." + target + ")!=null" : "true" )
 							.split( "$1a" ).join( exprAutoFnDetect )
 							.split( "$1" ).join( expr )
 							.split( "$2" ).join( fnargs || def.$2 || "" ) +
 						"__.push('";
 				}) +
-			"');}return __;"
+			"');return __;"
 		);
 	}
 	function updateWrapped( options, wrapped ) {
