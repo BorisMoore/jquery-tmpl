@@ -268,6 +268,32 @@
 		}
 	});
 
+	// Add getTemplate function to jQuery
+	// It takes an url to the template file, a name for the 
+	// template and a callback that is called as soon as the
+	// template was fetched and compiled.
+	jQuery.extend(true, jQuery, {
+		getTemplate: function(url, name, callback) {
+			return jQuery.ajax({type: 'get', url: url, data: null, success: callback, dataType: "template", templateName: name});
+		}
+	});
+	
+	jQuery.ajaxSetup({
+		accepts: {
+			template: 'text/x-jquery-tmpl'
+		},
+		contents: {
+			template: /tmpl/
+		}
+	});
+	
+	jQuery.ajaxPrefilter( "template", function(s) {
+		s.converters['text template'] = function (text) {
+			jQuery.template( s.templateName, text );
+			return s.templateName;
+		}
+	});
+	
 	//========================== Private helper functions, used by code above ==========================
 
 	function build( tmplItem, nested, content ) {
