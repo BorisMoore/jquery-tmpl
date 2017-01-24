@@ -35,7 +35,8 @@ Download make the dependencies of jQuery and include in your project
 ```JavaScript
     $.tmpl( "<li>${Name}</li>", { "Name" : "John Doe" }).appendTo( "#target" );
 ```
-```
+
+
 ### Example: Render data from a remote service, using jQuery.tmpl().
 ```html
 	<!DOCTYPE html>
