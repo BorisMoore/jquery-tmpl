@@ -21,8 +21,8 @@ Live versions of demos from this repository can be found at [http://borismoore.g
 
 <p>
   <a href="https://gitter.im/miamarti/jquery-tmpl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge" target="_blank"><img src="https://badges.gitter.im/Join%20Chat.svg"></a>
-  <a href="https://gitlab.com/miamarti/jquery-tmpl" target="_blank"><img src="https://img.shields.io/badge/gitlab-jquery-tmpl-yellow.svg"></a>
-  <img src="https://img.shields.io/badge/jquery\-tmpl-release-green.svg">
+  <a href="https://gitlab.com/miamarti/jquery-tmpl" target="_blank"><img src="https://img.shields.io/badge/gitlab-jqueryTmpl-yellow.svg"></a>
+  <img src="https://img.shields.io/badge/jqueryTmpl-release-green.svg">
   <img src="https://img.shields.io/badge/version-1.0.0-blue.svg">
   <img src="https://img.shields.io/bower/v/bootstrap.svg"> 
   <img src="https://img.shields.io/github/license/mashape/apistatus.svg">
