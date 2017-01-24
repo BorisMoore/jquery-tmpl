@@ -31,9 +31,9 @@ CKEditor is an Open source application, which means it can be modified any way y
 Download make the dependencies of jQuery and include in your project
 * https://jquery.com/
 
-<h3>Implementation</h3>
-```JavaScript
-    $.tmpl( "<li>${Name}</li>", { "Name" : "John Doe" }).appendTo( "#target" );
+### Bower install de dependency
+```
+$ bower install jquery.tmpl --save
 ```
 
 
@@ -94,10 +94,7 @@ Download make the dependencies of jQuery and include in your project
 	</html>
 ```
 
-## Bower install de dependency
-```
-$ bower install jquery.tmpl --save
-```
+
 
 ## Metrics
 
