@@ -1,6 +1,14 @@
-# jQuery Templates plugin vBeta1.0.0
+# jQuery Templates plugin
+===========
 
 _jQuery Templates is no longer in active development, and will be superseded by <a href="http://github.com/borismoore/jsrender">JsRender</a>. See vBeta1.0.0 tag for released beta version. Requires jQuery version 1.4.2._
+
+
+<p>
+  <a href="https://gitter.im/miamarti/jquery-tmpl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge" target="_blank"><img src="https://badges.gitter.im/Join%20Chat.svg"></a>
+  <a href="http://waffle.io/miamarti/jquery-tmpl"><img alt='Stories in Ready' src='https://badge.waffle.io/miamarti/jquery-tmpl.svg?label=ready&title=Ready' height="21" /></a>
+</p>
+
 
 ----
 
@@ -46,6 +54,13 @@ _The following is a restoration of jQuery's official documentation on tmpl() as 
 This documentation topic concerns the *jQuery Templates* plugin (jquery-tmpl), which can be downloaded from: http://github.com/jquery/jquery-tmpl.  
 
 The `jQuery.tmpl()` method is designed for chaining with `.appendTo`, `.prependTo`, `.insertAfter` or `.insertBefore` as in the following example.
+
+
+### Bower install de dependency
+```
+$ bower install jquery.tmpl --save
+```
+
 
 ### Example:
 ```JavaScript
@@ -229,3 +244,9 @@ Each template item (the result of rendering a data item with the template) is as
 	</body>
 	</html>
 ```
+
+
+
+## Metrics
+
+[![Throughput Graph](https://graphs.waffle.io/miamarti/jquery-tmpl/throughput.svg)](https://waffle.io/miamarti/jquery-tmpl/metrics/throughput)
