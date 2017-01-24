@@ -20,8 +20,20 @@
   "authors": [
       {
           "name": "Boris Moore",
-          "email": "borismoore@gmail.com;",
+          "email": "borismoore@gmail.com",
           "homepage": "http://www.jsviews.com/"
+      }, {
+          "name": "Richard D. Worth",
+          "email": "rdworth@gmail.com",
+          "homepage": ""
+      }, {
+          "name": "Scott González",
+          "email": "scott.gonzalez@gmail.com",
+          "homepage": "http://nemikor.com/"
+      }, {
+          "name": "John Resig",
+          "email": "jeresig@gmail.com",
+          "homepage": "http://ejohn.org/"
       }, {
           "name": "Miller Augusto S. Martins",
           "email": "miller.augusto@gmail.com",
