@@ -95,7 +95,7 @@ Download make the dependencies of jQuery and include in your project
 
 ## Bower install de dependency
 ```
-$ bower install jquery-tmpl --save
+$ bower install jquery.tmpl --save
 ```
 
 ## Metrics
