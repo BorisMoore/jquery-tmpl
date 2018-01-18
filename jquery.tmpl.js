@@ -243,6 +243,27 @@
 			"!": {
 				// Comment tag. Skipped by parser
 				open: ""
+			},
+			"for": {
+				/*
+					usage:
+			 		{{if paxmax && paxmin}}
+			 			{{for paxmax}}
+			 				{{if i >= paxmin}}<option>${i}</option>{{/if}}
+			 			{{/for}}
+			 		{{else}}<option value="1">1</option>{{/if}}
+				*/
+				
+			    open: "if($notnull_1){for(i=0;i<=$1;i++){",
+			    close: "};}"
+			},
+			"parsejson": {
+				/*
+					usage:
+			 		{{parsejson data.slider}}
+				*/
+				
+				open: "if($notnull_1){__.push(JSON.stringify($1a));}"
 			}
 		},
 
