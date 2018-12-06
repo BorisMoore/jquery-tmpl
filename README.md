@@ -1,6 +1,8 @@
 # jQuery Templates plugin vBeta1.0.0
 
-_jQuery Templates is no longer in active development, and will be superseded by <a href="http://github.com/borismoore/jsrender">JsRender</a>. See vBeta1.0.0 tag for released beta version. Requires jQuery version 1.4.2._
+_jQuery Templates is no longer in active development, and has been superseded by <a href="http://github.com/borismoore/jsrender">JsRender</a>_.
+
+JsRender functionality is a superset of the jQuery Templates feature set, and brings many improvements. The template tag syntax is similar. Rendering and compiling performance of JsRender is considerably better than jQuery templates performance.
 
 ----
 
@@ -8,15 +10,17 @@ _Note: This is the original official jQuery Templates plugin. The project was ma
 
 ----
 
-jQuery templates contain markup with binding expressions ('Template tags'). Templates are applied to data objects or arrays, and rendered into the HTML DOM
+See vBeta1.0.0 tag for released beta version. Requires jQuery version 1.4.2.
+
+jQuery templates contain markup with binding expressions ('Template tags'). Templates are applied to data objects or arrays, and rendered into the HTML DOM.
 
 Note that documentation for the _jQuery Templates_ plugin is **no longer maintained on the jQuery documentation site**. 
 
-An archive copy of the original documentation (previously at api.jquery.com/category/plugins/templates/) can be found [here] (http://web.archive.org/web/20120920065217/http://api.jquery.com/category/plugins/templates/).
+An archive copy of the original documentation (previously at api.jquery.com/category/plugins/templates/) can be found [here](http://web.archive.org/web/20120920065217/http://api.jquery.com/category/plugins/templates/).
 
-See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html] (http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html) for more background.
+See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html](http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html) for more background.
 
-Live versions of demos from this repository can be found at [http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html] (http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html).
+Live versions of some of the demos from this repository can be found at [http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html](http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html).
 
 <p>The beta1 version of jQuery Templates is available on CDN at:
 <ul>
