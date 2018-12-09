@@ -1,12 +1,19 @@
 # jQuery Templates plugin vBeta1.0.0
 
-_jQuery Templates is no longer in active development, and has been superseded by <a href="http://github.com/borismoore/jsrender">JsRender</a>_.
+_jQuery Templates is no longer in active development, and has been superseded by
+<a href="http://github.com/borismoore/jsrender">JsRender</a>_.
 
-JsRender functionality is a superset of the jQuery Templates feature set, and brings many improvements. The template tag syntax is similar. Rendering and compiling performance of JsRender is considerably better than jQuery templates performance.
+JsRender functionality is a superset of the jQuery Templates feature set,
+and brings many improvements. The template tag syntax is similar. Rendering
+and compiling performance of JsRender is considerably better than jQuery templates performance.
 
 ----
 
-_Note: This is the original official jQuery Templates plugin. The project was maintained by the jQuery team as an official jQuery plugin. Since the jQuery team has decided not to take this plugin past beta, it has been returned to the principal developer's GitHub account (Boris Moore). For more information on the history of jQuery Templates, and the roadmap going forward, see <a  href="http://www.borismoore.com/2011/10/jquery-templates-and-jsviews-roadmap.html">jQuery Templates and JsViews: The Roadmap</a>_
+_Note: This is the original official jQuery Templates plugin. The project was maintained by the
+jQuery team as an official jQuery plugin. Since the jQuery team has decided not to take this plugin
+past beta, it has been returned to the principal developer's GitHub account (Boris Moore).
+For more information on the history of jQuery Templates, and the roadmap going forward, see
+<a  href="http://www.borismoore.com/2011/10/jquery-templates-and-jsviews-roadmap.html">jQuery Templates and JsViews: The Roadmap</a>_
 
 ----
 
@@ -16,11 +23,14 @@ jQuery templates contain markup with binding expressions ('Template tags'). Temp
 
 Note that documentation for the _jQuery Templates_ plugin is **no longer maintained on the jQuery documentation site**. 
 
-An archive copy of the original documentation (previously at api.jquery.com/category/plugins/templates/) can be found [here](http://web.archive.org/web/20120920065217/http://api.jquery.com/category/plugins/templates/).
+An archive copy of the original documentation (previously at api.jquery.com/category/plugins/templates/) can be found
+[here](http://web.archive.org/web/20120920065217/http://api.jquery.com/category/plugins/templates/).
 
-See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html](http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html) for more background.
+See also [http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html](http://www.borismoore.com/2010/10/jquery-templates-is-now-official-jquery.html)
+for more background.
 
-Live versions of some of the demos from this repository can be found at [http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html](http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html).
+Live versions of some of the demos from this repository can be found at
+[http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html](http://borismoore.github.io/jquery-tmpl/demos/step-by-step.html).
 
 <p>The beta1 version of jQuery Templates is available on CDN at:
 <ul>
