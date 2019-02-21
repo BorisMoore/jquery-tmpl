@@ -208,7 +208,7 @@
 
 		encode: function( text ) {
 			// Do HTML encoding replacing < > & and ' and " by corresponding entities.
-			return ("" + text).split("<").join("&lt;").split(">").join("&gt;").split('"').join("&#34;").split("'").join("&#39;");
+			return ("" + text).split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;").split('"').join("&#34;").split("'").join("&#39;");
 		}
 	});
 
