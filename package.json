@@ -1,0 +1,19 @@
+{
+    "name": "jquery-templates",
+    "version": "0.1.0",
+    "description": "This repository was created to provide npm support for legacy code (1.0.0pre). This project is no longer active and was superseded by JsRender.",
+    "main": "jquery.tmpl.js",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/blackdrago/jquery-tmpl.git"
+    },
+    "dependencies": {
+        "jquery": ">=1.4.2"        
+    },
+    "keywords": [
+        "jquery.tmpl.js",
+        "1.0.0pre"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/blackdrago/jquery-tmpl#readme"
+}
